@@ -12,10 +12,11 @@ services:
       - "443:443"
       - "666:666"
     environment:
-      DO_AUTH_TOKEN: "${TRAEFIK_DO_TOKEN}"
+      - DO_AUTH_TOKEN=${TRAEFIK_DO_TOKEN}
+      - TZ=${TZ}
     volumes:
-      - "${TRAEFIK_PATH}/certificates:/letsencrypt:rw"
-      - "${TRAEFIK_PATH}/config:/etc/traefik:ro"
+      - "${CONFIG_PATH}/traefik/certificates:/letsencrypt:rw"
+      - "${CONFIG_PATH}/traefik/config:/etc/traefik:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - traefik.enable=true
