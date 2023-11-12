@@ -1,0 +1,23 @@
+# The theme to display: light, dark, grey, auto
+theme: auto
+
+jwt_secret: a_very_important_secret
+
+default_redirection_url: https://auth.local.example.com
+
+totp:
+  issuer: authelia.com
+
+# Server Configuration
+server:
+  host: 0.0.0.0
+  port: 9091
+
+# Log Configuration
+log:
+  level: debug
+
+# Telemetry Configuration
+telemetry:
+  metrics:
+    enabled: false
