@@ -1,0 +1,37 @@
+http:
+  middlewares:
+    secure-headers:
+      headers:
+        # Custom response headers
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
+          X-Forwarded-Proto: "https"
+        # SSL proxy headers
+        sslProxyHeaders:
+          X-Forwarded-Proto: https
+        # Referrer policy set to "same-origin"
+        referrerPolicy: "same-origin"
+        # Proxy headers for hosts
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+        # Custom request headers
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+        # Custom frame options set to "SAMEORIGIN"
+        customFrameOptionsValue: SAMEORIGIN
+        # SSL redirect enabled
+        sslRedirect: true
+        # Frame deny to prevent framing attacks
+        frameDeny: true
+        # Content Type Nosniff to prevent MIME-sniffing attacks
+        contentTypeNosniff: true
+        # Enable browser XSS filter
+        browserXssFilter: true
+        # Force Strict Transport Security (HSTS) header
+        forceSTSHeader: true
+        # Include subdomains in HSTS policy
+        stsIncludeSubdomains: true
+        # HSTS policy duration in seconds (2 years)
+        stsSeconds: 63072000
+        # Enable HSTS preload list
+        stsPreload: true

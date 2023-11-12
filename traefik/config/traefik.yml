@@ -1,0 +1,65 @@
+global:
+  # Enable Traefik to check for new versions
+  checkNewVersion: true
+  # Disable sending anonymous usage data
+  sendAnonymousUsage: false
+
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          # Redirect HTTP traffic to HTTPS
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: :443
+    http:
+      tls:
+        # Generate a wildcard domain certificate using the digitalocean certificate resolver
+        certResolver: digitalocean
+        domains:
+          - main: DOMAIN
+            sans:
+              - '*.DOMAIN'
+      middlewares:
+        # Apply secure headers and expose whitelist middleware
+        - secure-headers@file
+        # - exposeWhiteList@file
+
+  ssh:
+    address: :666
+
+providers:
+  # Set a throttle duration for providers to avoid excessive configuration reloads
+  providersThrottleDuration: 2s
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+  docker:
+    # Watch for Docker events and automatically discover services
+    watch: true
+    # Don't expose containers by default; configure explicitly in labels
+    exposedByDefault: false
+    # Connect Traefik to the specified Docker network
+    network: PROJECT_proxy
+
+api:
+  # Enable Traefik dashboard
+  dashboard: true
+
+certificatesResolvers:
+  digitalocean:
+    acme:
+      email: LETSENCRYPTEMAIL
+      # Let's Encrypt ACME server endpoint
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+      # Store Let's Encrypt certificates in acme.json file
+      storage: /letsencrypt/acme.json
+      dnsChallenge:
+        # Use DigitalOcean as the DNS challenge provider for Let's Encrypt
+        provider: digitalocean
