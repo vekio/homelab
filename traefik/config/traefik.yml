@@ -55,7 +55,7 @@ api:
 certificatesResolvers:
   digitalocean:
     acme:
-      email: LETSENCRYPTEMAIL
+      email: TRAEFIK_CERT_EMAIL
       # Let's Encrypt ACME server endpoint
       caServer: https://acme-v02.api.letsencrypt.org/directory
       # Store Let's Encrypt certificates in acme.json file
