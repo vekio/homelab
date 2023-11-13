@@ -2,7 +2,7 @@ version: '3'
 
 services:
   authelia:
-    image: authelia/authelia
+    image: authelia/authelia:${AUTHELIA_VERSION:-latest}
     container_name: authelia
     restart: unless-stopped
     networks:
@@ -11,8 +11,11 @@ services:
       - 9091
     environment:
       - TZ=${TZ}
+      # - AUTHELIA_JWT_SECRET_FILE=${AUTHELIA_JWT_SECRET_FILE}
+      # - AUTHELIA_SESSION_SECRET_FILE=${AUTHELIA_SESSION_SECRET_FILE}
+      # - AUTHELIA_SESSION_REDIS_PASSWORD_FILE=${AUTHELIA_SESSION_REDIS_PASSWORD_FILE}
     volumes:
-      - "${CONFIG_PATH}/authelia/config:/config:ro"
+      - "${CONFIG_PATH}/authelia/config:/config:rw"
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.authelia-rtr.rule=Host(`auth.${DOMAIN}`)'
@@ -20,8 +23,6 @@ services:
       - 'traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.${DOMAIN}'
       - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
       - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
-    healthcheck:
-      disable: true
 
 networks:
   proxy:

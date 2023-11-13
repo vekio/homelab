@@ -20,14 +20,23 @@ function dotenv () {
 # -----------------------------------------------------------------------------
 function traefik-config () {
 
-    cp -r ./traefik/config ./tmp
-    cp -r ./traefik/certificates ./tmp
-    chmod 600 ./tmp/certificates/acme.json
+    mkdir -p ./tmp/traefik ./tmp/authelia
 
-    # traefik.yml
-    sed -i 's/DOMAIN/'"${DOMAIN}"'/g' ./tmp/config/traefik.yml
-	sed -i 's/TRAEFIK_CERT_EMAIL/'"${TRAEFIK_CERT_EMAIL}"'/g' ./tmp/config/traefik.yml
-	sed -i 's/PROJECT/'"${PROJECT}"'/g' ./tmp/config/traefik.yml
+    cp -r ./traefik/config ./tmp/traefik
+    # cp -r ./traefik/certificates ./tmp/traefik
+    # chmod 600 ./tmp/traefik/certificates/acme.json
+
+    cp -r ./authelia/config ./tmp/authelia
+    touch ./tmp/authelia/config/db.sqlite3
+    chmod 600 ./tmp/authelia/config/db.sqlite3
+
+    # traefik
+    sed -i 's/DOMAIN/'"${DOMAIN}"'/g' ./tmp/traefik/config/traefik.yml
+	sed -i 's/TRAEFIK_CERT_EMAIL/'"${TRAEFIK_CERT_EMAIL}"'/g' ./tmp/traefik/config/traefik.yml
+	sed -i 's/PROJECT/'"${PROJECT}"'/g' ./tmp/traefik/config/traefik.yml
+
+    # authelia
+    sed -i 's/DOMAIN/'"${DOMAIN}"'/g' ./tmp/authelia/config/configuration.yml
 
     # # auth.yml
 	# sed -i 's/PROJECT/'"${PROJECT}"'/g' ./config/dynamic/auth.yml

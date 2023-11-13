@@ -10,3 +10,13 @@ traefik-logs:
 traefik-pull:
 	@docker compose -f ./traefik/compose.yml --env-file .env pull
 traefik-update: traefik-pull traefik-up
+
+authelia-up:
+	@docker compose -f ./authelia/compose.yml --env-file .env up -d
+authelia-down:
+	@docker compose -f ./authelia/compose.yml --env-file .env down -v
+authelia-logs:
+	@docker compose -f ./authelia/compose.yml --env-file .env logs -f
+authelia-pull:
+	@docker compose -f ./authelia/compose.yml --env-file .env pull
+authelia-update: authelia-pull authelia-up
