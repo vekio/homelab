@@ -22,11 +22,12 @@ function traefik-config () {
 
     mkdir -p ./tmp/traefik ./tmp/authelia
 
-    cp -r ./traefik/config ./tmp/traefik
-    # cp -r ./traefik/certificates ./tmp/traefik
+    cp -r ./services/traefik/config ./tmp/traefik
+    # TODO check if exists before cp or chmod
+    # cp -r ./services/traefik/certificates ./tmp/traefik
     # chmod 600 ./tmp/traefik/certificates/acme.json
 
-    cp -r ./authelia/config ./tmp/authelia
+    cp -r ./services/authelia/config ./tmp/authelia
     touch ./tmp/authelia/config/db.sqlite3
     chmod 600 ./tmp/authelia/config/db.sqlite3
 
