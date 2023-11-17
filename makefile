@@ -20,3 +20,13 @@ authelia-logs:
 authelia-pull:
 	@docker compose -f ./services/authelia/compose.yml --env-file .env pull
 authelia-update: authelia-pull authelia-up
+
+lldap-up:
+	@docker compose -f ./services/lldap/compose.yml --env-file .env up -d
+lldap-down:
+	@docker compose -f ./services/lldap/compose.yml --env-file .env down -v
+lldap-logs:
+	@docker compose -f ./services/lldap/compose.yml --env-file .env logs -f
+lldap-pull:
+	@docker compose -f ./services/lldap/compose.yml --env-file .env pull
+lldap-update: lldap-pull lldap-up

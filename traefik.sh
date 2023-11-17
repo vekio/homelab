@@ -20,12 +20,13 @@ function dotenv () {
 # -----------------------------------------------------------------------------
 function traefik-config () {
 
-    mkdir -p ./tmp/traefik ./tmp/authelia
+    mkdir -p ./tmp/traefik ./tmp/authelia ./tmp/lldap
 
     cp -r ./services/traefik/config ./tmp/traefik
-    # TODO check if exists before cp or chmod
-    # cp -r ./services/traefik/certificates ./tmp/traefik
-    # chmod 600 ./tmp/traefik/certificates/acme.json
+    [ -e "./tmp/traefik/certificates/acme.json" ] || {
+        cp -r ./services/traefik/certificates ./tmp/traefik
+        chmod 600 ./tmp/traefik/certificates/acme.json
+    }
 
     cp -r ./services/authelia/config ./tmp/authelia
     touch ./tmp/authelia/config/db.sqlite3
@@ -38,6 +39,12 @@ function traefik-config () {
 
     # authelia
     sed -i 's/DOMAIN/'"${DOMAIN}"'/g' ./tmp/authelia/config/configuration.yml
+    sed -i 's/AUTHELIA_JWT_SECRET/'"${AUTHELIA_JWT_SECRET}"'/g' ./tmp/authelia/config/configuration.yml
+    sed -i 's/SLD/'"${SLD}"'/g' ./tmp/authelia/config/configuration.yml
+    sed -i 's/TLD/'"${TLD}"'/g' ./tmp/authelia/config/configuration.yml
+    sed -i 's/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD/'"${AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD}"'/g' ./tmp/authelia/config/configuration.yml
+    sed -i 's/AUTHELIA_SESSION_SECRET/'"${AUTHELIA_SESSION_SECRET}"'/g' ./tmp/authelia/config/configuration.yml
+    sed -i 's/AUTHELIA_STORAGE_ENCRYPTION_KEY/'"${AUTHELIA_STORAGE_ENCRYPTION_KEY}"'/g' ./tmp/authelia/config/configuration.yml
 
     # # auth.yml
 	# sed -i 's/PROJECT/'"${PROJECT}"'/g' ./config/dynamic/auth.yml
