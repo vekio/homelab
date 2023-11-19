@@ -1,32 +1,6 @@
 traefik-config:
 	bash traefik.sh
-
-traefik-up:
-	@docker compose -f ./services/traefik/compose.yml --env-file .env up -d
-traefik-down:
-	@docker compose -f ./services/traefik/compose.yml --env-file .env down -v
-traefik-logs:
-	@docker compose -f ./services/traefik/compose.yml --env-file .env logs -f
-traefik-pull:
-	@docker compose -f ./services/traefik/compose.yml --env-file .env pull
-traefik-update: traefik-pull traefik-up
-
-authelia-up:
-	@docker compose -f ./services/authelia/compose.yml --env-file .env up -d
-authelia-down:
-	@docker compose -f ./services/authelia/compose.yml --env-file .env down -v
-authelia-logs:
-	@docker compose -f ./services/authelia/compose.yml --env-file .env logs -f
-authelia-pull:
-	@docker compose -f ./services/authelia/compose.yml --env-file .env pull
-authelia-update: authelia-pull authelia-up
-
-lldap-up:
-	@docker compose -f ./services/lldap/compose.yml --env-file .env up -d
-lldap-down:
-	@docker compose -f ./services/lldap/compose.yml --env-file .env down -v
-lldap-logs:
-	@docker compose -f ./services/lldap/compose.yml --env-file .env logs -f
-lldap-pull:
-	@docker compose -f ./services/lldap/compose.yml --env-file .env pull
-lldap-update: lldap-pull lldap-up
+install:
+	cd cli && go install ./cmd/homelab && cd -
+get:
+	cd cli && go get -u && cd -
