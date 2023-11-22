@@ -36,11 +36,11 @@ func initializeCommands() []*cli.Command {
 	var commands []*cli.Command
 
 	services := []string{
-		"authelia",
-		"gitea",
-		"immich",
-		"lldap",
-		"traefik",
+		AUTHELIA,
+		GITEA,
+		IMMICH,
+		LLDAP,
+		TRAEFIK,
 	}
 
 	for _, srv := range services {

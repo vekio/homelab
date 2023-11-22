@@ -9,19 +9,35 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+const (
+	AUTHELIA string = "authelia"
+	GITEA    string = "gitea"
+	IMMICH   string = "immich"
+	LLDAP    string = "lldap"
+	TRAEFIK  string = "traefik"
+)
+
 func ServiceCmdFactory(service string) *cli.Command {
+
+	defaultCmds := []*cli.Command{
+		configCmd,
+		pullCmd,
+		upCmd,
+		logsCmd,
+		stopCmd,
+		downCmd,
+		upgradeCmd,
+	}
+
+	switch service {
+	case LLDAP:
+		fmt.Println("awdawd")
+	}
+
 	return &cli.Command{
-		Name:  service,
-		Usage: fmt.Sprintf("Manage %s service", service),
-		Subcommands: []*cli.Command{
-			configCmd,
-			pullCmd,
-			upCmd,
-			logsCmd,
-			stopCmd,
-			downCmd,
-			upgradeCmd,
-		},
+		Name:        service,
+		Usage:       fmt.Sprintf("Manage %s service", service),
+		Subcommands: defaultCmds,
 	}
 }
 

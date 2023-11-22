@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/urfave/cli/v2"
 	config "github.com/vekio/homelab/cli/conf"
 )
 
@@ -29,4 +30,14 @@ func init() {
 		handler := slog.NewTextHandler(os.Stdout, opts)
 		slog.SetDefault(slog.New(handler))
 	}
+}
+
+var initCmd = &cli.Command{
+	Name:    "init",
+	Aliases: []string{"i"},
+	Usage:   "Initialize services with required folders and config files",
+	Action: func(cCtx *cli.Context) error {
+
+		return nil
+	},
 }
