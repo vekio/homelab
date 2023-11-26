@@ -29,23 +29,5 @@ var Cmd = &cli.App{
 	Version:   version,
 	Compiled:  time.Now(),
 	Copyright: fmt.Sprintf("%s (%s) Copyright %s\nLicense Apache-2.0", command, version, authorName),
-	Commands:  initializeCommands(),
-}
-
-func initializeCommands() []*cli.Command {
-	var commands []*cli.Command
-
-	services := []string{
-		AUTHELIA,
-		GITEA,
-		IMMICH,
-		LLDAP,
-		TRAEFIK,
-	}
-
-	for _, srv := range services {
-		commands = append(commands, ServiceCmdFactory(srv))
-	}
-
-	return commands
+	Commands:  initServiceCommands(),
 }

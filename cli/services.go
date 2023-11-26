@@ -2,10 +2,11 @@ package homelab
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
+	"log/slog"
+	"os/user"
 
 	"github.com/urfave/cli/v2"
+	config "github.com/vekio/homelab/cli/conf"
 )
 
 const (
@@ -16,7 +17,25 @@ const (
 	TRAEFIK  string = "traefik"
 )
 
-func ServiceCmdFactory(service string) *cli.Command {
+func initServiceCommands() []*cli.Command {
+	var commands []*cli.Command
+
+	services := []string{
+		AUTHELIA,
+		GITEA,
+		IMMICH,
+		LLDAP,
+		TRAEFIK,
+	}
+
+	for _, srv := range services {
+		commands = append(commands, serviceCmdFactory(srv))
+	}
+
+	return commands
+}
+
+func serviceCmdFactory(service string) *cli.Command {
 
 	defaultCmds := []*cli.Command{
 		configCmd,
@@ -29,8 +48,8 @@ func ServiceCmdFactory(service string) *cli.Command {
 	}
 
 	switch service {
-	case LLDAP:
-		fmt.Println("awdawd")
+	case TRAEFIK:
+		defaultCmds = append(defaultCmds, initCmd)
 	}
 
 	return &cli.Command{
@@ -40,134 +59,41 @@ func ServiceCmdFactory(service string) *cli.Command {
 	}
 }
 
-// Extract service from command context
 func getService(cCtx *cli.Context) string {
 	return cCtx.Lineage()[1].Command.Name
 }
 
-// Executes docker compose file
-func runDockerCompose(cCtx *cli.Context, command ...string) error {
-
-	service := getService(cCtx)
-	composeFile, err := ComposeFile(service)
+func composeFile(service string) (string, error) {
+	currentUser, err := user.Current()
 	if err != nil {
-		return err
+		return "", fmt.Errorf("Error getting current user: %s\n", err)
 	}
-
-	envFile, err := ComposeEnvFile(service)
 	if err != nil {
-		return err
+		return "", err
+	}
+	slog.Debug("load compose file", "service", service)
+
+	composeFilePath := fmt.Sprintf("%s/src/homelab/services/%s/compose.yml", currentUser.HomeDir, service)
+
+	return composeFilePath, nil
+}
+
+func composeEnvFile(service string) (string, error) {
+	currentUser, err := user.Current()
+	if err != nil {
+		return "", fmt.Errorf("Error getting current user: %s\n", err)
+	}
+	if err != nil {
+		return "", err
 	}
 
-	cmd := exec.Command("docker", append([]string{"compose", "-f", composeFile, "--env-file", envFile}, command...)...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("Error execute %s docker compose: %s\n", service, err)
+	envFile, err := config.GetCurrentEnvFile()
+	if err != nil {
+		return "", err
 	}
-	return nil
-}
+	slog.Debug("load env file", "env", envFile)
 
-var configCmd = &cli.Command{
-	Name:  "config",
-	Usage: "Parse, resolve and render compose file in canonical format",
-	Action: func(cCtx *cli.Context) error {
+	envFilePath := fmt.Sprintf("%s/src/homelab/%s", currentUser.HomeDir, envFile)
 
-		err := runDockerCompose(cCtx, "config")
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
-}
-
-var pullCmd = &cli.Command{
-	Name:  "pull",
-	Usage: "Pull service images",
-	Action: func(cCtx *cli.Context) error {
-
-		err := runDockerCompose(cCtx, "pull")
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
-}
-
-var upCmd = &cli.Command{
-	Name:  "up",
-	Usage: "Create and start containers",
-	Action: func(cCtx *cli.Context) error {
-
-		err := runDockerCompose(cCtx, "up", "-d")
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
-}
-
-var logsCmd = &cli.Command{
-	Name:  "logs",
-	Usage: "View output from containers",
-	Action: func(cCtx *cli.Context) error {
-
-		err := runDockerCompose(cCtx, "logs", "-f")
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
-}
-
-var stopCmd = &cli.Command{
-	Name:  "stop",
-	Usage: "Stop services",
-	Action: func(cCtx *cli.Context) error {
-
-		err := runDockerCompose(cCtx, "stop")
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
-}
-
-var downCmd = &cli.Command{
-	Name:  "down",
-	Usage: "Stop and remove containers, networks",
-	Action: func(cCtx *cli.Context) error {
-
-		err := runDockerCompose(cCtx, "down", "-v")
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
-}
-
-var upgradeCmd = &cli.Command{
-	Name:  "upgrade",
-	Usage: "Pull service images and start containers",
-	Action: func(cCtx *cli.Context) error {
-
-		err := runDockerCompose(cCtx, "pull")
-		if err != nil {
-			return err
-		}
-
-		err = runDockerCompose(cCtx, "up", "-d")
-		if err != nil {
-			return err
-		}
-
-		return nil
-	},
+	return envFilePath, nil
 }

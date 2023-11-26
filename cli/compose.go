@@ -2,45 +2,119 @@ package homelab
 
 import (
 	"fmt"
-	"log/slog"
-	"os/user"
+	"os"
+	"os/exec"
 
-	config "github.com/vekio/homelab/cli/conf"
+	"github.com/urfave/cli/v2"
 )
 
-func getHomeDir() (string, error) {
-	currentUser, err := user.Current()
+func execDockerCompose(service string, command ...string) error {
+	composeFile, err := composeFile(service)
 	if err != nil {
-		return "", fmt.Errorf("Error getting current user: %s\n", err)
+		return err
 	}
-	return currentUser.HomeDir, nil
+	cmd := exec.Command("docker", "compose", "-f", composeFile)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("Error execute %s docker compose: %s\n", service, err)
+	}
+	return nil
 }
 
-func ComposeFile(service string) (string, error) {
-	homeDir, err := getHomeDir()
-	if err != nil {
-		return "", err
-	}
-	slog.Debug("load compose file", "service", service)
-
-	composeFilePath := fmt.Sprintf("%s/src/homelab/services/%s/compose.yml", homeDir, service)
-
-	return composeFilePath, nil
+var configCmd = &cli.Command{
+	Name:  "config",
+	Usage: "Parse, resolve and render compose file in canonical format",
+	Action: func(cCtx *cli.Context) error {
+		service := getService(cCtx)
+		err := execDockerCompose(service, "config")
+		if err != nil {
+			return err
+		}
+		return nil
+	},
 }
 
-func ComposeEnvFile(service string) (string, error) {
-	homeDir, err := getHomeDir()
-	if err != nil {
-		return "", err
-	}
+var pullCmd = &cli.Command{
+	Name:  "pull",
+	Usage: "Pull service images",
+	Action: func(cCtx *cli.Context) error {
+		service := getService(cCtx)
+		err := execDockerCompose(service, "pull")
+		if err != nil {
+			return err
+		}
+		return nil
+	},
+}
 
-	envFile, err := config.GetCurrentEnvFile()
-	if err != nil {
-		return "", err
-	}
-	slog.Debug("load env file", "env", envFile)
+var upCmd = &cli.Command{
+	Name:  "up",
+	Usage: "Create and start containers",
+	Action: func(cCtx *cli.Context) error {
+		service := getService(cCtx)
+		err := execDockerCompose(service, "up", "-d")
+		if err != nil {
+			return err
+		}
+		return nil
+	},
+}
 
-	envFilePath := fmt.Sprintf("%s/src/homelab/%s", homeDir, envFile)
+var logsCmd = &cli.Command{
+	Name:  "logs",
+	Usage: "View output from containers",
+	Action: func(cCtx *cli.Context) error {
+		service := getService(cCtx)
+		err := execDockerCompose(service, "logs", "-f")
+		if err != nil {
+			return err
+		}
+		return nil
+	},
+}
 
-	return envFilePath, nil
+var stopCmd = &cli.Command{
+	Name:  "stop",
+	Usage: "Stop services",
+	Action: func(cCtx *cli.Context) error {
+		service := getService(cCtx)
+		err := execDockerCompose(service, "stop")
+		if err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var downCmd = &cli.Command{
+	Name:  "down",
+	Usage: "Stop and remove containers, networks",
+	Action: func(cCtx *cli.Context) error {
+		service := getService(cCtx)
+		err := execDockerCompose(service, "down", "-v")
+		if err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var upgradeCmd = &cli.Command{
+	Name:  "upgrade",
+	Usage: "Pull service images and start containers",
+	Action: func(cCtx *cli.Context) error {
+		service := getService(cCtx)
+		err := execDockerCompose(service, "pull")
+		if err != nil {
+			return err
+		}
+
+		err = execDockerCompose(service, "up", "-d")
+		if err != nil {
+			return err
+		}
+		return nil
+	},
 }
