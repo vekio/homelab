@@ -2,6 +2,7 @@ package homelab
 
 import (
 	"fmt"
+	"log/slog"
 	"os/user"
 
 	config "github.com/vekio/homelab/cli/conf"
@@ -20,6 +21,7 @@ func ComposeFile(service string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	slog.Debug("load compose file", "service", service)
 
 	composeFilePath := fmt.Sprintf("%s/src/homelab/services/%s/compose.yml", homeDir, service)
 
@@ -36,6 +38,7 @@ func ComposeEnvFile(service string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	slog.Debug("load env file", "env", envFile)
 
 	envFilePath := fmt.Sprintf("%s/src/homelab/%s", homeDir, envFile)
 

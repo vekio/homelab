@@ -2,7 +2,6 @@ package homelab
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"os/exec"
 
@@ -54,13 +53,11 @@ func runDockerCompose(cCtx *cli.Context, command ...string) error {
 	if err != nil {
 		return err
 	}
-	slog.Debug(fmt.Sprintf("Load compose file %s", composeFile))
 
 	envFile, err := ComposeEnvFile(service)
 	if err != nil {
 		return err
 	}
-	slog.Debug(fmt.Sprintf("Load env file %s", envFile))
 
 	cmd := exec.Command("docker", append([]string{"compose", "-f", composeFile, "--env-file", envFile}, command...)...)
 	cmd.Stdout = os.Stdout
