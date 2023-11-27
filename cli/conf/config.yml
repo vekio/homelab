@@ -1,0 +1,6 @@
+currentContext: "context1"
+contexts:
+  context1:
+    name:        "context1"
+    environment: "DEV"
+    envFile:     ".env"
