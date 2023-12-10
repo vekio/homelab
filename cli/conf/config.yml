@@ -1,0 +1,9 @@
+context:
+  current: "develop"
+  available:
+    - name: "develop"
+      environment: "dev"
+      env_file: "/path/to/dev-env-file"
+    - name: "production"
+      environment: "pro"
+      env_file: "/path/to/prod-env-file"
