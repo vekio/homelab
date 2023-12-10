@@ -6,7 +6,6 @@ import (
 	"os/user"
 
 	"github.com/urfave/cli/v2"
-	config "github.com/vekio/homelab/cli/conf"
 )
 
 const (
@@ -78,22 +77,22 @@ func composeFile(service string) (string, error) {
 	return composeFilePath, nil
 }
 
-func composeEnvFile(service string) (string, error) {
-	currentUser, err := user.Current()
-	if err != nil {
-		return "", fmt.Errorf("Error getting current user: %s\n", err)
-	}
-	if err != nil {
-		return "", err
-	}
+// func composeEnvFile(service string) (string, error) {
+// 	currentUser, err := user.Current()
+// 	if err != nil {
+// 		return "", fmt.Errorf("Error getting current user: %s\n", err)
+// 	}
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	envFile, err := config.GetCurrentEnvFile()
-	if err != nil {
-		return "", err
-	}
-	slog.Debug("load env file", "env", envFile)
+// 	envFile, err := config.GetCurrentEnvFile()
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	slog.Debug("load env file", "env", envFile)
 
-	envFilePath := fmt.Sprintf("%s/src/homelab/%s", currentUser.HomeDir, envFile)
+// 	envFilePath := fmt.Sprintf("%s/src/homelab/%s", currentUser.HomeDir, envFile)
 
-	return envFilePath, nil
-}
+// 	return envFilePath, nil
+// }
