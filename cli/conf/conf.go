@@ -28,8 +28,13 @@ type Context struct {
 	Available []ContextProp `yaml:",flow"`
 }
 
+type Service struct {
+	Repository string `yaml:"repository"`
+}
+
 type Config struct {
 	Context Context `yaml:"context"`
+	Service Service `yaml:"service"`
 }
 
 const (
@@ -89,7 +94,7 @@ func init() {
 }
 
 func (c *Config) isValid() bool {
-	return c.Context.Current != "" && len(c.Context.Available) > 0
+	return c.Context.Current != "" && len(c.Context.Available) > 0 && c.Service.Repository != ""
 }
 
 func GetCurrentEnvFile() (string, error) {
@@ -108,4 +113,8 @@ func GetCurrentEnv() (Environment, error) {
 		}
 	}
 	return "", fmt.Errorf("Error current context doesn't exists: %s", Settings.Context.Current)
+}
+
+func GetServiceRepo() string {
+	return Settings.Service.Repository
 }

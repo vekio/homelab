@@ -51,15 +51,17 @@ var initCmd = &cli.Command{
 	Usage:   "Initialize required folders and config files",
 	Action: func(cCtx *cli.Context) error {
 		service := getService(cCtx)
-
 		switch service {
 		case TRAEFIK:
-			initTraefik()
+			initTraefik(service)
 		}
 		return nil
 	},
 }
 
-func initTraefik() {
+func initTraefik(service string) {
+	serviceRepo := config.GetServiceRepo()
+	configDir := fmt.Sprintf("%s/%s", serviceRepo, service)
+	fmt.Println(configDir)
 
 }
