@@ -2,8 +2,10 @@ package homelab
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
+	"os/user"
 
 	"github.com/urfave/cli/v2"
 )
@@ -21,6 +23,18 @@ func execDockerCompose(service string, command ...string) error {
 		return fmt.Errorf("Error execute %s docker compose: %s\n", service, err)
 	}
 	return nil
+}
+
+func composeFile(service string) (string, error) {
+	currentUser, err := user.Current()
+	if err != nil {
+		return "", fmt.Errorf("Error getting current user: %s\n", err)
+	}
+	slog.Debug("load compose file", "service", service)
+
+	composeFilePath := fmt.Sprintf("%s/src/homelab/services/%s/compose.yml", currentUser.HomeDir, service)
+
+	return composeFilePath, nil
 }
 
 var configCmd = &cli.Command{

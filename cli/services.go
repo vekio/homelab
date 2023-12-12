@@ -2,8 +2,6 @@ package homelab
 
 import (
 	"fmt"
-	"log/slog"
-	"os/user"
 
 	"github.com/urfave/cli/v2"
 )
@@ -61,38 +59,3 @@ func serviceCmdFactory(service string) *cli.Command {
 func getService(cCtx *cli.Context) string {
 	return cCtx.Lineage()[1].Command.Name
 }
-
-func composeFile(service string) (string, error) {
-	currentUser, err := user.Current()
-	if err != nil {
-		return "", fmt.Errorf("Error getting current user: %s\n", err)
-	}
-	if err != nil {
-		return "", err
-	}
-	slog.Debug("load compose file", "service", service)
-
-	composeFilePath := fmt.Sprintf("%s/src/homelab/services/%s/compose.yml", currentUser.HomeDir, service)
-
-	return composeFilePath, nil
-}
-
-// func composeEnvFile(service string) (string, error) {
-// 	currentUser, err := user.Current()
-// 	if err != nil {
-// 		return "", fmt.Errorf("Error getting current user: %s\n", err)
-// 	}
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	envFile, err := config.GetCurrentEnvFile()
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	slog.Debug("load env file", "env", envFile)
-
-// 	envFilePath := fmt.Sprintf("%s/src/homelab/%s", currentUser.HomeDir, envFile)
-
-// 	return envFilePath, nil
-// }
