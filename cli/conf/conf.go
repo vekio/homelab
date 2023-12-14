@@ -33,8 +33,10 @@ type Service struct {
 }
 
 type Config struct {
-	Context Context `yaml:"context"`
-	Service Service `yaml:"service"`
+	Context   Context `yaml:"context"`
+	Service   Service `yaml:"service"`
+	ConfigDir string
+	Name      string
 }
 
 const (
@@ -87,6 +89,9 @@ func init() {
 	if err != nil {
 		log.Fatalf("Error unmarshalling YAML: %v", err)
 	}
+
+	Settings.Name = exeName
+	Settings.ConfigDir = configDir
 
 	if !Settings.isValid() {
 		log.Fatalf("Error settings in config.yml not valid")

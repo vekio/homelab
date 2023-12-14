@@ -8,6 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v2"
+	_dir "github.com/vekio/fs/dir"
 
 	config "github.com/vekio/homelab/cli/conf"
 )
@@ -21,7 +22,7 @@ func init() {
 
 	err = godotenv.Load(envFile)
 	if err != nil {
-		slog.Error(fmt.Sprintf("load env file: %s : %s", envFile, err))
+		log.Fatal(err)
 	}
 
 	env, err := config.GetCurrentEnv()
@@ -49,19 +50,29 @@ var initCmd = &cli.Command{
 	Name:    "init",
 	Aliases: []string{"i"},
 	Usage:   "Initialize required folders and config files",
-	Action: func(cCtx *cli.Context) error {
+	Action: func(cCtx *cli.Context) (err error) {
 		service := getService(cCtx)
+
 		switch service {
 		case TRAEFIK:
-			initTraefik(service)
+			err = initTraefik(service)
+			return err
 		}
-		return nil
+
+		return
 	},
 }
 
-func initTraefik(service string) {
+func initTraefik(service string) (err error) {
 	serviceRepo := config.GetServiceRepo()
-	configDir := fmt.Sprintf("%s/%s", serviceRepo, service)
-	fmt.Println(configDir)
+	traefikConfig := fmt.Sprintf("%s/%s/config", serviceRepo, service)
 
+	// Copy config folder
+	localConfig := fmt.Sprintf("%s/%s", config.Settings.ConfigDir, service)
+	err = _dir.Copy(traefikConfig, localConfig)
+	if err != nil {
+		return err
+	}
+
+	return
 }
