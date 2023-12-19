@@ -12,9 +12,9 @@ import (
 )
 
 type C struct {
-	Name string
-	Dir  string
-	File string
+	name string
+	dir  string
+	file string
 }
 
 var Config C
@@ -31,17 +31,17 @@ func init() {
 	)
 
 	Config = C{
-		Name: exeName,
-		Dir:  dir,
-		File: "config.yml",
+		name: exeName,
+		dir:  dir,
+		file: "config.yml",
 	}
 }
 
 // DirPath is the Dir and Name joined.
-func (c C) DirPath() string { return filepath.Join(c.Dir, c.Name) }
+func (c C) DirPath() string { return filepath.Join(c.dir, c.name) }
 
 // Path returns the combined Dir and File.
-func (c C) Path() string { return filepath.Join(c.Dir, c.Name, c.File) }
+func (c C) Path() string { return filepath.Join(c.dir, c.name, c.file) }
 
 // Exists returns true if a configuration file exists at Path.
 func (c C) Exists() (bool, error) {
