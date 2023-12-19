@@ -1,6 +1,8 @@
 version: '3'
 
 services:
+  ## Docker Hub: https://hub.docker.com/_/traefik
+  ## Docs: https://doc.traefik.io/traefik/
   traefik:
     image: traefik:${TRAEFIK_VERSION:-latest}
     container_name: traefik
@@ -8,7 +10,7 @@ services:
     networks:
       - proxy
     ports:
-      - "80:80"
+      # - "80:80"
       - "443:443"
       - "666:666"
     environment:

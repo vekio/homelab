@@ -1,6 +1,8 @@
 version: '3'
 
 services:
+  ## Docker Hub: https://hub.docker.com/r/authelia/authelia
+  ## Docs: https://www.authelia.com/
   authelia:
     image: authelia/authelia:${AUTHELIA_VERSION:-latest}
     container_name: authelia

@@ -49,6 +49,8 @@ func serviceCmdFactory(service string) *cli.Command {
 		defaultCmds = append(defaultCmds, initCmd)
 	case AUTHELIA:
 		defaultCmds = append(defaultCmds, initCmd)
+	case LLDAP:
+		defaultCmds = append(defaultCmds, initCmd)
 	}
 
 	return &cli.Command{
