@@ -29,22 +29,18 @@ var initCmd = &cli.Command{
 
 		switch service {
 		case TRAEFIK:
-			err = initTraefik(service)
+			if err := initTraefik(localConfig); err != nil {
 				return err
 			}
 
-		return
-	},
-}
-
-func initTraefik(service string) error {
-	serviceRepo := settings.getRepository()
-	traefikConfig := fmt.Sprintf("%s/%s/config", serviceRepo, service)
-
-	// Copy config folder
-	localConfig := fmt.Sprintf("%s/%s", conf.Config.DirPath(), service)
-	err := _dir.Copy(traefikConfig, localConfig)
-	if err != nil {
+			// Create acme.json
+			env, _ := settings.getCurrentEnv()
+			if env == DEV {
+				acmeFile := fmt.Sprintf("%s/%s/acme.json", localConfig, "certificates")
+				if err := _file.Touch(acmeFile, os.FileMode(0600)); err != nil {
+					return err
+				}
+			}
 
 		case AUTHELIA:
 			if err := initAuthelia(localConfig); err != nil {
