@@ -45,7 +45,7 @@ authentication_backend:
     #  skip_verify: false
     #  minimum_version: TLS1.2
     # Set base dn, like dc=google,dc.com
-    base_dn: dc=SLD,dc=TLD
+    base_dn: dc={{.SLD}},dc={{.TLD}}
     username_attribute: uid
     # You need to set this to ou=people, because all users are stored in this ou!
     additional_users_dn: ou=people
@@ -64,7 +64,7 @@ authentication_backend:
     display_name_attribute: displayName
     # The username and password of the admin user.
     # "admin" should be the admin username you set in the LLDAP configuration
-    user: uid=admin,ou=people,dc=SLD,dc=TLD
+    user: uid=admin,ou=people,dc={{.SLD}},dc={{.TLD}}
     # Password can also be set using a secret: https://www.authelia.com/docs/configuration/secrets.html
     password: {{.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD}}
 

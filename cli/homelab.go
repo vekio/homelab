@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/urfave/cli/v2"
@@ -55,8 +56,13 @@ var initCmd = &cli.Command{
 func initAuthelia(localConfig string) error {
 	// Parse configuration.yml
 	configurationYMLFile := fmt.Sprintf("%s/configuration.yml", localConfig)
+	domain := os.Getenv("DOMAIN")
+	sld := strings.Split(domain, ".")[0]
+	tld := strings.Split(domain, ".")[1]
 	data := map[string]string{
-		"DOMAIN":                          os.Getenv("DOMAIN"),
+		"DOMAIN":                          domain,
+		"SLD":                             sld,
+		"TLD":                             tld,
 		"AUTHELIA_SESSION_SECRET":         os.Getenv("AUTHELIA_SESSION_SECRET"),
 		"AUTHELIA_STORAGE_ENCRYPTION_KEY": os.Getenv("AUTHELIA_STORAGE_ENCRYPTION_KEY"),
 		"AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD": os.Getenv("AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD"),
