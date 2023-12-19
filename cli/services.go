@@ -47,6 +47,8 @@ func serviceCmdFactory(service string) *cli.Command {
 	switch service {
 	case TRAEFIK:
 		defaultCmds = append(defaultCmds, initCmd)
+	case AUTHELIA:
+		defaultCmds = append(defaultCmds, initCmd)
 	}
 
 	return &cli.Command{
