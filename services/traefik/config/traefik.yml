@@ -22,9 +22,9 @@ entryPoints:
         # Generate a wildcard domain certificate using the digitalocean certificate resolver
         certResolver: digitalocean
         domains:
-          - main: DOMAIN
+          - main: {{.DOMAIN}}
             sans:
-              - '*.DOMAIN'
+              - '*.{{.DOMAIN}}'
       middlewares:
         # Apply secure headers and expose whitelist middleware
         - secure-headers@file
@@ -46,7 +46,7 @@ providers:
     # Don't expose containers by default; configure explicitly in labels
     exposedByDefault: false
     # Connect Traefik to the specified Docker network
-    network: PROJECT_proxy
+    network: proxy
 
 api:
   # Enable Traefik dashboard
@@ -55,7 +55,7 @@ api:
 certificatesResolvers:
   digitalocean:
     acme:
-      email: TRAEFIK_CERT_EMAIL
+      email: {{.TRAEFIK_CERT_EMAIL}}
       # Let's Encrypt ACME server endpoint
       caServer: https://acme-v02.api.letsencrypt.org/directory
       # Store Let's Encrypt certificates in acme.json file

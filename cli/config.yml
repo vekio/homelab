@@ -1,3 +1,5 @@
+service:
+  repository: "/home/user/homelab/services"
 context:
   current: "develop"
   available:

@@ -2,64 +2,76 @@ package homelab
 
 import (
 	"fmt"
-	"log"
-	"log/slog"
 	"os"
+	"text/template"
 
-	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v2"
-
-	config "github.com/vekio/homelab/cli/conf"
+	_dir "github.com/vekio/fs/dir"
+	"github.com/vekio/homelab/cli/conf"
 )
-
-func init() {
-
-	envFile, err := config.GetCurrentEnvFile()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = godotenv.Load(envFile)
-	if err != nil {
-		slog.Error(fmt.Sprintf("load env file: %s : %s", envFile, err))
-	}
-
-	env, err := config.GetCurrentEnv()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	switch env {
-	case config.DEV:
-		opts := &slog.HandlerOptions{
-			Level: slog.LevelDebug,
-		}
-		handler := slog.NewTextHandler(os.Stdout, opts)
-		slog.SetDefault(slog.New(handler))
-	case config.PRO:
-		opts := &slog.HandlerOptions{
-			Level: slog.LevelInfo,
-		}
-		handler := slog.NewTextHandler(os.Stdout, opts)
-		slog.SetDefault(slog.New(handler))
-	}
-}
 
 var initCmd = &cli.Command{
 	Name:    "init",
 	Aliases: []string{"i"},
 	Usage:   "Initialize required folders and config files",
-	Action: func(cCtx *cli.Context) error {
+	Action: func(cCtx *cli.Context) (err error) {
 		service := getService(cCtx)
 
 		switch service {
 		case TRAEFIK:
-			initTraefik()
+			err = initTraefik(service)
+			return err
 		}
-		return nil
+
+		return
 	},
 }
 
-func initTraefik() {
+func initTraefik(service string) error {
+	serviceRepo := settings.getRepository()
+	traefikConfig := fmt.Sprintf("%s/%s/config", serviceRepo, service)
 
+	// Copy config folder
+	localConfig := fmt.Sprintf("%s/%s", conf.Config.DirPath(), service)
+	err := _dir.Copy(traefikConfig, localConfig)
+	if err != nil {
+		return err
+	}
+
+	// Parse traefik.yml
+	treafikYMLFile := fmt.Sprintf("%s/traefik.yml", localConfig)
+	data := map[string]string{
+		"DOMAIN":             os.Getenv("DOMAIN"),
+		"TRAEFIK_CERT_EMAIL": os.Getenv("TRAEFIK_CERT_EMAIL"),
+	}
+	if err := parseConfigFile(treafikYMLFile, data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func parseConfigFile(file string, data interface{}) error {
+	fileContent, err := os.ReadFile(file)
+	if err != nil {
+		return err
+	}
+
+	tmpl, err := template.New("").Parse(string(fileContent))
+	if err != nil {
+		return err
+	}
+
+	outputFile, err := os.Open(file)
+	if err != nil {
+		return err
+	}
+	defer outputFile.Close()
+
+	// Execute the template and write to the output file
+	if err := tmpl.Execute(outputFile, data); err != nil {
+		return err
+	}
+
+	return nil
 }
