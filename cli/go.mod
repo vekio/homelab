@@ -6,8 +6,7 @@ toolchain go1.21.4
 
 require (
 	github.com/urfave/cli/v2 v2.26.0
-	github.com/vekio/fs v0.2.0
-	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb
+	github.com/vekio/fs v0.3.3
 	gopkg.in/yaml.v3 v3.0.1
 )
 
