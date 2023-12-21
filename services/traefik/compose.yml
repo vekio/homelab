@@ -14,8 +14,8 @@ services:
       - "443:443"
       - "666:666"
     environment:
-      - DO_AUTH_TOKEN=${TRAEFIK_DO_TOKEN}
-      - TZ=${TZ}
+      DO_AUTH_TOKEN: ${TRAEFIK_DO_TOKEN}
+      TZ: ${TZ}
     volumes:
       - "${CONFIG_PATH}/traefik/certificates:/letsencrypt:rw"
       - "${CONFIG_PATH}/traefik/config:/etc/traefik:ro"

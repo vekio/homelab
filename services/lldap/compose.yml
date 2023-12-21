@@ -16,13 +16,13 @@ services:
     expose:
       - 3890
     environment:
-      - UID=${UID}
-      - GID=${GID}
-      - TZ=${TZ}
-      - LLDAP_JWT_SECRET=${LLDAP_JWT_SECRET}
-      - LLDAP_LDAP_USER_PASS=${LLDAP_LDAP_USER_PASS}
-      - LLDAP_LDAP_BASE_DN=dc=${SLD},dc=${TLD}
-      # - LLDAP_DATABASE_URL=postgres://postgres-user:password@postgres-server/my-database
+      UID: ${UID}
+      GID: ${GID}
+      TZ: ${TZ}
+      LLDAP_JWT_SECRET: ${LLDAP_JWT_SECRET}
+      LLDAP_LDAP_USER_PASS: ${LLDAP_LDAP_USER_PASS}
+      LLDAP_LDAP_BASE_DN: dc=${SLD},dc=${TLD}
+      # LLDAP_DATABASE_URL: postgres://postgres-user:password@postgres-server/my-database
     volumes:
       - "${CONFIG_PATH}/lldap/data:/data:rw"
     labels:
