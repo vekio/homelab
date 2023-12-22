@@ -1,70 +1,46 @@
 version: "3.7"
 
 services:
-
-  gitea-db:
-    image: postgres:${GITEA_DB_VERSION:-14-alpine}
-    container_name: ${PROJECT}_gitea-db
-    hostname: ${PROJECT}_gitea-db
-    restart: unless-stopped
-    networks:
-      - gitea
-    environment:
-      POSTGRES_PASSWORD: "${GITEA_DB_PASS}"
-      POSTGRES_USER: "${GITEA_DB_USER}"
-      POSTGRES_DB: "${GITEA_DB_NAME}"
-    volumes:
-      - "${SPRING_VOL_PATH}/gitea/db:/var/lib/postgresql/data"
-    labels:
-      - traefik.enable=false
-    healthcheck:
-      test: pg_isready -U "${GITEA_DB_USER}" -d "${GITEA_DB_NAME}"
-      interval: 10s
-      timeout: 2s
-      retries: 10
-
+  ## Docker Hub: https://hub.docker.com/r/gitea/gitea/
+  ## Docs: https://docs.gitea.com/
   gitea:
     image: gitea/gitea:${GITEA_VERSION:-latest}
-    container_name: ${PROJECT}_gitea
-    hostname: ${PROJECT}_gitea
+    container_name: gitea
     restart: unless-stopped
     networks:
       - proxy
-      - gitea
     # ports:
     #   - "3000:3000"
     #   - "666:22"
-    depends_on:
-      gitea-db:
-        condition: service_healthy
     volumes:
-      - "${SPRING_VOL_PATH}/gitea/data:/data"
+      - "${CONFIG_PATH}/gitea/data:/data"
     environment:
-      USER_UID: 1000
-      USER_GID: 1000
+      USER_UID: ${UID}
+      USER_GID: ${GID}
       SSH_PORT: 666
       SSH_LISTEN_PORT: 22
       ROOT_URL: "https://gitea.${DOMAIN}"
       DOMAIN: "gitea.${DOMAIN}"
       SSH_DOMAIN: "gitea.${DOMAIN}"
-      GITEA__database__DB_TYPE: postgres
-      GITEA__database__HOST: gitea-db:5432
-      GITEA__database__NAME: "${GITEA_DB_NAME}"
-      GITEA__database__USER: "${GITEA_DB_USER}"
-      GITEA__database__PASSWD: "${GITEA_DB_PASS}"
-      GITEA__mailer__ENABLED: true
-      GITEA__mailer__PROTOCOL: "smtp+starttls"
-      GITEA__mailer__FROM: "${SMTP_FROM}"
-      GITEA__mailer__SMTP_ADDR: "${SMTP_HOST}"
-      GITEA__mailer__SMTP_PORT: ${SMTP_PORT}
-      GITEA__mailer__USER: "${SMTP_USERNAME}"
-      GITEA__mailer__PASSWD: "${SMTP_PASSWORD}"
-      GITEA__mailer__FORCE_TRUST_SERVER_CERT: true
-      GITEA__service__DISABLE_REGISTRATION: true
-      GITEA__service__REGISTER_EMAIL_CONFIRM: true
-      GITEA__service__ENABLE_NOTIFY_MAIL: true
-      GITEA__service__REQUIRE_SIGNIN_VIEW: true
+      # GITEA__mailer__ENABLED: true
+      # GITEA__mailer__PROTOCOL: "smtp+starttls"
+      # GITEA__mailer__FROM: "${SMTP_FROM}"
+      # GITEA__mailer__SMTP_ADDR: "${SMTP_HOST}"
+      # GITEA__mailer__SMTP_PORT: ${SMTP_PORT}
+      # GITEA__mailer__USER: "${SMTP_USERNAME}"
+      # GITEA__mailer__PASSWD: "${SMTP_PASSWORD}"
+      # GITEA__mailer__FORCE_TRUST_SERVER_CERT: true
+
+      GITEA__service__DISABLE_REGISTRATION: false
+      GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+
+      # GITEA__service__REGISTER_EMAIL_CONFIRM: true
+      # GITEA__service__ENABLE_NOTIFY_MAIL: true
+      # GITEA__service__REQUIRE_SIGNIN_VIEW: true
+
       GITEA__openid__ENABLE_OPENID_SIGNUP: true
+      GITEA__openid__ENABLE_OPENID_SIGNIN: false
+      GITEA__openid__WHITELISTED_URIS: auth.${DOMAIN}
     labels:
       - traefik.enable=true
       # web
@@ -72,7 +48,7 @@ services:
       - traefik.http.routers.giteaWeb-rtr.rule=Host(`gitea.${DOMAIN}`)
       - traefik.http.routers.giteaWeb-rtr.service=giteaWeb-svc
       - traefik.http.services.giteaWeb-svc.loadbalancer.server.port=3000
-      # - traefik.http.routers.giteaWeb-rtr.middlewares=authentik@file
+      # - traefik.http.routers.giteaWeb-rtr.middlewares=authelia@file
       # ssh
       - traefik.tcp.routers.giteaSSH-rtr.entrypoints=ssh
       - traefik.tcp.routers.giteaSSH-rtr.rule=HostSNI(`*`)
@@ -82,6 +58,4 @@ services:
 networks:
   proxy:
     external: true
-    name: ${PROJECT}_proxy
-  gitea:
-    name: ${PROJECT}_gitea
+    name: proxy

@@ -45,11 +45,13 @@ func serviceCmdFactory(service string) *cli.Command {
 	}
 
 	switch service {
-	case TRAEFIK:
-		defaultCmds = append(defaultCmds, initCmd)
 	case AUTHELIA:
 		defaultCmds = append(defaultCmds, initCmd)
+	case GITEA:
+		defaultCmds = append(defaultCmds, initCmd)
 	case LLDAP:
+		defaultCmds = append(defaultCmds, initCmd)
+	case TRAEFIK:
 		defaultCmds = append(defaultCmds, initCmd)
 	}
 

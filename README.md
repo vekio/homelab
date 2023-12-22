@@ -1,5 +1,13 @@
 # Homelab
 
+## Services
+
+- Authelia (Uses lldap as the user base)
+- Gitea (sqlite)
+- Immich
+- Lldap (sqlite)
+- Traefik
+
 ## Start
 
 Inicializar los servicios:

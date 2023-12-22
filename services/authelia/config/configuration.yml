@@ -96,7 +96,7 @@ regulation:
   ban_time: 300
 
 storage:
-  encryption_key: AUTHELIA_STORAGE_ENCRYPTION_KEY # Now required
+  encryption_key: {{.AUTHELIA_STORAGE_ENCRYPTION_KEY}} # Now required
   local:
     path: /config/db.sqlite3
 
@@ -110,3 +110,20 @@ notifier:
   #   sender: admin@example.com
   filesystem:
     filename: /config/notification.txt
+
+identity_providers:
+  oidc:
+    clients:
+    - id: gitea
+      description: Gitea
+      secret: '$2b$12$nF1UR/VivY5iLN.ka7lBd.8DTCFFLohxuQcZEpm4y/zSSM4VsaeZO' # NTVkBiXi0UooIE6QNz9p29b451dush1jXCi4j3WJ3378fGgLT2jogUiUJ7DjYbqxErN6TMXF
+      public: false
+      authorization_policy: one_factor
+      consent_mode: implicit
+      redirect_uris:
+        - https://gitea.{{.DOMAIN}}/user/oauth2/authelia/callback
+      scopes:
+        - openid
+        - email
+        - profile
+      userinfo_signing_algorithm: none

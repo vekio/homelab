@@ -24,16 +24,20 @@ var initCmd = &cli.Command{
 		serviceConfig := fmt.Sprintf("%s/%s/config", repository, service)
 
 		switch service {
-		case TRAEFIK:
-			if err := initTraefik(serviceConfig, localConfig); err != nil {
-				return err
-			}
 		case AUTHELIA:
 			if err := initAuthelia(serviceConfig, localConfig); err != nil {
 				return err
 			}
+		case GITEA:
+			if err := initGitea(localConfig); err != nil {
+				return err
+			}
 		case LLDAP:
 			if err := initLldap(localConfig); err != nil {
+				return err
+			}
+		case TRAEFIK:
+			if err := initTraefik(serviceConfig, localConfig); err != nil {
 				return err
 			}
 		}
@@ -66,6 +70,26 @@ func initAuthelia(serviceConfig, localConfig string) error {
 	return nil
 }
 
+func initGitea(localConfig string) error {
+	dataDir := fmt.Sprintf("%s/data/", localConfig)
+	err := _fs.Create(dataDir, os.FileMode(_fs.DefaultDirPerms))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func initLldap(localConfig string) error {
+	dataDir := fmt.Sprintf("%s/data/", localConfig)
+	err := _fs.Create(dataDir, os.FileMode(_fs.DefaultDirPerms))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func initTraefik(serviceConfig, localConfig string) error {
 	// Create acme.json
 	acmeFile := fmt.Sprintf("%s/%s/acme.json", localConfig, "certificates")
@@ -86,16 +110,6 @@ func initTraefik(serviceConfig, localConfig string) error {
 		"TRAEFIK_CERT_EMAIL": os.Getenv("TRAEFIK_CERT_EMAIL"),
 	}
 	if err := parseConfigFile(treafikYMLFile, data); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initLldap(localConfig string) error {
-	dataDir := fmt.Sprintf("%s/data/", localConfig)
-	err := _fs.Create(dataDir, os.FileMode(_fs.DefaultDirPerms))
-	if err != nil {
 		return err
 	}
 
