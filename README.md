@@ -15,3 +15,10 @@ Inicializar los servicios:
 1. Traefik
 2. Lldap
 3. Authelia
+
+
+## Secrets
+
+Authelia: Consultar la documentación para generar los secrets de forma correcta.
+
+https://www.authelia.com/configuration/methods/secrets/

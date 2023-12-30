@@ -29,6 +29,8 @@ func initServiceCommands() []*cli.Command {
 		commands = append(commands, serviceCmdFactory(srv))
 	}
 
+	commands = append(commands, testCmd)
+
 	return commands
 }
 
@@ -64,4 +66,13 @@ func serviceCmdFactory(service string) *cli.Command {
 
 func getService(cCtx *cli.Context) string {
 	return cCtx.Lineage()[1].Command.Name
+}
+
+var testCmd = &cli.Command{
+	Name:  "test",
+	Usage: "testing",
+	Action: func(cCtx *cli.Context) error {
+
+		return nil
+	},
 }

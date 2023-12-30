@@ -1,12 +1,11 @@
 module github.com/vekio/homelab/cli
 
-go 1.21
-
-toolchain go1.21.4
+go 1.21.4
 
 require (
-	github.com/urfave/cli/v2 v2.26.0
+	github.com/urfave/cli/v2 v2.27.0
 	github.com/vekio/fs v0.3.3
+	github.com/vekio/rand v0.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
