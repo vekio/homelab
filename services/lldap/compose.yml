@@ -1,5 +1,11 @@
 version: '3'
 
+secrets:
+  LLDAP_JWT_SECRET_FILE:
+    file: ${CONFIG_PATH}/lldap/secrets/LLDAP_JWT_SECRET_FILE
+  LLDAP_LDAP_USER_PASS_FILE:
+    file: ${CONFIG_PATH}/lldap/secrets/LLDAP_LDAP_USER_PASS_FILE
+
 services:
   ## Docker Hub: https://hub.docker.com/r/lldap/lldap
   ## Docs: https://github.com/lldap/lldap/blob/main/README.md
@@ -15,12 +21,13 @@ services:
       # - "17170:17170" # Web front-end
     expose:
       - 3890
+    secrets: [ LLDAP_JWT_SECRET_FILE, LLDAP_LDAP_USER_PASS_FILE ]
     environment:
       UID: ${UID}
       GID: ${GID}
       TZ: ${TZ}
-      LLDAP_JWT_SECRET: ${LLDAP_JWT_SECRET}
-      LLDAP_LDAP_USER_PASS: ${LLDAP_LDAP_USER_PASS}
+      LLDAP_JWT_SECRET_FILE: /run/secrets/LLDAP_JWT_SECRET_FILE
+      LLDAP_LDAP_USER_PASS_FILE: /run/secrets/LLDAP_LDAP_USER_PASS_FILE
       LLDAP_LDAP_BASE_DN: dc=${SLD},dc=${TLD}
       # LLDAP_DATABASE_URL: postgres://postgres-user:password@postgres-server/my-database
     volumes:
