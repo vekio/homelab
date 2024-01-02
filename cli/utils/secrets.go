@@ -11,6 +11,7 @@ type Secret struct {
 	Length int
 }
 
+// TODO 0600 permissions
 func CreateAlphanumericSecret(filename string, n int) error {
 	s, err := _secretgen.GenerateRandomAlphaNumeric(n)
 	if err != nil {

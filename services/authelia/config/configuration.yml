@@ -103,11 +103,13 @@ notifier:
   filesystem:
     filename: /config/notification.txt
 
+# TODO bcrypt to crypto lib, new command to append this text when required (or uncomment)
 identity_providers:
   oidc:
     clients:
     - id: gitea
       description: Gitea
+      # docker run --rm authelia/authelia:latest authelia crypto hash generate bcrypt --random --random.length 64 --random.charset alphanumeric
       secret: '$2b$12$nF1UR/VivY5iLN.ka7lBd.8DTCFFLohxuQcZEpm4y/zSSM4VsaeZO' # NTVkBiXi0UooIE6QNz9p29b451dush1jXCi4j3WJ3378fGgLT2jogUiUJ7DjYbqxErN6TMXF
       public: false
       authorization_policy: one_factor

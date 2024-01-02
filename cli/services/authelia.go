@@ -3,14 +3,16 @@ package services
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	_fs "github.com/vekio/fs"
+	_dir "github.com/vekio/fs/dir"
 	"github.com/vekio/homelab/cli/utils"
 )
 
 func InitAuthelia(repoConfig, envConfig string) error {
 
-	if err := initAutheliaConfig(envConfig); err != nil {
+	if err := initAutheliaConfig(repoConfig, envConfig); err != nil {
 		return err
 	}
 
@@ -21,20 +23,29 @@ func InitAuthelia(repoConfig, envConfig string) error {
 	return nil
 }
 
-func initAutheliaConfig(envConfig string) error {
+func initAutheliaConfig(repoConfig, envConfig string) error {
 	// Create config folder
-	configDir := fmt.Sprintf("%s/config/", envConfig)
-	err := _fs.Create(configDir, os.FileMode(_fs.DefaultDirPerms))
+	autheliaConfig := fmt.Sprintf("%s/config/", envConfig)
+	err := _dir.Copy(repoConfig, autheliaConfig)
+	if err != nil {
+		return err
+	}
+
+	// Read LLDAP_LDAP_USER_PASS_FILE from lldap config folder
+	// TODO try again secrets
+	ldapPassFile := fmt.Sprintf("%s/lldap/secrets/LLDAP_LDAP_USER_PASS_FILE", filepath.Dir(envConfig))
+	ldapPass, err := os.ReadFile(ldapPassFile)
 	if err != nil {
 		return err
 	}
 
 	// Read configuration.yml and parse with env variables
-	configurationYMLFile := fmt.Sprintf("%s/configuration.yml", envConfig)
+	configurationYMLFile := fmt.Sprintf("%s/configuration.yml", autheliaConfig)
 	data := map[string]string{
 		"DOMAIN": os.Getenv("DOMAIN"),
 		"SLD":    os.Getenv("SLD"),
 		"TLD":    os.Getenv("TLD"),
+		"AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD": string(ldapPass),
 	}
 	if err := parseConfigFile(configurationYMLFile, data); err != nil {
 		return err

@@ -19,7 +19,7 @@ func InitLldap(envConfig string) error {
 	// Generate alphanumeric secrets
 	secrets := []utils.Secret{
 		{Name: "LLDAP_JWT_SECRET_FILE", Length: 64},
-		{Name: "LLDAP_LDAP_USER_PASS_FILE", Length: 16},
+		{Name: "LLDAP_LDAP_USER_PASS_FILE", Length: 64},
 	}
 
 	for _, secret := range secrets {
