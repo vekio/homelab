@@ -6,6 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/urfave/cli/v2"
+	"github.com/vekio/homelab/cli/utils"
 )
 
 func execDockerCompose(service string, command ...string) error {
@@ -14,7 +15,6 @@ func execDockerCompose(service string, command ...string) error {
 
 	cmdArgs := append([]string{"docker", "compose", "-f", composeFile}, command...)
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
-	// cmd := exec.Command("docker", "compose", "-f", composeFile, command...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -28,7 +28,7 @@ var configCmd = &cli.Command{
 	Name:  "config",
 	Usage: "Parse, resolve and render compose file in canonical format",
 	Action: func(cCtx *cli.Context) error {
-		service := getService(cCtx)
+		service := utils.ParentCommandName(cCtx)
 		err := execDockerCompose(service, "config")
 		if err != nil {
 			return err
@@ -41,7 +41,7 @@ var pullCmd = &cli.Command{
 	Name:  "pull",
 	Usage: "Pull service images",
 	Action: func(cCtx *cli.Context) error {
-		service := getService(cCtx)
+		service := utils.ParentCommandName(cCtx)
 		err := execDockerCompose(service, "pull")
 		if err != nil {
 			return err
@@ -54,7 +54,7 @@ var upCmd = &cli.Command{
 	Name:  "up",
 	Usage: "Create and start containers",
 	Action: func(cCtx *cli.Context) error {
-		service := getService(cCtx)
+		service := utils.ParentCommandName(cCtx)
 		err := execDockerCompose(service, "up", "-d")
 		if err != nil {
 			return err
@@ -67,7 +67,7 @@ var logsCmd = &cli.Command{
 	Name:  "logs",
 	Usage: "View output from containers",
 	Action: func(cCtx *cli.Context) error {
-		service := getService(cCtx)
+		service := utils.ParentCommandName(cCtx)
 		err := execDockerCompose(service, "logs", "-f")
 		if err != nil {
 			return err
@@ -80,7 +80,7 @@ var stopCmd = &cli.Command{
 	Name:  "stop",
 	Usage: "Stop services",
 	Action: func(cCtx *cli.Context) error {
-		service := getService(cCtx)
+		service := utils.ParentCommandName(cCtx)
 		err := execDockerCompose(service, "stop")
 		if err != nil {
 			return err
@@ -93,7 +93,7 @@ var downCmd = &cli.Command{
 	Name:  "down",
 	Usage: "Stop and remove containers, networks",
 	Action: func(cCtx *cli.Context) error {
-		service := getService(cCtx)
+		service := utils.ParentCommandName(cCtx)
 		err := execDockerCompose(service, "down", "-v")
 		if err != nil {
 			return err
@@ -106,7 +106,7 @@ var upgradeCmd = &cli.Command{
 	Name:  "upgrade",
 	Usage: "Pull service images and start containers",
 	Action: func(cCtx *cli.Context) error {
-		service := getService(cCtx)
+		service := utils.ParentCommandName(cCtx)
 		err := execDockerCompose(service, "pull")
 		if err != nil {
 			return err
