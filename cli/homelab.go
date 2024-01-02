@@ -19,7 +19,7 @@ var initCmd = &cli.Command{
 	Aliases: []string{"i"},
 	Usage:   "Initialize required folders and config files",
 	Action: func(cCtx *cli.Context) error {
-		service := getService(cCtx)
+		service := utils.ParentCommandName(cCtx)
 		repository := settings.getRepository()
 		localConfig := fmt.Sprintf("%s/%s", conf.Config.DirPath(), service)
 		serviceConfig := fmt.Sprintf("%s/%s/config", repository, service)
