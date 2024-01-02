@@ -12,16 +12,16 @@ type Secret struct {
 }
 
 func CreateAlphanumericSecret(filename string, n int) error {
+	s, err := _secretgen.GenerateRandomAlphaNumeric(n)
+	if err != nil {
+		return err
+	}
+
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-
-	s, err := _secretgen.GenerateRandomAlphaNumeric(n)
-	if err != nil {
-		return err
-	}
 
 	_, err = file.WriteString(s + "\r\n")
 	if err != nil {

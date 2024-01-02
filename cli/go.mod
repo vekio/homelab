@@ -4,7 +4,7 @@ go 1.21.4
 
 require (
 	github.com/urfave/cli/v2 v2.27.1
-	github.com/vekio/crypto v0.1.0
+	github.com/vekio/crypto v0.1.1
 	github.com/vekio/fs v0.3.3
 	github.com/vekio/rand v0.2.1
 	gopkg.in/yaml.v3 v3.0.1
