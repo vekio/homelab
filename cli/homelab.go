@@ -2,17 +2,21 @@ package homelab
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"text/template"
 
 	"github.com/urfave/cli/v2"
-	_fs "github.com/vekio/fs"
-	_dir "github.com/vekio/fs/dir"
-	_file "github.com/vekio/fs/file"
 	"github.com/vekio/homelab/cli/conf"
+	s "github.com/vekio/homelab/cli/services"
 	"github.com/vekio/homelab/cli/utils"
 )
+
+var testCmd = &cli.Command{
+	Name:  "test",
+	Usage: "testing",
+	Action: func(cCtx *cli.Context) error {
+
+		return nil
+	},
+}
 
 var initCmd = &cli.Command{
 	Name:    "init",
@@ -21,145 +25,29 @@ var initCmd = &cli.Command{
 	Action: func(cCtx *cli.Context) error {
 		service := utils.ParentCommandName(cCtx)
 		repository := settings.getRepository()
-		localConfig := fmt.Sprintf("%s/%s", conf.Config.DirPath(), service)
-		serviceConfig := fmt.Sprintf("%s/%s/config", repository, service)
+
+		envConfig := fmt.Sprintf("%s/%s", conf.Config.DirPath(), service)
+		repoConfig := fmt.Sprintf("%s/%s/config", repository, service)
 
 		switch service {
-		case AUTHELIA:
-			if err := initAuthelia(serviceConfig, localConfig); err != nil {
+		case s.AUTHELIA:
+			if err := s.InitAuthelia(repoConfig, envConfig); err != nil {
 				return err
 			}
-		case GITEA:
-			if err := initGitea(localConfig); err != nil {
+		case s.GITEA:
+			if err := s.InitGitea(envConfig); err != nil {
 				return err
 			}
-		case LLDAP:
-			if err := initLldap(localConfig); err != nil {
+		case s.LLDAP:
+			if err := s.InitLldap(envConfig); err != nil {
 				return err
 			}
-		case TRAEFIK:
-			if err := initTraefik(serviceConfig, localConfig); err != nil {
+		case s.TRAEFIK:
+			if err := s.InitTraefik(repoConfig, envConfig); err != nil {
 				return err
 			}
 		}
 
 		return nil
 	},
-}
-
-func initAuthelia(serviceConfig, localConfig string) error {
-	// Copy config folder
-	autheliaConfig := fmt.Sprintf("%s/config", localConfig)
-	if err := _dir.Copy(serviceConfig, autheliaConfig); err != nil {
-		return err
-	}
-
-	// Parse configuration.yml
-	configurationYMLFile := fmt.Sprintf("%s/configuration.yml", autheliaConfig)
-	data := map[string]string{
-		"DOMAIN":                          os.Getenv("DOMAIN"),
-		"SLD":                             os.Getenv("SLD"),
-		"TLD":                             os.Getenv("TLD"),
-		"AUTHELIA_SESSION_SECRET":         os.Getenv("AUTHELIA_SESSION_SECRET"),
-		"AUTHELIA_STORAGE_ENCRYPTION_KEY": os.Getenv("AUTHELIA_STORAGE_ENCRYPTION_KEY"),
-		"AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD": os.Getenv("AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD"),
-	}
-	if err := parseConfigFile(configurationYMLFile, data); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initGitea(localConfig string) error {
-	dataDir := fmt.Sprintf("%s/data/", localConfig)
-	err := _fs.Create(dataDir, os.FileMode(_fs.DefaultDirPerms))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initLldap(localConfig string) error {
-	// Create secrets folder
-	secretsDir := fmt.Sprintf("%s/secrets/", localConfig)
-	err := _fs.Create(secretsDir, os.FileMode(_fs.DefaultDirPerms))
-	if err != nil {
-		return err
-	}
-
-	// Generate secrets files
-	secrets := []utils.Secret{
-		{Name: "LLDAP_JWT_SECRET_FILE", Length: 64},
-		{Name: "LLDAP_LDAP_USER_PASS_FILE", Length: 16},
-	}
-
-	for _, secret := range secrets {
-		secretFile := fmt.Sprintf("%s/%s", secretsDir, secret.Name)
-		err = utils.CreateAlphanumericSecret(secretFile, secret.Length)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Create data folder
-	dataDir := fmt.Sprintf("%s/data/", localConfig)
-	err = _fs.Create(dataDir, os.FileMode(_fs.DefaultDirPerms))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initTraefik(serviceConfig, localConfig string) error {
-	// Create acme.json
-	acmeFile := fmt.Sprintf("%s/%s/acme.json", localConfig, "certificates")
-	if err := _file.Touch(acmeFile, os.FileMode(0600)); err != nil {
-		return err
-	}
-
-	// Copy config folder
-	traefikConfig := fmt.Sprintf("%s/config", localConfig)
-	if err := _dir.Copy(serviceConfig, traefikConfig); err != nil {
-		return err
-	}
-
-	// Parse traefik.yml
-	treafikYMLFile := fmt.Sprintf("%s/traefik.yml", traefikConfig)
-	data := map[string]string{
-		"DOMAIN":             os.Getenv("DOMAIN"),
-		"TRAEFIK_CERT_EMAIL": os.Getenv("TRAEFIK_CERT_EMAIL"),
-	}
-	if err := parseConfigFile(treafikYMLFile, data); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func parseConfigFile(file string, data interface{}) error {
-	fileContent, err := os.ReadFile(file)
-	if err != nil {
-		return err
-	}
-
-	tmpl, err := template.New("").Parse(string(fileContent))
-	if err != nil {
-		return err
-	}
-
-	outputFile, err := os.Create(file)
-	if err != nil {
-		return err
-	}
-	defer outputFile.Close()
-
-	// Execute the template and write to the output file
-	if err := tmpl.Execute(outputFile, data); err != nil {
-		return fmt.Errorf("executing template for %s: %w", filepath.Base(file), err)
-	}
-
-	return nil
 }

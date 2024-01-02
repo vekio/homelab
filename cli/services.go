@@ -4,28 +4,13 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v2"
-)
-
-const (
-	AUTHELIA string = "authelia"
-	GITEA    string = "gitea"
-	IMMICH   string = "immich"
-	LLDAP    string = "lldap"
-	TRAEFIK  string = "traefik"
+	s "github.com/vekio/homelab/cli/services"
 )
 
 func initServiceCommands() []*cli.Command {
 	var commands []*cli.Command
 
-	services := []string{
-		AUTHELIA,
-		GITEA,
-		IMMICH,
-		LLDAP,
-		TRAEFIK,
-	}
-
-	for _, srv := range services {
+	for _, srv := range s.AvailableServices() {
 		commands = append(commands, serviceCmdFactory(srv))
 	}
 
@@ -44,17 +29,7 @@ func serviceCmdFactory(service string) *cli.Command {
 		stopCmd,
 		downCmd,
 		upgradeCmd,
-	}
-
-	switch service {
-	case AUTHELIA:
-		defaultCmds = append(defaultCmds, initCmd)
-	case GITEA:
-		defaultCmds = append(defaultCmds, initCmd)
-	case LLDAP:
-		defaultCmds = append(defaultCmds, initCmd)
-	case TRAEFIK:
-		defaultCmds = append(defaultCmds, initCmd)
+		initCmd,
 	}
 
 	return &cli.Command{
@@ -62,13 +37,4 @@ func serviceCmdFactory(service string) *cli.Command {
 		Usage:       fmt.Sprintf("Manage %s service", service),
 		Subcommands: defaultCmds,
 	}
-}
-
-var testCmd = &cli.Command{
-	Name:  "test",
-	Usage: "testing",
-	Action: func(cCtx *cli.Context) error {
-
-		return nil
-	},
 }
