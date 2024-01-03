@@ -52,7 +52,21 @@ var initCmd = &cli.Command{
 	Usage:   "Initialize required folders and config files",
 	Action: func(cCtx *cli.Context) error {
 
-		services.InitAuthelia()
+		if err := services.InitAuthelia(); err != nil {
+			return err
+		}
+
+		if err := services.InitGitea(); err != nil {
+			return err
+		}
+
+		if err := services.InitLldap(); err != nil {
+			return err
+		}
+
+		if err := services.InitTraefik(); err != nil {
+			return err
+		}
 
 		return nil
 	},

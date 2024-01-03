@@ -9,7 +9,7 @@ func WriteSecret(filename, secret string) error {
 	}
 	defer file.Close()
 
-	_, err = file.WriteString(secret + "\r\n")
+	_, err = file.WriteString(secret)
 	if err != nil {
 		return err
 	}
