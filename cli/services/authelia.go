@@ -3,7 +3,6 @@ package services
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	_fs "github.com/vekio/fs"
 	_dir "github.com/vekio/fs/dir"
@@ -33,11 +32,11 @@ func initAutheliaConfig(repoConfig, envConfig string) error {
 
 	// Read LLDAP_LDAP_USER_PASS_FILE from lldap config folder
 	// TODO try again secrets
-	ldapPassFile := fmt.Sprintf("%s/lldap/secrets/LLDAP_LDAP_USER_PASS_FILE", filepath.Dir(envConfig))
-	ldapPass, err := os.ReadFile(ldapPassFile)
-	if err != nil {
-		return err
-	}
+	// ldapPassFile := fmt.Sprintf("%s/lldap/secrets/LLDAP_LDAP_USER_PASS_FILE", filepath.Dir(envConfig))
+	// ldapPass, err := os.ReadFile(ldapPassFile)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// Read configuration.yml and parse with env variables
 	configurationYMLFile := fmt.Sprintf("%s/configuration.yml", autheliaConfig)
@@ -45,7 +44,7 @@ func initAutheliaConfig(repoConfig, envConfig string) error {
 		"DOMAIN": os.Getenv("DOMAIN"),
 		"SLD":    os.Getenv("SLD"),
 		"TLD":    os.Getenv("TLD"),
-		"AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD": string(ldapPass),
+		// "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD": string(ldapPass),
 	}
 	if err := parseConfigFile(configurationYMLFile, data); err != nil {
 		return err

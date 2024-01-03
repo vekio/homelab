@@ -59,7 +59,7 @@ authentication_backend:
     # "admin" should be the admin username you set in the LLDAP configuration
     user: uid=admin,ou=people,dc={{.SLD}},dc={{.TLD}}
     # Password can also be set using a secret: https://www.authelia.com/docs/configuration/secrets.html
-    password: {{.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD}}
+    # password: {{.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD}}
 
 access_control:
   default_policy: deny
