@@ -1,4 +1,4 @@
-package homelab
+package secrets
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type S struct {
+type s struct {
 	Authelia Authelia `yaml:"authelia"`
 	Gitea    Gitea    `yaml:"gitea"`
 	Lldap    Lldap    `yaml:"lldap"`
@@ -37,19 +37,19 @@ type Lldap struct {
 type Traefik struct {
 }
 
-var secrets S
+var Secrets s
 
-// softInitSecrets initializes secrets if the file does not exist.
+// SoftInitSecrets initializes secrets if the file does not exist.
 // Checks if the specified file exists, and if not, calls initSecrets
 // to generate and save secrets.
-func softInitSecrets(filename string) error {
+func SoftInitSecrets(filename string) error {
 	exists, err := _file.Exists(filename)
 	if err != nil {
 		return fmt.Errorf("softInitSecrets: failed to check file existence: %w", err)
 	}
 
 	if !exists {
-		return initSecrets(filename)
+		return InitSecrets(filename)
 	}
 
 	if err = loadSecrets(filename); err != nil {
@@ -59,9 +59,9 @@ func softInitSecrets(filename string) error {
 	return nil
 }
 
-// initSecrets initializes and saves secrets to a file and saves them
+// InitSecrets initializes and saves secrets to a file and saves them
 // to the specified file.
-func initSecrets(filename string) error {
+func InitSecrets(filename string) error {
 	autheliaSecrets, err := autheliaSecrets()
 	if err != nil {
 		return fmt.Errorf("initSecrets: failed to generate Authelia secrets: %w", err)
@@ -72,7 +72,7 @@ func initSecrets(filename string) error {
 		return fmt.Errorf("initSecrets: failed to generate Lldap secrets: %w", err)
 	}
 
-	secrets = S{
+	Secrets = s{
 		Authelia: autheliaSecrets,
 		Gitea:    Gitea{},
 		Lldap:    lldapSecrets,
@@ -157,7 +157,7 @@ func loadSecrets(filename string) error {
 		return fmt.Errorf("loadSecrets: failed to read file %s: %w", filename, err)
 	}
 
-	err = yaml.Unmarshal(yamlFile, &secrets)
+	err = yaml.Unmarshal(yamlFile, &Secrets)
 	if err != nil {
 		return fmt.Errorf("loadSecrets: failed to unmarshal YAML: %w", err)
 	}
@@ -168,7 +168,7 @@ func loadSecrets(filename string) error {
 // saveSecrets saves the secrets data to a YAML file.
 // It marshals the secrets into YAML format and writes it to the specified file.
 func saveSecrets(filename string) error {
-	yamlData, err := yaml.Marshal(&secrets)
+	yamlData, err := yaml.Marshal(&Secrets)
 	if err != nil {
 		return fmt.Errorf("saveSecrets: failed to marshal YAML: %w", err)
 	}

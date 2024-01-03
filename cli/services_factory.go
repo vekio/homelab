@@ -4,20 +4,7 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v2"
-	s "github.com/vekio/homelab/cli/services"
 )
-
-func initServiceCommands() []*cli.Command {
-	var commands []*cli.Command
-
-	for _, srv := range s.AvailableServices() {
-		commands = append(commands, serviceCmdFactory(srv))
-	}
-
-	commands = append(commands, testCmd)
-
-	return commands
-}
 
 func serviceCmdFactory(service string) *cli.Command {
 
@@ -29,7 +16,7 @@ func serviceCmdFactory(service string) *cli.Command {
 		stopCmd,
 		downCmd,
 		upgradeCmd,
-		initCmd,
+		// initCmd,
 	}
 
 	return &cli.Command{

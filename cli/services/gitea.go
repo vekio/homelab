@@ -10,7 +10,7 @@ import (
 func InitGitea(envConfig string) error {
 	// Create data folder
 	dataDir := fmt.Sprintf("%s/data/", envConfig)
-	err := _fs.Create(dataDir, os.FileMode(_fs.DefaultDirPerms))
+	err := _fs.CreateDir(dataDir, os.FileMode(_fs.DefaultDirPerms))
 	if err != nil {
 		return err
 	}
