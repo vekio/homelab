@@ -1,86 +1,90 @@
 package services
 
 import (
-	"fmt"
 	"os"
 
 	_fs "github.com/vekio/fs"
-	_dir "github.com/vekio/fs/dir"
+	"github.com/vekio/homelab/cli/conf"
+	"github.com/vekio/homelab/cli/secrets"
 	"github.com/vekio/homelab/cli/utils"
 )
 
-func InitAuthelia(repoConfig, envConfig string) error {
+func InitAuthelia() error {
+	autheliaConf := conf.Config.DirPath() + "/" + AUTHELIA
 
-	if err := initAutheliaConfig(repoConfig, envConfig); err != nil {
+	err := _fs.CreateDir(autheliaConf, os.FileMode(_fs.DefaultDirPerms))
+	if err != nil {
 		return err
 	}
 
-	if err := initAutheliaSecrets(envConfig); err != nil {
+	err = initAutheliaConfig(autheliaConf)
+	if err != nil {
+		return err
+	}
+
+	err = initAutheliaSecrets(autheliaConf)
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func initAutheliaConfig(repoConfig, envConfig string) error {
-	// Create config folder
-	autheliaConfig := fmt.Sprintf("%s/config/", envConfig)
-	err := _dir.Copy(repoConfig, autheliaConfig)
+func initAutheliaConfig(autheliaConf string) error {
+	err := _fs.CreateDir(autheliaConf+"/config", os.FileMode(_fs.DefaultDirPerms))
 	if err != nil {
 		return err
 	}
 
-	// Read LLDAP_LDAP_USER_PASS_FILE from lldap config folder
-	// TODO try again secrets
-	// ldapPassFile := fmt.Sprintf("%s/lldap/secrets/LLDAP_LDAP_USER_PASS_FILE", filepath.Dir(envConfig))
-	// ldapPass, err := os.ReadFile(ldapPassFile)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// Read configuration.yml and parse with env variables
-	configurationYMLFile := fmt.Sprintf("%s/configuration.yml", autheliaConfig)
 	data := map[string]string{
 		"DOMAIN": os.Getenv("DOMAIN"),
 		"SLD":    os.Getenv("SLD"),
 		"TLD":    os.Getenv("TLD"),
-		// "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD": string(ldapPass),
 	}
-	if err := parseConfigFile(configurationYMLFile, data); err != nil {
+
+	src := repoConfig + "/" + AUTHELIA + "/config/configuration.yml"
+	dst := autheliaConf + "/config/configuration.yml"
+	if err := utils.ParseConfig(src, dst, data); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func initAutheliaSecrets(envConfig string) error {
-	// Create secrets folder
-	secretsDir := fmt.Sprintf("%s/secrets/", envConfig)
-
-	err := _fs.Create(secretsDir, os.FileMode(_fs.DefaultDirPerms))
+func initAutheliaSecrets(autheliaConf string) error {
+	secretsDir := autheliaConf + "/secrets"
+	err := _fs.CreateDir(secretsDir, os.FileMode(_fs.DefaultDirPerms))
 	if err != nil {
 		return err
 	}
 
-	// Generate alphanumeric secrets
-	secrets := []utils.Secret{
-		{Name: "AUTHELIA_JWT_SECRET_FILE", Length: 64},
-		{Name: "AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE", Length: 64},
-		{Name: "AUTHELIA_SESSION_SECRET_FILE", Length: 64},
-		{Name: "AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE", Length: 64},
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_JWT_SECRET_FILE",
+		secrets.Secrets.Authelia.JWTSecret); err != nil {
+		return err
 	}
 
-	for _, secret := range secrets {
-		secretFile := fmt.Sprintf("%s/%s", secretsDir, secret.Name)
-		err = utils.CreateAlphanumericSecret(secretFile, secret.Length)
-		if err != nil {
-			return err
-		}
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE",
+		secrets.Secrets.Authelia.IdentityProviderOIDCHMACSecret); err != nil {
+		return err
 	}
 
-	// Generate private key secret
-	keyFile := fmt.Sprintf("%s/%s", secretsDir, "AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE")
-	if err := utils.GenerateRSAPrivateKey(keyFile); err != nil {
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE",
+		secrets.Secrets.Authelia.IdentityProviderIssuerPrivateKey); err != nil {
+		return err
+	}
+
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_SESSION_SECRET_FILE",
+		secrets.Secrets.Authelia.SessionSecret); err != nil {
+		return err
+	}
+
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE",
+		secrets.Secrets.Authelia.StorageEncryptionKey); err != nil {
+		return err
+	}
+
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE",
+		secrets.Secrets.Lldap.LDAPUserPass); err != nil {
 		return err
 	}
 

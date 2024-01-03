@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/urfave/cli/v2"
+	"github.com/vekio/homelab/cli/services"
 )
 
 const command = "homelab"
@@ -29,5 +30,44 @@ var Cmd = &cli.App{
 	Version:   version,
 	Compiled:  time.Now(),
 	Copyright: fmt.Sprintf("%s (%s) Copyright %s\nLicense Apache-2.0", command, version, authorName),
-	Commands:  initServiceCommands(),
+	Commands:  commands(),
+}
+
+func commands() []*cli.Command {
+	var commands []*cli.Command
+
+	for _, srv := range services.AvailableServices() {
+		commands = append(commands, serviceCmdFactory(srv))
+	}
+
+	commands = append(commands, initCmd)
+	commands = append(commands, testCmd)
+
+	return commands
+}
+
+var initCmd = &cli.Command{
+	Name:    "init",
+	Aliases: []string{"i"},
+	Usage:   "Initialize required folders and config files",
+	Action: func(cCtx *cli.Context) error {
+
+		if err := services.InitAuthelia(); err != nil {
+			return err
+		}
+
+		if err := services.InitGitea(); err != nil {
+			return err
+		}
+
+		if err := services.InitLldap(); err != nil {
+			return err
+		}
+
+		if err := services.InitTraefik(); err != nil {
+			return err
+		}
+
+		return nil
+	},
 }
