@@ -91,7 +91,7 @@ func (c C) Init() error {
 		}
 	}
 
-	if err := fs.Create(d, fs.DefaultDirPerms); err != nil {
+	if err := fs.CreateDir(d, fs.DefaultDirPerms); err != nil {
 		return fmt.Errorf("error init config: %w", err)
 	}
 

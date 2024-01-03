@@ -9,6 +9,13 @@ import (
 	"github.com/vekio/homelab/cli/utils"
 )
 
+func init() {
+	secretsFile := conf.Config.DirPath() + "/secrets.yml"
+	if err := softInitSecrets(secretsFile); err != nil {
+		fmt.Println("failed to init secrets %s", err)
+	}
+}
+
 var testCmd = &cli.Command{
 	Name:  "test",
 	Usage: "testing",
