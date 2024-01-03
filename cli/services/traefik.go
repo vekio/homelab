@@ -28,6 +28,7 @@ func InitTraefik() error {
 		return err
 	}
 
+	// TODO investigate DO token as secret
 	// err = initTraefikSecrets(traefikConf)
 	// if err != nil {
 	// 	return err
