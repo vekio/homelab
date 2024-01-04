@@ -15,6 +15,7 @@ secrets:
     file: ${CONFIG}/authelia/secrets/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
 
 services:
+  ## Authelia - Authentication and authorization server
   ## Docker Hub: https://hub.docker.com/r/authelia/authelia
   ## Docs: https://www.authelia.com/
   authelia:
