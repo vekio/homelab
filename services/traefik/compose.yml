@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+  ## Traefik - HTTP reverse proxy and load balancer
   ## Docker Hub: https://hub.docker.com/_/traefik
   ## Docs: https://doc.traefik.io/traefik/
   traefik:
