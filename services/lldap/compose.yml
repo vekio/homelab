@@ -2,9 +2,9 @@ version: '3'
 
 secrets:
   LLDAP_JWT_SECRET_FILE:
-    file: ${CONFIG_PATH}/lldap/secrets/LLDAP_JWT_SECRET_FILE
+    file: ${CONFIG}/lldap/secrets/LLDAP_JWT_SECRET_FILE
   LLDAP_LDAP_USER_PASS_FILE:
-    file: ${CONFIG_PATH}/lldap/secrets/LLDAP_LDAP_USER_PASS_FILE
+    file: ${CONFIG}/lldap/secrets/LLDAP_LDAP_USER_PASS_FILE
 
 services:
   ## Docker Hub: https://hub.docker.com/r/lldap/lldap
@@ -20,13 +20,13 @@ services:
     secrets: [ LLDAP_JWT_SECRET_FILE, LLDAP_LDAP_USER_PASS_FILE ]
     environment:
       TZ: ${TZ}
-      UID: ${UID}
-      GID: ${GID}
+      UID: ${UUID}
+      GID: ${GGID}
       LLDAP_JWT_SECRET_FILE: /run/secrets/LLDAP_JWT_SECRET_FILE
       LLDAP_LDAP_USER_PASS_FILE: /run/secrets/LLDAP_LDAP_USER_PASS_FILE
       LLDAP_LDAP_BASE_DN: dc=${SLD},dc=${TLD}
     volumes:
-      - "${CONFIG_PATH}/lldap/data:/data:rw"
+      - "${CONFIG}/lldap/data:/data:rw"
     labels:
       - traefik.enable=true
       - traefik.http.routers.lldap-rtr.entrypoints=websecure

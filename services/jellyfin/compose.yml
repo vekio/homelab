@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  ## Docker Hub: https://hub.docker.com/r/jellyfin/jellyfin
+  ## Docs: https://jellyfin.org/docs/
+  jellyfin:
+    image: jellyfin/jellyfin:${JELLYFIN_VERSION:-latest}
+    container_name: jellyfin
+    restart: unless-stopped
+    networks:
+      - proxy
+    # ports:
+    #   - "8096:8096"
+    volumes:
+      - "${SPRING_CONFIG}/jellyfin/config:/config:rw"
+      - "${SPRING_CONFIG}/jellyfin/cache:/cache:rw"
+      - "${SPRING_MEDIA}/movies:/media/movies:rw"
+      - "${SPRING_MEDIA}/tvshows:/media/tvshows:rw"
+      - "${SPRING_TRANSCODE}:/transcode:rw"
+    environment:
+      TZ: ${TZ}
+      PUID: ${UUID}
+      PGID: ${GGID}
+      UMASK: 2
+      JELLYFIN_PublishedServerUrl: "https://media.${DOMAIN}"
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin-rtr.entrypoints=websecure
+      - traefik.http.routers.jellyfin-rtr.rule=Host(`media.${DOMAIN}`)
+      - traefik.http.routers.jellyfin-rtr.service=jellyfin-svc
+      - traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096
+
+networks:
+  proxy:
+    external: true

@@ -13,10 +13,10 @@ services:
     #   - "3000:3000"
     #   - "666:22"
     volumes:
-      - "${CONFIG_PATH}/gitea/data:/data"
+      - "${CONFIG}/gitea/data:/data"
     environment:
-      USER_UID: ${UID}
-      USER_GID: ${GID}
+      USER_UID: ${UUID}
+      USER_GID: ${GGID}
       SSH_PORT: 666
       SSH_LISTEN_PORT: 22
       ROOT_URL: "https://gitea.${DOMAIN}"
