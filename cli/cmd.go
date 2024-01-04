@@ -40,7 +40,7 @@ func commands() []*cli.Command {
 		commands = append(commands, serviceCmdFactory(srv))
 	}
 
-	commands = append(commands, initCmd)
+	commands = append(commands, initCmd, allUpCmd, allDownCmd)
 	commands = append(commands, testCmd)
 
 	return commands
@@ -69,5 +69,65 @@ var initCmd = &cli.Command{
 		}
 
 		return nil
+	},
+}
+
+var allUpCmd = &cli.Command{
+	Name:    "allup",
+	Aliases: []string{"au"},
+	Usage:   "Create and start all service containers",
+	Action: func(cCtx *cli.Context) (err error) {
+		// Order by priority
+		err = execDockerCompose(services.TRAEFIK, "up", "-d")
+		if err != nil {
+			return err
+		}
+
+		err = execDockerCompose(services.LLDAP, "up", "-d")
+		if err != nil {
+			return err
+		}
+
+		err = execDockerCompose(services.AUTHELIA, "up", "-d")
+		if err != nil {
+			return err
+		}
+
+		err = execDockerCompose(services.GITEA, "up", "-d")
+		if err != nil {
+			return err
+		}
+
+		return
+	},
+}
+
+var allDownCmd = &cli.Command{
+	Name:    "alldown",
+	Aliases: []string{"ad"},
+	Usage:   "Stop and remove services containers, networks and volumes",
+	Action: func(cCtx *cli.Context) (err error) {
+		// Order by less priority
+		err = execDockerCompose(services.GITEA, "down", "-v")
+		if err != nil {
+			return err
+		}
+
+		err = execDockerCompose(services.AUTHELIA, "down", "-v")
+		if err != nil {
+			return err
+		}
+
+		err = execDockerCompose(services.LLDAP, "down", "-v")
+		if err != nil {
+			return err
+		}
+
+		err = execDockerCompose(services.TRAEFIK, "down", "-v")
+		if err != nil {
+			return err
+		}
+
+		return
 	},
 }
