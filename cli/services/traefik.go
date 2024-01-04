@@ -44,14 +44,37 @@ func initTraefikConfig(traefikConf string) error {
 		return err
 	}
 
-	data := map[string]string{
-		"DOMAIN":             os.Getenv("DOMAIN"),
-		"TRAEFIK_CERT_EMAIL": os.Getenv("TRAEFIK_CERT_EMAIL"),
+	traefikData := map[string]string{
+		"DOMAIN":                  os.Getenv("DOMAIN"),
+		"TRAEFIK_CERT_EMAIL":      os.Getenv("TRAEFIK_CERT_EMAIL"),
+		"TRAEFIK_LETSENCRYPT_API": os.Getenv("TRAEFIK_LETSENCRYPT_API"),
 	}
 
 	src = repoConfig + "/" + TRAEFIK + "/config/traefik.yml"
 	dst = traefikConf + "/config/traefik.yml"
-	if err := utils.ParseConfig(src, dst, data); err != nil {
+	if err := utils.ParseConfig(src, dst, traefikData); err != nil {
+		return err
+	}
+
+	unraidData := map[string]string{
+		"DOMAIN": os.Getenv("DOMAIN"),
+		"UNRAID": os.Getenv("UNRAID"),
+	}
+
+	src = repoConfig + "/" + TRAEFIK + "/config/dynamic/unraid.yml"
+	dst = traefikConf + "/config/dynamic/unraid.yml"
+	if err := utils.ParseConfig(src, dst, unraidData); err != nil {
+		return err
+	}
+
+	piholeData := map[string]string{
+		"DOMAIN": os.Getenv("DOMAIN"),
+		"PIHOLE": os.Getenv("PIHOLE"),
+	}
+
+	src = repoConfig + "/" + TRAEFIK + "/config/dynamic/pihole.yml"
+	dst = traefikConf + "/config/dynamic/pihole.yml"
+	if err := utils.ParseConfig(src, dst, piholeData); err != nil {
 		return err
 	}
 

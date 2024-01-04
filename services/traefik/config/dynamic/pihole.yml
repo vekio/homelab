@@ -1,0 +1,19 @@
+http:
+  routers:
+    pihole:
+      entryPoints:
+        - websecure
+      rule: 'Host(`pihole.{{.DOMAIN}}`)'
+      service: pihole
+      middlewares:
+        - pihole-redirectregex
+  services:
+    pihole:
+      loadBalancer:
+        servers:
+          - url: "http://{{.PIHOLE}}"
+  middlewares:
+    pihole-redirectregex:
+      redirectRegex:
+        regex: "^https?://pihole.{{.DOMAIN}}/$"
+        replacement: "https://pihole.{{.DOMAIN}}/admin"
