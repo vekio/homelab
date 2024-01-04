@@ -136,7 +136,7 @@ func lldapSecrets() (Lldap, error) {
 		return Lldap{}, fmt.Errorf("lldapSecrets: failed to generate JWT secret: %w", err)
 	}
 
-	ldapUserPass, err := _sgen.GenerateRandomAlphaNumeric(64)
+	ldapUserPass, err := _sgen.GenerateRandomAlphaNumeric(16)
 	if err != nil {
 		return Lldap{}, fmt.Errorf("lldapSecrets: failed to generate LDAP user password: %w", err)
 	}
