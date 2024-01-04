@@ -7,6 +7,7 @@ secrets:
     file: ${CONFIG}/lldap/secrets/LLDAP_LDAP_USER_PASS_FILE
 
 services:
+  ## LLDAP - Light LDAP implementation for authentication
   ## Docker Hub: https://hub.docker.com/r/lldap/lldap
   ## Docs: https://github.com/lldap/lldap/blob/main/README.md
   lldap:
