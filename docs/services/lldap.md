@@ -2,7 +2,7 @@
 
 LLDAP - Light LDAP implementation for authentication
 
-## Post-instalación
+## Instalación
 
 1. Crear el grupo `admins` e incluir en él al usuario `admin`.
 
@@ -10,7 +10,7 @@ LLDAP - Light LDAP implementation for authentication
 
 Unicamente el usuarios `admin` tiene acceso al panel de administración. La
 constraseña del usuario `admin` se establece en un secreto que se pasa al
-contenedor la primera vez que se arranca.
+contenedor la primera vez que se arranca, LLDAP_LDAP_USER_PASS_FILE.
 
 <!--
 Si se cambia la contraseña al usuario `admin` será necesario:

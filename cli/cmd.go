@@ -60,6 +60,10 @@ var initCmd = &cli.Command{
 			return err
 		}
 
+		if err := services.InitJellyfin(); err != nil {
+			return err
+		}
+
 		if err := services.InitLldap(); err != nil {
 			return err
 		}

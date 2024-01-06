@@ -2,8 +2,9 @@
 
 Lista de servicios disponibles
 
-
-- LLDAP - Light LDAP implementation for authentication
+- [Authelia](/docs/services/authelia.md) - Authentication and authorization server
+    - https://auth.{{.DOMAIN}}
+- [LLDAP](/docs/services/lldap.md) - Light LDAP implementation for authentication
     - https://lldap.{{.DOMAIN}}
-- Traefik - HTTP reverse proxy and load balancer.
+- [Traefik](/docs/services/traefik.md) - HTTP reverse proxy and load balancer.
     - https://traefik.{{.DOMAIN}}

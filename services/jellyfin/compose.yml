@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+  ## Jellyfin - Media System
   ## Docker Hub: https://hub.docker.com/r/jellyfin/jellyfin
   ## Docs: https://jellyfin.org/docs/
   jellyfin:
