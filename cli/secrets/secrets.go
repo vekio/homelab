@@ -14,6 +14,7 @@ import (
 type s struct {
 	Authelia Authelia `yaml:"authelia"`
 	Gitea    Gitea    `yaml:"gitea"`
+	Immich   Immich   `yaml:"immich"`
 	Lldap    Lldap    `yaml:"lldap"`
 	Traefik  Traefik  `yaml:"traefik"`
 }
@@ -27,6 +28,10 @@ type Authelia struct {
 }
 
 type Gitea struct {
+}
+
+type Immich struct {
+	DBPass string `yaml:"db_pass"`
 }
 
 type Lldap struct {
@@ -67,6 +72,11 @@ func InitSecrets(filename string) error {
 		return fmt.Errorf("initSecrets: failed to generate Authelia secrets: %w", err)
 	}
 
+	immichSecrets, err := immichSecrets()
+	if err != nil {
+		return fmt.Errorf("initSecrets: failed to generate Immich secrets: %w", err)
+	}
+
 	lldapSecrets, err := lldapSecrets()
 	if err != nil {
 		return fmt.Errorf("initSecrets: failed to generate Lldap secrets: %w", err)
@@ -75,6 +85,7 @@ func InitSecrets(filename string) error {
 	Secrets = s{
 		Authelia: autheliaSecrets,
 		Gitea:    Gitea{},
+		Immich:   immichSecrets,
 		Lldap:    lldapSecrets,
 		Traefik:  Traefik{},
 	}
@@ -147,6 +158,20 @@ func lldapSecrets() (Lldap, error) {
 	}
 
 	return lldapSecrets, nil
+}
+
+// immichSecrets generates secrets required for Immich.
+func immichSecrets() (Immich, error) {
+	dbPass, err := _sgen.GenerateRandomAlphaNumeric(16)
+	if err != nil {
+		return Immich{}, fmt.Errorf("immichSecrets: failed to generate db pass: %w", err)
+	}
+
+	immichSecrets := Immich{
+		DBPass: dbPass,
+	}
+
+	return immichSecrets, nil
 }
 
 // loadSecrets loads secrets data from a YAML file.

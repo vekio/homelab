@@ -60,6 +60,10 @@ var initCmd = &cli.Command{
 			return err
 		}
 
+		if err := services.InitImmich(); err != nil {
+			return err
+		}
+
 		if err := services.InitJellyfin(); err != nil {
 			return err
 		}
@@ -102,6 +106,11 @@ var allUpCmd = &cli.Command{
 			return err
 		}
 
+		err = execDockerCompose(services.IMMICH, "up", "-d")
+		if err != nil {
+			return err
+		}
+
 		return
 	},
 }
@@ -112,6 +121,11 @@ var allDownCmd = &cli.Command{
 	Usage:   "Stop and remove services containers, networks and volumes",
 	Action: func(cCtx *cli.Context) (err error) {
 		// Order by less priority
+		err = execDockerCompose(services.IMMICH, "down", "-v")
+		if err != nil {
+			return err
+		}
+
 		err = execDockerCompose(services.GITEA, "down", "-v")
 		if err != nil {
 			return err
