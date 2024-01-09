@@ -14,6 +14,7 @@ import (
 type s struct {
 	Authelia Authelia `yaml:"authelia"`
 	Gitea    Gitea    `yaml:"gitea"`
+	Immich   Immich   `yaml:"immich"`
 	Lldap    Lldap    `yaml:"lldap"`
 	Traefik  Traefik  `yaml:"traefik"`
 }
@@ -27,6 +28,12 @@ type Authelia struct {
 }
 
 type Gitea struct {
+	OIDCSecret string
+}
+
+type Immich struct {
+	DBPass     string `yaml:"db_pass"`
+	OIDCSecret string
 }
 
 type Lldap struct {
@@ -67,6 +74,16 @@ func InitSecrets(filename string) error {
 		return fmt.Errorf("initSecrets: failed to generate Authelia secrets: %w", err)
 	}
 
+	giteaSecrets, err := giteaSecrets()
+	if err != nil {
+		return fmt.Errorf("initSecrets: failed to generate Gitea secrets: %w", err)
+	}
+
+	immichSecrets, err := immichSecrets()
+	if err != nil {
+		return fmt.Errorf("initSecrets: failed to generate Immich secrets: %w", err)
+	}
+
 	lldapSecrets, err := lldapSecrets()
 	if err != nil {
 		return fmt.Errorf("initSecrets: failed to generate Lldap secrets: %w", err)
@@ -74,7 +91,8 @@ func InitSecrets(filename string) error {
 
 	Secrets = s{
 		Authelia: autheliaSecrets,
-		Gitea:    Gitea{},
+		Gitea:    giteaSecrets,
+		Immich:   immichSecrets,
 		Lldap:    lldapSecrets,
 		Traefik:  Traefik{},
 	}
@@ -147,6 +165,40 @@ func lldapSecrets() (Lldap, error) {
 	}
 
 	return lldapSecrets, nil
+}
+
+// giteaSecrets generates various secrets required for Gitea.
+func giteaSecrets() (Gitea, error) {
+	oidcSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
+	if err != nil {
+		return Gitea{}, fmt.Errorf("giteaSecrets: failed to generate OIDC secret: %w", err)
+	}
+
+	giteaSecrets := Gitea{
+		OIDCSecret: oidcSecret,
+	}
+
+	return giteaSecrets, nil
+}
+
+// immichSecrets generates secrets required for Immich.
+func immichSecrets() (Immich, error) {
+	dbPass, err := _sgen.GenerateRandomAlphaNumeric(16)
+	if err != nil {
+		return Immich{}, fmt.Errorf("immichSecrets: failed to generate db pass: %w", err)
+	}
+
+	oidcSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
+	if err != nil {
+		return Immich{}, fmt.Errorf("immichSecrets: failed to generate OIDC secret: %w", err)
+	}
+
+	immichSecrets := Immich{
+		DBPass:     dbPass,
+		OIDCSecret: oidcSecret,
+	}
+
+	return immichSecrets, nil
 }
 
 // loadSecrets loads secrets data from a YAML file.

@@ -15,4 +15,5 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20231213231151-1d8dd44e695e // indirect
+	golang.org/x/crypto v0.18.0
 )

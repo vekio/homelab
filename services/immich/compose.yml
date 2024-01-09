@@ -1,0 +1,111 @@
+version: '3'
+
+secrets:
+  IMMICH_DB_PASS:
+    file: ${CONFIG}/immich/secrets/IMMICH_DB_PASS
+
+services:
+  ## Immich - Self-hosted photo and video backup
+  ## Docs: https://immich.app/docs/overview/introduction
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    container_name: immich_server
+    command: [ "start.sh", "immich" ]
+    restart: unless-stopped
+    networks:
+      - immich
+      - proxy
+    depends_on:
+      - redis
+      - database
+    secrets: [ IMMICH_DB_PASS ]
+    environment:
+      DB_HOSTNAME: ${IMMICH_DB_HOST:-database}
+      DB_USERNAME: ${IMMICH_DB_USER:-immich}
+      DB_PASSWORD_FILE: /run/secrets/IMMICH_DB_PASS
+      DB_DATABASE_NAME: ${IMMICH_DB_NAME:-immichdb}
+      REDIS_HOSTNAME: ${IMMICH_REDIS_HOST:-redis}
+    volumes:
+      - "${SPRING_GALLERY}:/usr/src/app/upload"
+      - "/etc/localtime:/etc/localtime:ro"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.immich-rtr.rule=Host(`photos.${DOMAIN}`)'
+      - 'traefik.http.routers.immich-rtr.entrypoints=websecure'
+      # - traefik.http.routers.immich-rtr.rule=(Host(`photos.${DOMAIN}`) && Pathprefix(`/api`))
+      - 'traefik.http.routers.immich-rtr.service=immich-svc'
+      - 'traefik.http.services.immich-svc.loadbalancer.server.port=3001'
+      # - traefik.http.middlewares.immichStripPrefix.stripprefix.prefixes=/api
+      # - traefik.http.routers.immich-rtr.middlewares=immichStripPrefix
+
+  immich-microservices:
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    container_name: immich_microservices
+    command: [ "start.sh", "microservices" ]
+    restart: unless-stopped
+    networks:
+      - immich
+    depends_on:
+      - redis
+      - database
+    secrets: [ IMMICH_DB_PASS ]
+    environment:
+      DB_HOSTNAME: ${IMMICH_DB_HOST:-database}
+      DB_USERNAME: ${IMMICH_DB_USER:-immich}
+      DB_PASSWORD_FILE: /run/secrets/IMMICH_DB_PASS
+      DB_DATABASE_NAME: ${IMMICH_DB_NAME:-immichdb}
+      REDIS_HOSTNAME: ${IMMICH_REDIS_HOST:-redis}
+    volumes:
+      - "${SPRING_MEDIA}:/usr/src/app/upload"
+      - "/etc/localtime:/etc/localtime:ro"
+    labels:
+      - 'traefik.enable=false'
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    container_name: immich_machine_learning
+    restart: unless-stopped
+    networks:
+      - immich
+    secrets: [ IMMICH_DB_PASS ]
+    environment:
+      DB_HOSTNAME: ${IMMICH_DB_HOST:-database}
+      DB_USERNAME: ${IMMICH_DB_USER:-immich}
+      DB_PASSWORD_FILE: /run/secrets/IMMICH_DB_PASS
+      DB_DATABASE_NAME: ${IMMICH_DB_NAME:-immichdb}
+      REDIS_HOSTNAME: ${IMMICH_REDIS_HOST:-redis}
+    volumes:
+      - "${CONFIG}/authelia/cache:/cache:rw"
+    labels:
+      - 'traefik.enable=false'
+
+  redis:
+    image: redis:6.2-alpine@sha256:c5a607fb6e1bb15d32bbcf14db22787d19e428d59e31a5da67511b49bb0f1ccc
+    container_name: immich_redis
+    restart: unless-stopped
+    networks:
+      - immich
+    labels:
+      - 'traefik.enable=false'
+
+  database:
+    image: tensorchord/pgvecto-rs:pg14-v0.1.11@sha256:0335a1a22f8c5dd1b697f14f079934f5152eaaa216c09b61e293be285491f8ee
+    container_name: immich_postgres
+    restart: unless-stopped
+    networks:
+      - immich
+    secrets: [ IMMICH_DB_PASS ]
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/IMMICH_DB_PASS
+      POSTGRES_USER: ${IMMICH_DB_USER:-immich}
+      POSTGRES_DB: ${IMMICH_DB_NAME:-immichdb}
+    volumes:
+      - "${CONFIG}/authelia/data:/var/lib/postgresql/data:rw"
+    labels:
+      - 'traefik.enable=false'
+
+networks:
+  proxy:
+    external: true
+  immich:
+    name: immich

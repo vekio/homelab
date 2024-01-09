@@ -58,8 +58,6 @@ authentication_backend:
     # The username and password of the admin user.
     # "admin" should be the admin username you set in the LLDAP configuration
     user: uid=admin,ou=people,dc={{.SLD}},dc={{.TLD}}
-    # Password can also be set using a secret: https://www.authelia.com/docs/configuration/secrets.html
-    # password: {{.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD}}
 
 access_control:
   default_policy: deny
@@ -109,13 +107,26 @@ identity_providers:
     clients:
     - id: gitea
       description: Gitea
-      # docker run --rm authelia/authelia:latest authelia crypto hash generate bcrypt --random --random.length 64 --random.charset alphanumeric
-      secret: '$2b$12$nF1UR/VivY5iLN.ka7lBd.8DTCFFLohxuQcZEpm4y/zSSM4VsaeZO' # NTVkBiXi0UooIE6QNz9p29b451dush1jXCi4j3WJ3378fGgLT2jogUiUJ7DjYbqxErN6TMXF
+      secret: '{{.GITEA_OIDC_SECRET}}'
       public: false
       authorization_policy: one_factor
       consent_mode: implicit
       redirect_uris:
         - https://gitea.{{.DOMAIN}}/user/oauth2/authelia/callback
+      scopes:
+        - openid
+        - email
+        - profile
+      userinfo_signing_algorithm: none
+    - id: immich
+      description: Immich
+      secret: '{{.IMMICH_OIDC_SECRET}}'
+      public: false
+      authorization_policy: one_factor
+      consent_mode: implicit
+      redirect_uris:
+        - https://photos.{{.DOMAIN}}/auth/login
+        - app.immich:/
       scopes:
         - openid
         - email

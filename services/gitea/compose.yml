@@ -1,6 +1,7 @@
-version: "3.7"
+version: '3'
 
 services:
+  ## Gitea - Self-hosted Git service
   ## Docker Hub: https://hub.docker.com/r/gitea/gitea/
   ## Docs: https://docs.gitea.com/
   gitea:
