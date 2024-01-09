@@ -36,10 +36,22 @@ func initAutheliaConfig(autheliaConf string) error {
 		return err
 	}
 
+	giteaOIDCHash, err := utils.Bcrypt(secrets.Secrets.Gitea.OIDCSecret)
+	if err != nil {
+		return err
+	}
+
+	immichOIDCHash, err := utils.Bcrypt(secrets.Secrets.Immich.OIDCSecret)
+	if err != nil {
+		return err
+	}
+
 	data := map[string]string{
-		"DOMAIN": os.Getenv("DOMAIN"),
-		"SLD":    os.Getenv("SLD"),
-		"TLD":    os.Getenv("TLD"),
+		"DOMAIN":             os.Getenv("DOMAIN"),
+		"SLD":                os.Getenv("SLD"),
+		"TLD":                os.Getenv("TLD"),
+		"GITEA_OIDC_SECRET":  giteaOIDCHash,
+		"IMMICH_OIDC_SECRET": immichOIDCHash,
 	}
 
 	src := repoConfig + "/" + AUTHELIA + "/config/configuration.yml"

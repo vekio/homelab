@@ -22,7 +22,7 @@ services:
     environment:
       DB_HOSTNAME: ${IMMICH_DB_HOST:-database}
       DB_USERNAME: ${IMMICH_DB_USER:-immich}
-      DB_PASSWORD: /run/secrets/IMMICH_DB_PASS
+      DB_PASSWORD_FILE: /run/secrets/IMMICH_DB_PASS
       DB_DATABASE_NAME: ${IMMICH_DB_NAME:-immichdb}
       REDIS_HOSTNAME: ${IMMICH_REDIS_HOST:-redis}
     volumes:
@@ -48,10 +48,11 @@ services:
     depends_on:
       - redis
       - database
+    secrets: [ IMMICH_DB_PASS ]
     environment:
       DB_HOSTNAME: ${IMMICH_DB_HOST:-database}
       DB_USERNAME: ${IMMICH_DB_USER:-immich}
-      DB_PASSWORD: /run/secrets/IMMICH_DB_PASS
+      DB_PASSWORD_FILE: /run/secrets/IMMICH_DB_PASS
       DB_DATABASE_NAME: ${IMMICH_DB_NAME:-immichdb}
       REDIS_HOSTNAME: ${IMMICH_REDIS_HOST:-redis}
     volumes:
@@ -66,10 +67,11 @@ services:
     restart: unless-stopped
     networks:
       - immich
+    secrets: [ IMMICH_DB_PASS ]
     environment:
       DB_HOSTNAME: ${IMMICH_DB_HOST:-database}
       DB_USERNAME: ${IMMICH_DB_USER:-immich}
-      DB_PASSWORD: /run/secrets/IMMICH_DB_PASS
+      DB_PASSWORD_FILE: /run/secrets/IMMICH_DB_PASS
       DB_DATABASE_NAME: ${IMMICH_DB_NAME:-immichdb}
       REDIS_HOSTNAME: ${IMMICH_REDIS_HOST:-redis}
     volumes:
@@ -94,7 +96,7 @@ services:
       - immich
     secrets: [ IMMICH_DB_PASS ]
     environment:
-      POSTGRES_PASSWORD: /run/secrets/IMMICH_DB_PASS
+      POSTGRES_PASSWORD_FILE: /run/secrets/IMMICH_DB_PASS
       POSTGRES_USER: ${IMMICH_DB_USER:-immich}
       POSTGRES_DB: ${IMMICH_DB_NAME:-immichdb}
     volumes:

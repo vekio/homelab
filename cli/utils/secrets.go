@@ -1,6 +1,10 @@
 package utils
 
-import "os"
+import (
+	"os"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 func WriteSecret(filename, secret string) error {
 	file, err := os.Create(filename)
@@ -15,4 +19,14 @@ func WriteSecret(filename, secret string) error {
 	}
 
 	return nil
+}
+
+func Bcrypt(password string) (string, error) {
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	hashedString := string(hashedBytes)
+	return hashedString, nil
 }
