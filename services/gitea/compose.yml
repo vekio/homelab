@@ -14,7 +14,7 @@ services:
     #   - "3000:3000"
     #   - "666:22"
     volumes:
-      - "${CONFIG}/gitea/data:/data"
+      - "${SPRING_VOLUME}/gitea/data:/data"
     environment:
       USER_UID: ${UUID}
       USER_GID: ${GGID}

@@ -73,7 +73,7 @@ services:
       DB_DATABASE_NAME: ${IMMICH_DB_NAME:-immichdb}
       REDIS_HOSTNAME: ${IMMICH_REDIS_HOST:-redis}
     volumes:
-      - "${CONFIG}/authelia/cache:/cache:rw"
+      - "${SPRING_VOLUME}/authelia/cache:/cache:rw"
     labels:
       - 'traefik.enable=false'
 
@@ -98,7 +98,7 @@ services:
       POSTGRES_USER: ${IMMICH_DB_USER:-immich}
       POSTGRES_DB: ${IMMICH_DB_NAME:-immichdb}
     volumes:
-      - "${CONFIG}/authelia/data:/var/lib/postgresql/data:rw"
+      - "${SPRING_VOLUME}/authelia/data:/var/lib/postgresql/data:rw"
     labels:
       - 'traefik.enable=false'
 

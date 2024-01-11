@@ -46,7 +46,7 @@ services:
       AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
       AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE: /run/secrets/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
     volumes:
-      - "${CONFIG}/authelia/config:/config:rw"
+      - "${SPRING_VOLUME}/authelia/config:/config:rw"
     labels:
       - 'traefik.enable=true'
       # web

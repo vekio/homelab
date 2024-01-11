@@ -18,8 +18,8 @@ services:
       DO_AUTH_TOKEN: ${TRAEFIK_DO_TOKEN}
       TZ: ${TZ}
     volumes:
-      - "${CONFIG}/traefik/certificates:/letsencrypt:rw"
-      - "${CONFIG}/traefik/config:/etc/traefik:ro"
+      - "${SPRING_VOLUME}/traefik/certificates:/letsencrypt:rw"
+      - "${SPRING_VOLUME}/traefik/config:/etc/traefik:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - traefik.enable=true

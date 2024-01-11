@@ -27,7 +27,7 @@ services:
       LLDAP_LDAP_USER_PASS_FILE: /run/secrets/LLDAP_LDAP_USER_PASS_FILE
       LLDAP_LDAP_BASE_DN: dc=${SLD},dc=${TLD}
     volumes:
-      - "${CONFIG}/lldap/data:/data:rw"
+      - "${SPRING_VOLUME}/lldap/data:/data:rw"
     labels:
       - traefik.enable=true
       # web
