@@ -19,15 +19,16 @@ function dotenv () {
 # Replace env variables
 # -----------------------------------------------------------------------------
 function upload-configs () {
-  ssh spring "mkdir -p ${SPRING_CONFIG} \
-    ${SPRING_CONFIG}/authelia \
-    ${SPRING_CONFIG}/gitea \
-    ${SPRING_CONFIG}/jellyfin \
-    ${SPRING_CONFIG}/lldap \
-    ${SPRING_CONFIG}/traefik"
+  ssh spring "mkdir -p ${SPRING_VOLUME} \
+    ${SPRING_VOLUME}/authelia \
+    ${SPRING_VOLUME}/gitea \
+    ${SPRING_VOLUME}/immich \
+    ${SPRING_VOLUME}/jellyfin \
+    ${SPRING_VOLUME}/lldap \
+    ${SPRING_VOLUME}/traefik"
 
-  scp -r ${CONFIG}/authelia/config spring:${SPRING_CONFIG}/authelia
-  scp -r ${CONFIG}/traefik/config spring:${SPRING_CONFIG}/traefik
+  scp -r ${CONFIG}/authelia/config spring:${SPRING_VOLUME}/authelia
+  scp -r ${CONFIG}/traefik/config spring:${SPRING_VOLUME}/traefik
 }
 
 # Main

@@ -13,8 +13,8 @@ services:
     # ports:
     #   - "8096:8096"
     volumes:
-      - "${SPRING_CONFIG}/jellyfin/config:/config:rw"
-      - "${SPRING_CONFIG}/jellyfin/cache:/cache:rw"
+      - "${SPRING_VOLUME}/jellyfin/config:/config:rw"
+      - "${SPRING_VOLUME}/jellyfin/cache:/cache:rw"
       - "${SPRING_MEDIA}/movies:/media/movies:rw"
       - "${SPRING_MEDIA}/tvshows:/media/tvshows:rw"
       - "${SPRING_TRANSCODE}:/transcode:rw"
