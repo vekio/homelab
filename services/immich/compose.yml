@@ -30,13 +30,11 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
     labels:
       - 'traefik.enable=true'
+      # web
       - 'traefik.http.routers.immich-rtr.rule=Host(`photos.${DOMAIN}`)'
       - 'traefik.http.routers.immich-rtr.entrypoints=websecure'
-      # - traefik.http.routers.immich-rtr.rule=(Host(`photos.${DOMAIN}`) && Pathprefix(`/api`))
       - 'traefik.http.routers.immich-rtr.service=immich-svc'
       - 'traefik.http.services.immich-svc.loadbalancer.server.port=3001'
-      # - traefik.http.middlewares.immichStripPrefix.stripprefix.prefixes=/api
-      # - traefik.http.routers.immich-rtr.middlewares=immichStripPrefix
 
   immich-microservices:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}

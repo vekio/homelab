@@ -35,7 +35,8 @@ Jellyfin - Media System
 8. Jellyfin User Settings:
     - Enable User Creation: Check
     - Enable access to all libraries: Check
-9. Entrar con el usuario admin y eliminar al usuario con el que iniciamos la instalción `install`
+9. Entrar con el usuario `homelab` y darle permisos de admin
+10. Eliminar al usuario `install`
 
 ## Referencias
 

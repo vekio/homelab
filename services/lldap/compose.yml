@@ -30,11 +30,11 @@ services:
       - "${CONFIG}/lldap/data:/data:rw"
     labels:
       - traefik.enable=true
+      # web
       - traefik.http.routers.lldap-rtr.entrypoints=websecure
       - traefik.http.routers.lldap-rtr.rule=Host(`lldap.${DOMAIN}`)
       - traefik.http.routers.lldap-rtr.service=lldap-svc
       - traefik.http.services.lldap-svc.loadbalancer.server.port=17170
-      # - traefik.http.routers.lldap-rtr.middlewares=authelia@docker
 
 networks:
   proxy:

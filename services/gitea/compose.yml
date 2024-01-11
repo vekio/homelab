@@ -49,7 +49,6 @@ services:
       - traefik.http.routers.giteaWeb-rtr.rule=Host(`gitea.${DOMAIN}`)
       - traefik.http.routers.giteaWeb-rtr.service=giteaWeb-svc
       - traefik.http.services.giteaWeb-svc.loadbalancer.server.port=3000
-      # - traefik.http.routers.giteaWeb-rtr.middlewares=authelia@file
       # ssh
       - traefik.tcp.routers.giteaSSH-rtr.entrypoints=ssh
       - traefik.tcp.routers.giteaSSH-rtr.rule=HostSNI(`*`)

@@ -55,9 +55,7 @@ authentication_backend:
     mail_attribute: mail
     # The attribute holding the display name of the user. This will be used to greet an authenticated user.
     display_name_attribute: displayName
-    # The username and password of the admin user.
-    # "admin" should be the admin username you set in the LLDAP configuration
-    user: uid=admin,ou=people,dc={{.SLD}},dc={{.TLD}}
+    user: uid=lldap,ou=people,dc={{.SLD}},dc={{.TLD}}
 
 access_control:
   default_policy: deny
@@ -65,7 +63,7 @@ access_control:
     - domain: traefik.{{.DOMAIN}}
       policy: one_factor
       subject:
-        - 'group:admins'
+        - 'group:traefik_admin'
 
 session:
   name: authelia_session
@@ -126,6 +124,7 @@ identity_providers:
       consent_mode: implicit
       redirect_uris:
         - https://photos.{{.DOMAIN}}/auth/login
+        - https://photos.{{.DOMAIN}}/user-settings
         - app.immich:/
       scopes:
         - openid

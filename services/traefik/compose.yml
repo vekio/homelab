@@ -23,6 +23,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - traefik.enable=true
+      # web
       - traefik.http.routers.traefik-rtr.entrypoints=websecure
       - traefik.http.routers.traefik-rtr.rule=Host(`traefik.${DOMAIN}`)
       - traefik.http.routers.traefik-rtr.service=api@internal
