@@ -106,6 +106,11 @@ var allUpCmd = &cli.Command{
 			return err
 		}
 
+		err = execDockerCompose(services.JELLYFIN, "up", "-d")
+		if err != nil {
+			return err
+		}
+
 		err = execDockerCompose(services.IMMICH, "up", "-d")
 		if err != nil {
 			return err
@@ -122,6 +127,11 @@ var allDownCmd = &cli.Command{
 	Action: func(cCtx *cli.Context) (err error) {
 		// Order by less priority
 		err = execDockerCompose(services.IMMICH, "down", "-v")
+		if err != nil {
+			return err
+		}
+
+		err = execDockerCompose(services.JELLYFIN, "down", "-v")
 		if err != nil {
 			return err
 		}
