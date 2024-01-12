@@ -29,12 +29,12 @@ services:
     volumes:
       - "${SPRING_VOLUME}/lldap/data:/data:rw"
     labels:
-      - traefik.enable=true
+      - 'traefik.enable=true'
       # web
-      - traefik.http.routers.lldap-rtr.entrypoints=websecure
-      - traefik.http.routers.lldap-rtr.rule=Host(`lldap.${DOMAIN}`)
-      - traefik.http.routers.lldap-rtr.service=lldap-svc
-      - traefik.http.services.lldap-svc.loadbalancer.server.port=17170
+      - 'traefik.http.routers.lldap-rtr.entrypoints=websecure'
+      - 'traefik.http.routers.lldap-rtr.rule=Host(`lldap.${DOMAIN}`)'
+      - 'traefik.http.routers.lldap-rtr.service=lldap-svc'
+      - 'traefik.http.services.lldap-svc.loadbalancer.server.port=17170'
 
 networks:
   proxy:

@@ -6,12 +6,17 @@ LLDAP - Light LDAP implementation for authentication
 
 1. Iniciar sesión con `admin`
 2. Crear grupos:
-    - `traefik_admin`
+    - `admins`
+    - `jellyfin_users`
 3. Crear usuarios:
-    - `homelab`, grupos: `lldap_admin`, `traefik_admin`
+    - `homelab`, grupos: `lldap_admin`, `admins`, `jellyfin_users`
     - `lldap`, groups: `lldap_strict_readonly` y `lldap_password_manager`
       La contraseña debe coincidir con el secreto LLDAP_LDAP_USER_PASS_FILE
-4. Eliminar `admin`
+4. Eliminar usuario `admin`
+5. Crear usuarios personales
+
+⚠️ Al crear usuarios hay que añadir le campo name (Display Name) que sino falla
+la autenticación de jellyfin
 
 ## Acceso
 

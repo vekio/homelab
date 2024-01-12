@@ -27,11 +27,12 @@ services:
     devices:
       - /dev/dri:/dev/dri
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.jellyfin-rtr.entrypoints=websecure
-      - traefik.http.routers.jellyfin-rtr.rule=Host(`media.${DOMAIN}`)
-      - traefik.http.routers.jellyfin-rtr.service=jellyfin-svc
-      - traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096
+      - 'traefik.enable=true'
+      # web
+      - 'traefik.http.routers.jellyfin-rtr.entrypoints=websecure'
+      - 'traefik.http.routers.jellyfin-rtr.rule=Host(`media.${DOMAIN}`)'
+      - 'traefik.http.routers.jellyfin-rtr.service=jellyfin-svc'
+      - 'traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096'
 
 networks:
   proxy:

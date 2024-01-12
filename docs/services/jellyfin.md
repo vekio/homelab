@@ -4,11 +4,10 @@ Jellyfin - Media System
 
 ## Instalación
 
-1. Idioma: Español
-2. Admin account (mas adelante será eliminada):
-    - `install`
-    - random
-3. Idioma: Español; Castellano. País: España.
+1. Seleccionar idioma de la interfaz: Español
+2. Crear cuenta admin (mas adelante será eliminada):
+    - `temp`
+3. Seleccionar idioma de los metadatos: Spanish; Catilian. País: Spain.
 4. Permitir conexiones remotas OK
 5. Plugins:
     - Instalar: "LDAP Authentication". Reiniciar
@@ -20,7 +19,7 @@ Jellyfin - Media System
     - Skip SSL/TLS Verification: No Check
     - Allow Password Change: No Check
     - Password Reset Url: Empty
-    - LDAP Bind User: uid=admin,ou=people,dc={{.SLD}},dc={{.TLD}}
+    - LDAP Bind User: uid=lldap,ou=people,dc={{.SLD}},dc={{.TLD}}
     - User Password: LLDAP_LDAP_USER_PASS_FILE
     - LDAP Base DN: dc={{.SLD}},dc={{.TLD}}
     - Probar haciendo click en "Save and Test LDAP Server Settings"
