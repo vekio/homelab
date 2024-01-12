@@ -115,6 +115,7 @@ identity_providers:
         - openid
         - email
         - profile
+        - groups
       userinfo_signing_algorithm: none
     - id: immich
       description: Immich
