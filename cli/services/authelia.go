@@ -50,6 +50,10 @@ func initAutheliaConfig(autheliaConf string) error {
 		"DOMAIN":             os.Getenv("DOMAIN"),
 		"SLD":                os.Getenv("SLD"),
 		"TLD":                os.Getenv("TLD"),
+		"SMTP_USERNAME":      os.Getenv("SMTP_USERNAME"),
+		"SMTP_HOST":          os.Getenv("SMTP_HOST"),
+		"SMTP_PORT":          os.Getenv("SMTP_PORT"),
+		"SMTP_FROM":          os.Getenv("SMTP_FROM"),
 		"GITEA_OIDC_SECRET":  giteaOIDCHash,
 		"IMMICH_OIDC_SECRET": immichOIDCHash,
 	}
@@ -97,6 +101,11 @@ func initAutheliaSecrets(autheliaConf string) error {
 
 	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE",
 		secrets.Secrets.Lldap.LDAPUserPass); err != nil {
+		return err
+	}
+
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE",
+		os.Getenv("SMTP_PASSWORD")); err != nil {
 		return err
 	}
 

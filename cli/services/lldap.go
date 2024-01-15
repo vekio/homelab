@@ -48,6 +48,11 @@ func initLldapSecrets(lldapConf string) error {
 		return err
 	}
 
+	if err = utils.WriteSecret(secretsDir+"/LLDAP_SMTP_OPTIONS__PASSWORD_FILE",
+		os.Getenv("SMTP_PASSWORD")); err != nil {
+		return err
+	}
+
 	return nil
 }
 

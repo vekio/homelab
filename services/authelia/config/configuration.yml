@@ -88,18 +88,18 @@ storage:
     path: /config/db.sqlite3
 
 notifier:
-  # TODO link smtp service
-  # smtp:
-  #   username: test
-  #   # This secret can also be set using the env variables AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
-  #   password: password
-  #   host: mail.example.com
-  #   port: 25
-  #   sender: admin@example.com
-  filesystem:
-    filename: /config/notification.txt
+  smtp:
+    username: {{.SMTP_USERNAME}}
+    host: {{.SMTP_HOST}}
+    port: {{.SMTP_PORT}}
+    sender: "{{.SMTP_FROM}}"
+    subject: "[Authelia] {title}"
+    disable_starttls: false
+    tls:
+      skip_verify: true
+  # filesystem:
+  #   filename: /config/notification.txt
 
-# TODO bcrypt to crypto lib, new command to append this text when required (or uncomment)
 identity_providers:
   oidc:
     clients:

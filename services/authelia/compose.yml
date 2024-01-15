@@ -13,6 +13,8 @@ secrets:
     file: ${CONFIG}/authelia/secrets/AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
   AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE:
     file: ${CONFIG}/authelia/secrets/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
+  AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE:
+    file: ${CONFIG}/authelia/secrets/AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
 
 services:
   ## Authelia - Authentication and authorization server
@@ -24,6 +26,7 @@ services:
     restart: unless-stopped
     networks:
       - proxy
+      - smtp
     expose:
       - 9091
     secrets:
@@ -33,7 +36,8 @@ services:
         AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE,
         AUTHELIA_SESSION_SECRET_FILE,
         AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE,
-        AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
+        AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE,
+        AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
       ]
     environment:
       TZ: ${TZ}
@@ -45,6 +49,7 @@ services:
       AUTHELIA_SESSION_SECRET_FILE: /run/secrets/AUTHELIA_SESSION_SECRET_FILE
       AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
       AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE: /run/secrets/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
+      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: /run/secrets/AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
     volumes:
       - "${SPRING_VOLUME}/authelia/config:/config:rw"
     labels:
@@ -59,4 +64,6 @@ services:
 
 networks:
   proxy:
+    external: true
+  smtp:
     external: true
