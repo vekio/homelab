@@ -27,12 +27,12 @@ function upload-configs () {
     ${SPRING_VOLUME}/lldap \
     ${SPRING_VOLUME}/traefik"
 
-  scp -r ${CONFIG}/authelia spring:${SPRING_VOLUME}/authelia
-  scp -r ${CONFIG}/gitea spring:${SPRING_VOLUME}/gitea
-  scp -r ${CONFIG}/immich spring:${SPRING_VOLUME}/immich
-  scp -r ${CONFIG}/jellyfin spring:${SPRING_VOLUME}/jellyfin
-  scp -r ${CONFIG}/lldap spring:${SPRING_VOLUME}/lldap
-  scp -r ${CONFIG}/traefik spring:${SPRING_VOLUME}/traefik
+  rsync -av --exclude='secrets' ${CONFIG}/authelia spring:${SPRING_VOLUME}/authelia
+  rsync -av --exclude='secrets' ${CONFIG}/gitea spring:${SPRING_VOLUME}/gitea
+  rsync -av --exclude='secrets' ${CONFIG}/immich spring:${SPRING_VOLUME}/immich
+  rsync -av --exclude='secrets' ${CONFIG}/jellyfin spring:${SPRING_VOLUME}/jellyfin
+  rsync -av --exclude='secrets' ${CONFIG}/lldap spring:${SPRING_VOLUME}/lldap
+  rsync -av --exclude='secrets' ${CONFIG}/traefik spring:${SPRING_VOLUME}/traefik
 }
 
 # Main
