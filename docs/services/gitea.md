@@ -18,9 +18,7 @@ Gitea - Self-hosted Git service
     - Required Claim Value: `gitea_users`
 5. Iniciar sesion con `homelab` y linkearlo con el usuario inicial `homelab`
 
-## TODO
-
-- [ ] Filtro para grupo de usuarios
+Los usuarios que quieran acceder a gitea deben estar en el grupo `gitea_users`.
 
 ## Referencias
 

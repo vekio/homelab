@@ -15,6 +15,7 @@ func execDockerCompose(service string, command ...string) error {
 
 	cmdArgs := append([]string{"docker", "compose", "-f", composeFile}, command...)
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 

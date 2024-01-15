@@ -2,6 +2,7 @@ package homelab
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/urfave/cli/v2"
@@ -51,7 +52,6 @@ var initCmd = &cli.Command{
 	Aliases: []string{"i"},
 	Usage:   "Initialize required folders and config files",
 	Action: func(cCtx *cli.Context) error {
-
 		if err := services.InitAuthelia(); err != nil {
 			return err
 		}
@@ -91,28 +91,30 @@ var allUpCmd = &cli.Command{
 			return err
 		}
 
-		err = execDockerCompose(services.LLDAP, "up", "-d")
-		if err != nil {
+		if err = os.Setenv("PROTONMAIL_BRIDGE_COMMAND", ""); err != nil {
+			return err
+		}
+		if err = execDockerCompose(services.PROTONMAIL_BRIDGE, "up", "-d"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.AUTHELIA, "up", "-d")
-		if err != nil {
+		if err = execDockerCompose(services.LLDAP, "up", "-d"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.GITEA, "up", "-d")
-		if err != nil {
+		if err = execDockerCompose(services.AUTHELIA, "up", "-d"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.JELLYFIN, "up", "-d")
-		if err != nil {
+		if err = execDockerCompose(services.GITEA, "up", "-d"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.IMMICH, "up", "-d")
-		if err != nil {
+		if err = execDockerCompose(services.JELLYFIN, "up", "-d"); err != nil {
+			return err
+		}
+
+		if err = execDockerCompose(services.IMMICH, "up", "-d"); err != nil {
 			return err
 		}
 
@@ -126,33 +128,31 @@ var allDownCmd = &cli.Command{
 	Usage:   "Stop and remove services containers, networks and volumes",
 	Action: func(cCtx *cli.Context) (err error) {
 		// Order by less priority
-		err = execDockerCompose(services.IMMICH, "down", "-v")
-		if err != nil {
+		if err = execDockerCompose(services.IMMICH, "down", "-v"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.JELLYFIN, "down", "-v")
-		if err != nil {
+		if err = execDockerCompose(services.JELLYFIN, "down", "-v"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.GITEA, "down", "-v")
-		if err != nil {
+		if err = execDockerCompose(services.GITEA, "down", "-v"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.AUTHELIA, "down", "-v")
-		if err != nil {
+		if err = execDockerCompose(services.AUTHELIA, "down", "-v"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.LLDAP, "down", "-v")
-		if err != nil {
+		if err = execDockerCompose(services.LLDAP, "down", "-v"); err != nil {
 			return err
 		}
 
-		err = execDockerCompose(services.TRAEFIK, "down", "-v")
-		if err != nil {
+		if err = execDockerCompose(services.TRAEFIK, "down", "-v"); err != nil {
+			return err
+		}
+
+		if err = execDockerCompose(services.PROTONMAIL_BRIDGE, "down", "-v"); err != nil {
 			return err
 		}
 
