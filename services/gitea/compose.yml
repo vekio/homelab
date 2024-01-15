@@ -10,6 +10,7 @@ services:
     restart: unless-stopped
     networks:
       - proxy
+      - smtp
     # ports:
     #   - "3000:3000"
     #   - "666:22"
@@ -23,25 +24,25 @@ services:
       ROOT_URL: "https://gitea.${DOMAIN}"
       DOMAIN: "gitea.${DOMAIN}"
       SSH_DOMAIN: "gitea.${DOMAIN}"
-      # GITEA__mailer__ENABLED: true
-      # GITEA__mailer__PROTOCOL: "smtp+starttls"
-      # GITEA__mailer__FROM: "${SMTP_FROM}"
-      # GITEA__mailer__SMTP_ADDR: "${SMTP_HOST}"
-      # GITEA__mailer__SMTP_PORT: ${SMTP_PORT}
-      # GITEA__mailer__USER: "${SMTP_USERNAME}"
-      # GITEA__mailer__PASSWD: "${SMTP_PASSWORD}"
-      # GITEA__mailer__FORCE_TRUST_SERVER_CERT: true
-
+      # SMTP
+      GITEA__mailer__ENABLED: true
+      GITEA__mailer__PROTOCOL: "smtp+starttls"
+      GITEA__mailer__FROM: "${SMTP_FROM}"
+      GITEA__mailer__SMTP_ADDR: "${SMTP_HOST}"
+      GITEA__mailer__SMTP_PORT: ${SMTP_PORT}
+      GITEA__mailer__USER: "${SMTP_USERNAME}"
+      GITEA__mailer__PASSWD: "${SMTP_PASSWORD}"
+      GITEA__mailer__FORCE_TRUST_SERVER_CERT: true
+      # OpenID
       GITEA__service__DISABLE_REGISTRATION: false
       GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: true
-
+      GITEA__openid__ENABLE_OPENID_SIGNUP: true
+      GITEA__openid__ENABLE_OPENID_SIGNIN: false
+      GITEA__openid__WHITELISTED_URIS: "auth.${DOMAIN}"
+      #
       # GITEA__service__REGISTER_EMAIL_CONFIRM: true
       # GITEA__service__ENABLE_NOTIFY_MAIL: true
       # GITEA__service__REQUIRE_SIGNIN_VIEW: true
-
-      GITEA__openid__ENABLE_OPENID_SIGNUP: true
-      GITEA__openid__ENABLE_OPENID_SIGNIN: false
-      GITEA__openid__WHITELISTED_URIS: auth.${DOMAIN}
     labels:
       - traefik.enable=true
       # web
@@ -59,3 +60,6 @@ networks:
   proxy:
     external: true
     name: proxy
+  smtp:
+    external: true
+    name: smtp

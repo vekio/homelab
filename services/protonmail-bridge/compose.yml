@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  ## Protonmail-bridge: SMTP
+  ## Docker Hub: https://hub.docker.com/r/shenxn/protonmail-bridge
+  protonmail-bridge:
+    image: shenxn/protonmail-bridge:${PROTONMAIL_BRIDGE_VERSION:-latest}
+    container_name: protonmail-bridge
+    restart: unless-stopped
+    networks:
+      - smtp
+    # ports:
+    #   - 1025:25/tcp
+    #   - 1143:143/tcp
+    stdin_open: true
+    tty: true
+    command: ${PROTONMAIL_BRIDGE_COMMAND}
+    volumes:
+      - "${SPRING_VOLUME}/protonmail-bridge:/root"
+
+networks:
+  smtp:
+    name: smtp
