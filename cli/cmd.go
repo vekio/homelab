@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/urfave/cli/v2"
-	"github.com/vekio/homelab/cli/services"
+	services "github.com/vekio/homelab/cli/services_old"
 )
 
 const command = "homelab"
@@ -42,7 +42,6 @@ func commands() []*cli.Command {
 	}
 
 	commands = append(commands, initCmd, allUpCmd, allDownCmd)
-	commands = append(commands, testCmd)
 
 	return commands
 }

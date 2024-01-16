@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v2"
-	"github.com/vekio/homelab/cli/services"
+	services "github.com/vekio/homelab/cli/services_old"
 )
 
 func serviceCmdFactory(service string) *cli.Command {

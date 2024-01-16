@@ -1,5 +1,7 @@
 package conf
 
+// TODO Mover a otro repo
+
 import (
 	"fmt"
 	"os"
@@ -9,6 +11,7 @@ import (
 	"github.com/vekio/fs"
 	"github.com/vekio/fs/dir"
 	"github.com/vekio/fs/file"
+	"gopkg.in/yaml.v3"
 )
 
 type C struct {
@@ -115,5 +118,18 @@ func (c C) SoftInit() error {
 			return fmt.Errorf("error at soft-init config: %w", err)
 		}
 	}
+	return nil
+}
+
+func (c C) ReadConfig(config interface{}) error {
+	yamlFile, err := os.ReadFile(c.Path())
+	if err != nil {
+		return fmt.Errorf("error leyendo el archivo YAML: %w", err)
+	}
+
+	if err := yaml.Unmarshal(yamlFile, config); err != nil {
+		return fmt.Errorf("error deserializando YAML: %w", err)
+	}
+
 	return nil
 }

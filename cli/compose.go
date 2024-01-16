@@ -1,27 +1,12 @@
 package homelab
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-
 	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/cli/utils"
 )
 
 func execDockerCompose(service string, command ...string) error {
-	repository := settings.getRepository()
-	composeFile := fmt.Sprintf("%s/%s/compose.yml", repository, service)
 
-	cmdArgs := append([]string{"docker", "compose", "-f", composeFile}, command...)
-	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("execute %s compose: %w", service, err)
-	}
 	return nil
 }
 
