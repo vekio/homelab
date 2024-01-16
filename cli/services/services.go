@@ -1,14 +1,14 @@
 package services
 
-var repoConfig string = "/home/alberto/src/homelab/services"
+type Service struct {
+	Name        string
+	ComposeFile string
+	Init        Initialize
+	Context     string
+}
 
-func AvailableServices() []string {
-	return []string{
-		AUTHELIA,
-		GITEA,
-		IMMICH,
-		JELLYFIN,
-		LLDAP,
-		PROTONMAIL_BRIDGE,
-		TRAEFIK}
+type Initialize func() error
+
+func init() {
+
 }
