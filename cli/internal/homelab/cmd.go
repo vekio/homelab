@@ -2,11 +2,9 @@ package homelab
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/urfave/cli/v2"
-	services "github.com/vekio/homelab/cli/services_old"
 )
 
 const command = "homelab"
@@ -31,130 +29,130 @@ var Cmd = &cli.App{
 	Version:   version,
 	Compiled:  time.Now(),
 	Copyright: fmt.Sprintf("%s (%s) Copyright %s\nLicense Apache-2.0", command, version, authorName),
-	Commands:  commands(),
+	// Commands:  commands(),
 }
 
-func commands() []*cli.Command {
-	var commands []*cli.Command
+// func commands() []*cli.Command {
+// 	var commands []*cli.Command
 
-	for _, srv := range services.AvailableServices() {
-		commands = append(commands, serviceCmdFactory(srv))
-	}
+// 	for _, srv := range services.AvailableServices() {
+// 		commands = append(commands, serviceCmdFactory(srv))
+// 	}
 
-	commands = append(commands, initCmd, allUpCmd, allDownCmd)
+// 	commands = append(commands, initCmd, allUpCmd, allDownCmd)
 
-	return commands
-}
+// 	return commands
+// }
 
-var initCmd = &cli.Command{
-	Name:    "init",
-	Aliases: []string{"i"},
-	Usage:   "Initialize required folders and config files",
-	Action: func(cCtx *cli.Context) error {
-		if err := services.InitAuthelia(); err != nil {
-			return err
-		}
+// var initCmd = &cli.Command{
+// 	Name:    "init",
+// 	Aliases: []string{"i"},
+// 	Usage:   "Initialize required folders and config files",
+// 	Action: func(cCtx *cli.Context) error {
+// 		if err := services.InitAuthelia(); err != nil {
+// 			return err
+// 		}
 
-		if err := services.InitGitea(); err != nil {
-			return err
-		}
+// 		if err := services.InitGitea(); err != nil {
+// 			return err
+// 		}
 
-		if err := services.InitImmich(); err != nil {
-			return err
-		}
+// 		if err := services.InitImmich(); err != nil {
+// 			return err
+// 		}
 
-		if err := services.InitJellyfin(); err != nil {
-			return err
-		}
+// 		if err := services.InitJellyfin(); err != nil {
+// 			return err
+// 		}
 
-		if err := services.InitLldap(); err != nil {
-			return err
-		}
+// 		if err := services.InitLldap(); err != nil {
+// 			return err
+// 		}
 
-		if err := services.InitTraefik(); err != nil {
-			return err
-		}
+// 		if err := services.InitTraefik(); err != nil {
+// 			return err
+// 		}
 
-		return nil
-	},
-}
+// 		return nil
+// 	},
+// }
 
-var allUpCmd = &cli.Command{
-	Name:    "allup",
-	Aliases: []string{"au"},
-	Usage:   "Create and start all service containers",
-	Action: func(cCtx *cli.Context) (err error) {
-		// Order by priority
-		err = execDockerCompose(services.TRAEFIK, "up", "-d")
-		if err != nil {
-			return err
-		}
+// var allUpCmd = &cli.Command{
+// 	Name:    "allup",
+// 	Aliases: []string{"au"},
+// 	Usage:   "Create and start all service containers",
+// 	Action: func(cCtx *cli.Context) (err error) {
+// 		// Order by priority
+// 		err = execDockerCompose(services.TRAEFIK, "up", "-d")
+// 		if err != nil {
+// 			return err
+// 		}
 
-		if err = os.Setenv("PROTONMAIL_BRIDGE_COMMAND", ""); err != nil {
-			return err
-		}
-		if err = execDockerCompose(services.PROTONMAIL_BRIDGE, "up", "-d"); err != nil {
-			return err
-		}
+// 		if err = os.Setenv("PROTONMAIL_BRIDGE_COMMAND", ""); err != nil {
+// 			return err
+// 		}
+// 		if err = execDockerCompose(services.PROTONMAIL_BRIDGE, "up", "-d"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.LLDAP, "up", "-d"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.LLDAP, "up", "-d"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.AUTHELIA, "up", "-d"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.AUTHELIA, "up", "-d"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.GITEA, "up", "-d"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.GITEA, "up", "-d"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.JELLYFIN, "up", "-d"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.JELLYFIN, "up", "-d"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.IMMICH, "up", "-d"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.IMMICH, "up", "-d"); err != nil {
+// 			return err
+// 		}
 
-		return
-	},
-}
+// 		return
+// 	},
+// }
 
-var allDownCmd = &cli.Command{
-	Name:    "alldown",
-	Aliases: []string{"ad"},
-	Usage:   "Stop and remove services containers, networks and volumes",
-	Action: func(cCtx *cli.Context) (err error) {
-		// Order by less priority
-		if err = execDockerCompose(services.IMMICH, "down", "-v"); err != nil {
-			return err
-		}
+// var allDownCmd = &cli.Command{
+// 	Name:    "alldown",
+// 	Aliases: []string{"ad"},
+// 	Usage:   "Stop and remove services containers, networks and volumes",
+// 	Action: func(cCtx *cli.Context) (err error) {
+// 		// Order by less priority
+// 		if err = execDockerCompose(services.IMMICH, "down", "-v"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.JELLYFIN, "down", "-v"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.JELLYFIN, "down", "-v"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.GITEA, "down", "-v"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.GITEA, "down", "-v"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.AUTHELIA, "down", "-v"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.AUTHELIA, "down", "-v"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.LLDAP, "down", "-v"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.LLDAP, "down", "-v"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.TRAEFIK, "down", "-v"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.TRAEFIK, "down", "-v"); err != nil {
+// 			return err
+// 		}
 
-		if err = execDockerCompose(services.PROTONMAIL_BRIDGE, "down", "-v"); err != nil {
-			return err
-		}
+// 		if err = execDockerCompose(services.PROTONMAIL_BRIDGE, "down", "-v"); err != nil {
+// 			return err
+// 		}
 
-		return
-	},
-}
+// 		return
+// 	},
+// }

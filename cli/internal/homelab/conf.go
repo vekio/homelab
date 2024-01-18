@@ -2,30 +2,25 @@ package homelab
 
 import (
 	_ "embed"
-	"fmt"
-	"log"
-
-	"github.com/vekio/homelab/cli/conf"
-	_c "github.com/vekio/homelab/cli/config"
 )
 
 func init() {
-	err := conf.Config.SoftInit()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err := conf.Config.SoftInit()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	_, err = conf.Config.Data()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// _, err = conf.Config.Data()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	err = conf.Config.ReadConfig(&_c.Config)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = conf.Config.ReadConfig(&_c.Config)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	fmt.Println(_c.Config)
+	// fmt.Println(_c.Config)
 
 	// err = yaml.Unmarshal([]byte(data), &settings)
 	// if err != nil {

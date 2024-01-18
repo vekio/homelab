@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/vekio/homelab/cli/conf"
-	"github.com/vekio/homelab/cli/secrets"
+	"github.com/vekio/homelab/cli/internal/pkg/secrets"
+	"github.com/vekio/homelab/cli/pkg/conf"
 )
 
 func init() {
