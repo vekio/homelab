@@ -2,7 +2,7 @@ package homelab
 
 import (
 	"github.com/urfave/cli/v2"
-	"github.com/vekio/homelab/cli/internal/pkg/utils"
+	"github.com/vekio/homelab/internal/pkg/utils"
 )
 
 func execDockerCompose(service string, command ...string) error {

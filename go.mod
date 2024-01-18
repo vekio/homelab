@@ -1,4 +1,4 @@
-module github.com/vekio/homelab/cli
+module github.com/vekio/homelab
 
 go 1.21.4
 

@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/vekio/homelab/cli/internal/homelab"
+	"github.com/vekio/homelab/internal/homelab"
 )
 
 func main() {
