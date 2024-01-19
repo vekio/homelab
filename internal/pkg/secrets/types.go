@@ -1,14 +1,14 @@
 package secrets
 
-type secretConfig struct {
-	Authelia authelia `yaml:"authelia"`
-	Gitea    gitea    `yaml:"gitea"`
-	Immich   immich   `yaml:"immich"`
-	Lldap    lldap    `yaml:"lldap"`
-	Traefik  traefik  `yaml:"traefik"`
+type secretsConfig struct {
+	Authelia autheliaSecrets `yaml:"authelia"`
+	Gitea    giteaSecrets    `yaml:"gitea"`
+	Immich   immichSecrets   `yaml:"immich"`
+	Lldap    lldapSecrets    `yaml:"lldap"`
+	Traefik  traefikSecrets  `yaml:"traefik"`
 }
 
-type authelia struct {
+type autheliaSecrets struct {
 	JWTSecret                        string `yaml:"jwt_secret"`
 	IdentityProviderOIDCHMACSecret   string `yaml:"identity_providers_oidc_hmac_secret"`
 	IdentityProviderIssuerPrivateKey string `yaml:"identity_providers_issuer_private_key"`
@@ -16,19 +16,19 @@ type authelia struct {
 	StorageEncryptionKey             string `yaml:"storage_encryption_key"`
 }
 
-type gitea struct {
+type giteaSecrets struct {
 	OIDCSecret string
 }
 
-type immich struct {
+type immichSecrets struct {
 	DBPass     string `yaml:"db_pass"`
 	OIDCSecret string
 }
 
-type lldap struct {
+type lldapSecrets struct {
 	JWTSecret    string `yaml:"jwt_secret"`
 	LDAPUserPass string `yaml:"ldap_user_pass"`
 }
 
-type traefik struct {
+type traefikSecrets struct {
 }

@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var Secrets secretConfig
+var Secrets secretsConfig
 
 // SoftInitSecrets checks if the secrets file exists. If not, it calls InitSecrets,
 // otherwise, it loads the existing secrets file.
@@ -36,36 +36,36 @@ func SoftInitSecrets(filename string) error {
 // InitSecrets initializes service secrets and saves them in the specified file.
 func InitSecrets(filename string) error {
 	// Generate Authelia secrets
-	autheliaSecrets, err := autheliaSecrets()
+	autheliaSecrets, err := generateAutheliaSecrets()
 	if err != nil {
 		return fmt.Errorf("InitSecrets: failed generating Authelia secrets: %w", err)
 	}
 
 	// Generate Gitea secrets
-	giteaSecrets, err := giteaSecrets()
+	giteaSecrets, err := generateGiteaSecrets()
 	if err != nil {
 		return fmt.Errorf("InitSecrets: failed generating Gitea secrets: %w", err)
 	}
 
 	// Generate Immich secrets
-	immichSecrets, err := immichSecrets()
+	immichSecrets, err := generateImmichSecrets()
 	if err != nil {
 		return fmt.Errorf("InitSecrets: failed generating Immich secrets: %w", err)
 	}
 
 	// Generate Lldap secrets
-	lldapSecrets, err := lldapSecrets()
+	lldapSecrets, err := generateLldapSecrets()
 	if err != nil {
 		return fmt.Errorf("InitSecrets: failed generating Lldap secrets: %w", err)
 	}
 
 	// Populate the global Secrets variable with the generated secrets
-	Secrets = secretConfig{
+	Secrets = secretsConfig{
 		Authelia: autheliaSecrets,
 		Gitea:    giteaSecrets,
 		Immich:   immichSecrets,
 		Lldap:    lldapSecrets,
-		Traefik:  traefik{},
+		Traefik:  traefikSecrets{},
 	}
 
 	// Save the generated secrets to the specified file
