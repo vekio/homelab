@@ -1,14 +1,5 @@
 package services
 
-type Service struct {
-	Name        string
-	ComposeFile string
-	Init        Initialize
-	Context     string
-}
+var composeFile = "/tmp"
 
-type Initialize func() error
-
-func init() {
-
-}
+var repoConfig = "/tmp"

@@ -1,6 +1,6 @@
 traefik-config:
 	bash traefik.sh
 install:
-	cd cli && go install ./cmd/homelab && cd -
+	go install ./cmd/homelab
 get:
-	cd cli && go get -u && cd -
+	go get -u

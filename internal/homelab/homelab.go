@@ -12,28 +12,22 @@ import (
 	"github.com/vekio/homelab/pkg/conf"
 )
 
-const version = "v0.0.1"
-const command = "homelab"
-const authorEmail = "alberto@casta.me"
-const authorName = "Alberto Castañeiras"
-const summary = "CLI for manage homelab"
-const description = "Manage homelab services and their config files."
+var Version string
 
 var Cmd = &cli.App{
 	Name:        command,
-	Usage:       summary,
-	Description: description,
+	Usage:       `manage homelab`,
+	Description: `Manage homelab services and their config files.`,
 	UsageText:   fmt.Sprintf("%s COMMAND SUBCOMMAND", command),
-	// HideHelpCommand: true,
 	Authors: []*cli.Author{
 		{
 			Name:  authorName,
 			Email: authorEmail,
 		},
 	},
-	Version:   version,
+	Version:   Version,
 	Compiled:  time.Now(),
-	Copyright: fmt.Sprintf("%s (%s) Copyright %s\nLicense Apache-2.0", command, version, authorName),
+	Copyright: fmt.Sprintf("%s (%s) Copyright %s\nLicense Apache-2.0", command, Version, authorName),
 	// Commands:  commands(),
 }
 

@@ -7,6 +7,15 @@ import (
 	"os/exec"
 )
 
+type Service struct {
+	Name        string
+	ComposeFile string
+	Context     string
+	Init        Initialize
+}
+
+type Initialize func() error
+
 type Compose interface {
 	Config()
 	Down()

@@ -4,45 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	_rsa "github.com/vekio/crypto/rsa"
 	_fs "github.com/vekio/fs"
 	_file "github.com/vekio/fs/file"
-	_sgen "github.com/vekio/rand/secretgen"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/yaml.v3"
 )
-
-type s struct {
-	Authelia Authelia `yaml:"authelia"`
-	Gitea    Gitea    `yaml:"gitea"`
-	Immich   Immich   `yaml:"immich"`
-	Lldap    Lldap    `yaml:"lldap"`
-	Traefik  Traefik  `yaml:"traefik"`
-}
-
-type Authelia struct {
-	JWTSecret                        string `yaml:"jwt_secret"`
-	IdentityProviderOIDCHMACSecret   string `yaml:"identity_providers_oidc_hmac_secret"`
-	IdentityProviderIssuerPrivateKey string `yaml:"identity_providers_issuer_private_key"`
-	SessionSecret                    string `yaml:"session_secret"`
-	StorageEncryptionKey             string `yaml:"storage_encryption_key"`
-}
-
-type Gitea struct {
-	OIDCSecret string
-}
-
-type Immich struct {
-	DBPass     string `yaml:"db_pass"`
-	OIDCSecret string
-}
-
-type Lldap struct {
-	JWTSecret    string `yaml:"jwt_secret"`
-	LDAPUserPass string `yaml:"ldap_user_pass"`
-}
-
-type Traefik struct {
-}
 
 var Secrets s
 
@@ -104,103 +70,6 @@ func InitSecrets(filename string) error {
 	return nil
 }
 
-// autheliaSecrets generates various secrets required for Authelia.
-// It returns an Authelia struct containing the secrets and an error if any.
-func autheliaSecrets() (Authelia, error) {
-	jwtSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
-	if err != nil {
-		return Authelia{}, fmt.Errorf("autheliaSecrets: failed to generate JWT secret: %w", err)
-	}
-
-	identityProviderOIDCHMACSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
-	if err != nil {
-		return Authelia{}, fmt.Errorf("autheliaSecrets: failed to generate OIDC HMAC secret: %w", err)
-	}
-
-	keyPair, err := _rsa.GenerateKeyPair(4096)
-	if err != nil {
-		return Authelia{}, fmt.Errorf("autheliaSecrets: failed to generate RSA key pair: %w", err)
-	}
-	identityProviderIssuerPrivateKey, err := _rsa.PrivateKeyData(keyPair)
-	if err != nil {
-		return Authelia{}, fmt.Errorf("autheliaSecrets: failed to extract private key data: %w", err)
-	}
-
-	sessionSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
-	if err != nil {
-		return Authelia{}, fmt.Errorf("autheliaSecrets: failed to generate session secret: %w", err)
-	}
-
-	storageEncryptionKey, err := _sgen.GenerateRandomAlphaNumeric(64)
-	if err != nil {
-		return Authelia{}, fmt.Errorf("autheliaSecrets: failed to generate storage encryption key: %w", err)
-	}
-
-	autheliaSecrets := Authelia{
-		JWTSecret:                        jwtSecret,
-		IdentityProviderOIDCHMACSecret:   identityProviderOIDCHMACSecret,
-		IdentityProviderIssuerPrivateKey: identityProviderIssuerPrivateKey,
-		SessionSecret:                    sessionSecret,
-		StorageEncryptionKey:             storageEncryptionKey,
-	}
-
-	return autheliaSecrets, nil
-}
-
-// lldapSecrets generates various secrets required for LLDAP.
-func lldapSecrets() (Lldap, error) {
-	jwtSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
-	if err != nil {
-		return Lldap{}, fmt.Errorf("lldapSecrets: failed to generate JWT secret: %w", err)
-	}
-
-	ldapUserPass, err := _sgen.GenerateRandomAlphaNumeric(16)
-	if err != nil {
-		return Lldap{}, fmt.Errorf("lldapSecrets: failed to generate LDAP user password: %w", err)
-	}
-
-	lldapSecrets := Lldap{
-		JWTSecret:    jwtSecret,
-		LDAPUserPass: ldapUserPass,
-	}
-
-	return lldapSecrets, nil
-}
-
-// giteaSecrets generates various secrets required for Gitea.
-func giteaSecrets() (Gitea, error) {
-	oidcSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
-	if err != nil {
-		return Gitea{}, fmt.Errorf("giteaSecrets: failed to generate OIDC secret: %w", err)
-	}
-
-	giteaSecrets := Gitea{
-		OIDCSecret: oidcSecret,
-	}
-
-	return giteaSecrets, nil
-}
-
-// immichSecrets generates secrets required for Immich.
-func immichSecrets() (Immich, error) {
-	dbPass, err := _sgen.GenerateRandomAlphaNumeric(16)
-	if err != nil {
-		return Immich{}, fmt.Errorf("immichSecrets: failed to generate db pass: %w", err)
-	}
-
-	oidcSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
-	if err != nil {
-		return Immich{}, fmt.Errorf("immichSecrets: failed to generate OIDC secret: %w", err)
-	}
-
-	immichSecrets := Immich{
-		DBPass:     dbPass,
-		OIDCSecret: oidcSecret,
-	}
-
-	return immichSecrets, nil
-}
-
 // loadSecrets loads secrets data from a YAML file.
 // It reads the file, unmarshals the YAML data, and populates the 'secrets' variable.
 func loadSecrets(filename string) error {
@@ -231,4 +100,29 @@ func saveSecrets(filename string) error {
 	}
 
 	return nil
+}
+
+func WriteSecret(filename, secret string) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(secret)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Bcrypt(password string) (string, error) {
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	hashedString := string(hashedBytes)
+	return hashedString, nil
 }
