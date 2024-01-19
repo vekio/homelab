@@ -51,12 +51,12 @@ func initAutheliaConfig(autheliaConf string) error {
 		return fmt.Errorf("initAutheliaConfig: failed creating %s: %w", configDir, err)
 	}
 
-	giteaOIDCHash, err := secrets.Bcrypt(secrets.Secrets.Gitea.OIDCSecret)
+	giteaOIDCHash, err := utils.Bcrypt(secrets.Secrets.Gitea.OIDCSecret)
 	if err != nil {
 		return fmt.Errorf("initAutheliaConfig: failed encrypting Gitea.OIDCSecret: %w", err)
 	}
 
-	immichOIDCHash, err := secrets.Bcrypt(secrets.Secrets.Immich.OIDCSecret)
+	immichOIDCHash, err := utils.Bcrypt(secrets.Secrets.Immich.OIDCSecret)
 	if err != nil {
 		return fmt.Errorf("initAutheliaConfig: failed encrypting Immich.OIDCSecret: %w", err)
 	}

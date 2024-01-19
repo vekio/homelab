@@ -41,8 +41,9 @@ func init() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, opts))
 	slog.SetDefault(logger)
 
-	filename := conf.Config.DirPath() + "/secrets.yml"
-	if err := secrets.SoftInitSecrets(filename); err != nil {
+	// Init secrets
+	secretsFile := conf.Config.DirPath() + "/secrets.yml"
+	if err := secrets.SoftInitSecrets(secretsFile); err != nil {
 		log.Fatalf("failed to init secrets %s", err)
 	}
 
