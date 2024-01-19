@@ -1,6 +1,9 @@
-traefik-config:
-	bash traefik.sh
+VERSION := $(shell cat VERSION)
+
+# FLAGS
+VERSIONFLAG := -X 'github.com/vekio/homelab/internal/homelab.Version=v$(VERSION)'
+
 install:
-	go install ./cmd/homelab
-get:
-	go get -u
+	go install -ldflags="${VERSIONFLAG}" ./cmd/homelab
+
+default: install
