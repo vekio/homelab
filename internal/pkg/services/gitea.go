@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"os"
 
 	_fs "github.com/vekio/fs"
@@ -10,7 +11,7 @@ import (
 
 var giteaSrv = Service{
 	Name:        GITEA,
-	ComposeFile: composeFile,
+	ComposeFile: fmt.Sprintf("%s/%s/compose.yml", repoConfig, GITEA),
 	Context:     context.DEFAULT,
 	Priority:    5,
 	Init:        initGitea,

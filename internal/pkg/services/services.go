@@ -1,8 +1,6 @@
 package services
 
-var composeFile = "/tmp"
-
-var repoConfig = "/tmp"
+var repoConfig string = "/home/alberto/src/homelab/services"
 
 func Available() map[string]Service {
 

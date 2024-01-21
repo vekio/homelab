@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"os"
 
 	_fs "github.com/vekio/fs"
@@ -10,7 +11,7 @@ import (
 
 var jellyfinSrv = Service{
 	Name:        JELLYFIN,
-	ComposeFile: composeFile,
+	ComposeFile: fmt.Sprintf("%s/%s/compose.yml", repoConfig, JELLYFIN),
 	Context:     context.DEFAULT,
 	Priority:    6,
 	Init:        initJellyfin,

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"os"
 
 	_fs "github.com/vekio/fs"
@@ -13,7 +14,7 @@ import (
 
 var traefikSrv = Service{
 	Name:        TRAEFIK,
-	ComposeFile: composeFile,
+	ComposeFile: fmt.Sprintf("%s/%s/compose.yml", repoConfig, TRAEFIK),
 	Context:     context.DEFAULT,
 	Priority:    1,
 	Init:        initTraefik,

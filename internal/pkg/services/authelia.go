@@ -13,7 +13,7 @@ import (
 
 var autheliaSrv = Service{
 	Name:        AUTHELIA,
-	ComposeFile: composeFile,
+	ComposeFile: fmt.Sprintf("%s/%s/compose.yml", repoConfig, AUTHELIA),
 	Context:     context.DEFAULT,
 	Priority:    4,
 	Init:        initAuthelia,

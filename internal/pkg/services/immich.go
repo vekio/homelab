@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"os"
 
 	_fs "github.com/vekio/fs"
@@ -12,7 +13,7 @@ import (
 
 var immichSrv = Service{
 	Name:        IMMICH,
-	ComposeFile: composeFile,
+	ComposeFile: fmt.Sprintf("%s/%s/compose.yml", repoConfig, IMMICH),
 	Context:     context.DEFAULT,
 	Priority:    7,
 	Init: func() error {

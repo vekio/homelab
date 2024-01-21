@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"os"
 
 	_fs "github.com/vekio/fs"
@@ -10,7 +11,7 @@ import (
 
 var protonmailBridgeSrv = Service{
 	Name:        PROTONMAIL_BRIDGE,
-	ComposeFile: composeFile,
+	ComposeFile: fmt.Sprintf("%s/%s/compose.yml", repoConfig, PROTONMAIL_BRIDGE),
 	Context:     context.DEFAULT,
 	Priority:    2,
 	Init:        initProtonmailBridge,

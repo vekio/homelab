@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	"log/slog"
+	// "log/slog"
 	"os"
 	"os/exec"
 )
@@ -29,8 +29,8 @@ type Compose interface {
 }
 
 func (s Service) Config() error {
-	slog.Debug("docker compose config",
-		slog.String("service", s.Name))
+	// slog.Debug("docker compose config",
+	// slog.String("service", s.Name))
 	if err := s.exComposeCmd("config"); err != nil {
 		return err
 	}
@@ -38,8 +38,8 @@ func (s Service) Config() error {
 }
 
 func (s Service) Down() error {
-	slog.Debug("docker compose down",
-		slog.String("service", s.Name))
+	// slog.Debug("docker compose down",
+	// slog.String("service", s.Name))
 	if err := s.exComposeCmd("down", "-v"); err != nil {
 		return err
 	}
@@ -47,8 +47,8 @@ func (s Service) Down() error {
 }
 
 func (s Service) Logs() error {
-	slog.Debug("docker compose logs",
-		slog.String("service", s.Name))
+	// slog.Debug("docker compose logs",
+	// slog.String("service", s.Name))
 	if err := s.exComposeCmd("logs", "-f"); err != nil {
 		return err
 	}
@@ -56,8 +56,8 @@ func (s Service) Logs() error {
 }
 
 func (s Service) Pull() error {
-	slog.Debug("docker compose pull",
-		slog.String("service", s.Name))
+	// slog.Debug("docker compose pull",
+	// slog.String("service", s.Name))
 	if err := s.exComposeCmd("pull"); err != nil {
 		return err
 	}
@@ -65,8 +65,8 @@ func (s Service) Pull() error {
 }
 
 func (s Service) Restart() error {
-	slog.Debug("docker compose restart",
-		slog.String("service", s.Name))
+	// slog.Debug("docker compose restart",
+	// slog.String("service", s.Name))
 	if err := s.exComposeCmd("restart"); err != nil {
 		return err
 	}
@@ -74,8 +74,8 @@ func (s Service) Restart() error {
 }
 
 func (s Service) Stop() error {
-	slog.Debug("docker compose stop",
-		slog.String("service", s.Name))
+	// slog.Debug("docker compose stop",
+	// slog.String("service", s.Name))
 	if err := s.exComposeCmd("stop"); err != nil {
 		return err
 	}
@@ -83,8 +83,8 @@ func (s Service) Stop() error {
 }
 
 func (s Service) Up() error {
-	slog.Debug("docker compose up",
-		slog.String("service", s.Name))
+	// slog.Debug("docker compose up",
+	// slog.String("service", s.Name))
 	if err := s.exComposeCmd("up", "-d"); err != nil {
 		return err
 	}
@@ -92,8 +92,8 @@ func (s Service) Up() error {
 }
 
 func (s Service) Upgrade() error {
-	slog.Debug("docker compose upgrade",
-		slog.String("service", s.Name))
+	// slog.Debug("docker compose upgrade",
+	// slog.String("service", s.Name))
 	if err := s.Pull(); err != nil {
 		return err
 	}
@@ -105,8 +105,8 @@ func (s Service) Upgrade() error {
 
 func (s Service) exComposeCmd(command ...string) error {
 	cmdArgs := append([]string{"docker", "compose", "-f", s.ComposeFile}, command...)
-	slog.Debug("executing docker compose command",
-		slog.String("command", fmt.Sprint(cmdArgs)))
+	// slog.Debug("executing docker compose command",
+	// slog.String("command", fmt.Sprint(cmdArgs)))
 
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
 	cmd.Stdin = os.Stdin
@@ -116,8 +116,8 @@ func (s Service) exComposeCmd(command ...string) error {
 	if err := cmd.Run(); err != nil {
 		err := fmt.Errorf("error executing docker compose command: %w", err)
 
-		slog.Error(err.Error(),
-			slog.String("command", fmt.Sprint(cmdArgs)))
+		// slog.Error(err.Error(),
+		// slog.String("command", fmt.Sprint(cmdArgs)))
 
 		return err
 	}

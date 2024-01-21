@@ -1,23 +1,23 @@
 package config
 
-type Environment string
+type environment string
 
-type ContextProp struct {
+type contextProp struct {
 	Name        string      `yaml:"name"`
-	Environment Environment `yaml:"environment"`
+	Environment environment `yaml:"environment"`
 	EnvFile     string      `yaml:"env_file"`
 }
 
-type Context struct {
+type context struct {
 	Current   string        `yaml:"current"`
-	Available []ContextProp `yaml:",flow"`
+	Available []contextProp `yaml:",flow"`
 }
 
-type Service struct {
+type service struct {
 	Repository string `yaml:"repository"`
 }
 
-type C struct {
-	Service Service `yaml:"service"`
-	Context Context `yaml:"context"`
+type homeConfig struct {
+	Service service `yaml:"service"`
+	Context context `yaml:"context"`
 }

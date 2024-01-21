@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"os"
 
 	_fs "github.com/vekio/fs"
@@ -12,7 +13,7 @@ import (
 
 var lldapSrv = Service{
 	Name:        LLDAP,
-	ComposeFile: composeFile,
+	ComposeFile: fmt.Sprintf("%s/%s/compose.yml", repoConfig, LLDAP),
 	Context:     context.DEFAULT,
 	Priority:    3,
 	Init:        initLldap,

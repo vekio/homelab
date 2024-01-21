@@ -1,6 +1,6 @@
 package config
 
 const (
-	DEV Environment = "dev"
-	PRO Environment = "pro"
+	DEV environment = "dev"
+	PRO environment = "pro"
 )
