@@ -28,7 +28,25 @@ var Cmd = &cli.App{
 	Version:   Version,
 	Compiled:  time.Now(),
 	Copyright: fmt.Sprintf("%s (%s) Copyright %s\nLicense Apache-2.0", command, Version, authorName),
-	// Commands:  commands(),
+	Commands:  commands(),
+}
+
+func commands() []*cli.Command {
+	var cmds []*cli.Command
+
+	// Services commands
+	cmds = append(cmds, serviceCmds()...)
+
+	// Init command
+	cmds = append(cmds, initCmd)
+
+	// AllUp command
+	cmds = append(cmds, allUpCmd)
+
+	// AllDown command
+	cmds = append(cmds, allDownCmd)
+
+	return cmds
 }
 
 func init() {

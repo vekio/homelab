@@ -8,19 +8,20 @@ import (
 	"github.com/vekio/homelab/internal/pkg/context"
 	"github.com/vekio/homelab/internal/pkg/secrets"
 	"github.com/vekio/homelab/internal/pkg/utils"
+	cmd "github.com/vekio/homelab/pkg/conf"
 )
 
-var authelia = &Service{
+var autheliaSrv = Service{
 	Name:        AUTHELIA,
 	ComposeFile: composeFile,
 	Context:     context.DEFAULT,
-	Init:        InitAuthelia,
+	Priority:    4,
+	Init:        initAuthelia,
 }
 
-// Init function for authelia service
-func InitAuthelia() error {
-	// autheliaConf := conf.Config.DirPath() + "/" + AUTHELIA
-	autheliaConf := AUTHELIA
+// initAuthelia init function for authelia service
+func initAuthelia() error {
+	autheliaConf := cmd.Config.DirPath() + "/" + AUTHELIA
 
 	// Create homelab/authelia config folder
 	err := _fs.CreateDir(autheliaConf, os.FileMode(_fs.DefaultDirPerms))
@@ -89,40 +90,40 @@ func initAutheliaSecrets(autheliaConf string) error {
 		return err
 	}
 
-	// if err = utils.WriteSecret(secretsDir+"/AUTHELIA_JWT_SECRET_FILE",
-	// 	secrets.Secrets.Authelia.JWTSecret); err != nil {
-	// 	return err
-	// }
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_JWT_SECRET_FILE",
+		secrets.Secrets.Authelia.JWTSecret); err != nil {
+		return err
+	}
 
-	// if err = utils.WriteSecret(secretsDir+"/AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE",
-	// 	secrets.Secrets.Authelia.IdentityProviderOIDCHMACSecret); err != nil {
-	// 	return err
-	// }
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE",
+		secrets.Secrets.Authelia.IdentityProviderOIDCHMACSecret); err != nil {
+		return err
+	}
 
-	// if err = utils.WriteSecret(secretsDir+"/AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE",
-	// 	secrets.Secrets.Authelia.IdentityProviderIssuerPrivateKey); err != nil {
-	// 	return err
-	// }
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE",
+		secrets.Secrets.Authelia.IdentityProviderIssuerPrivateKey); err != nil {
+		return err
+	}
 
-	// if err = utils.WriteSecret(secretsDir+"/AUTHELIA_SESSION_SECRET_FILE",
-	// 	secrets.Secrets.Authelia.SessionSecret); err != nil {
-	// 	return err
-	// }
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_SESSION_SECRET_FILE",
+		secrets.Secrets.Authelia.SessionSecret); err != nil {
+		return err
+	}
 
-	// if err = utils.WriteSecret(secretsDir+"/AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE",
-	// 	secrets.Secrets.Authelia.StorageEncryptionKey); err != nil {
-	// 	return err
-	// }
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE",
+		secrets.Secrets.Authelia.StorageEncryptionKey); err != nil {
+		return err
+	}
 
-	// if err = utils.WriteSecret(secretsDir+"/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE",
-	// 	secrets.Secrets.Lldap.LDAPUserPass); err != nil {
-	// 	return err
-	// }
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE",
+		secrets.Secrets.Lldap.LDAPUserPass); err != nil {
+		return err
+	}
 
-	// if err = utils.WriteSecret(secretsDir+"/AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE",
-	// 	os.Getenv("SMTP_PASSWORD")); err != nil {
-	// 	return err
-	// }
+	if err = utils.WriteSecret(secretsDir+"/AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE",
+		os.Getenv("SMTP_PASSWORD")); err != nil {
+		return err
+	}
 
 	return nil
 }

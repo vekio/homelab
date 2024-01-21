@@ -1,5 +1,41 @@
 package homelab
 
+import (
+	"fmt"
+
+	"github.com/urfave/cli/v2"
+	"github.com/vekio/homelab/internal/pkg/services"
+)
+
+func serviceCmds() []*cli.Command {
+	var cmds []*cli.Command
+
+	srvs := services.Available()
+
+	for _, srv := range srvs {
+		composeCmds := []*cli.Command{
+			configCmd,
+			downCmd,
+			logsCmd,
+			pullCmd,
+			restartCmd,
+			stopCmd,
+			upCmd,
+			upgradeCmd,
+		}
+
+		srvCmd := &cli.Command{
+			Name:        srv.Name,
+			Usage:       fmt.Sprintf("Manage %s service", srv.Name),
+			Subcommands: composeCmds,
+		}
+
+		cmds = append(cmds, srvCmd)
+	}
+
+	return cmds
+}
+
 // import (
 // 	"fmt"
 

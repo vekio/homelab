@@ -12,6 +12,7 @@ type Service struct {
 	ComposeFile string
 	Context     string
 	Init        Initialize
+	Priority    int
 }
 
 type Initialize func() error
