@@ -2,7 +2,6 @@ package homelab
 
 import (
 	"cmp"
-	"fmt"
 	"slices"
 
 	"github.com/urfave/cli/v2"
@@ -14,10 +13,32 @@ var initCmd = &cli.Command{
 	Aliases: []string{"i"},
 	Usage:   "Initialize required folders and config files",
 	Action: func(cCtx *cli.Context) error {
-		srvs := services.Available()
+		var srvs []services.Service
+
+		// Order by priority
+		for _, srv := range services.Available() {
+			srvs = append(srvs, srv)
+		}
+
+		slices.SortFunc(srvs, func(a, b services.Service) int {
+			return cmp.Compare(a.Priority, b.Priority)
+		})
+
 		for _, srv := range srvs {
+			if srv.Name == services.PROTONMAIL_BRIDGE {
+				continue
+				// err := os.Setenv("PROTONMAIL_BRIDGE_COMMAND", "init")
+				// if err != nil {
+				// 	return err
+				// }
+				// err = srv.ExComposeCmd("run", "--rm", "protonmail-bridge")
+				// if err != nil {
+				// 	return err
+				// }
+			}
 			srv.Init()
 		}
+
 		return nil
 	},
 }
@@ -39,10 +60,9 @@ var allDownCmd = &cli.Command{
 		})
 		slices.Reverse(srvs)
 
-		fmt.Println(srvs)
-		// for _, srv := range srvs {
-		// 	srv.Down()
-		// }
+		for _, srv := range srvs {
+			srv.Down()
+		}
 		return nil
 	},
 }
@@ -62,10 +82,9 @@ var allUpCmd = &cli.Command{
 			return cmp.Compare(a.Priority, b.Priority)
 		})
 
-		fmt.Println(srvs)
-		// for _, srv := range srvs {
-		// 	srv.Up()
-		// }
+		for _, srv := range srvs {
+			srv.Up()
+		}
 		return nil
 	},
 }

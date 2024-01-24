@@ -50,7 +50,6 @@ func commands() []*cli.Command {
 
 func init() {
 
-	fmt.Println("Homelab Init")
 	// Init cmd config
 	err := acmd.Config.SoftInit()
 	if err != nil {

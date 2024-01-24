@@ -16,9 +16,7 @@ var immichSrv = Service{
 	ComposeFile: fmt.Sprintf("%s/%s/compose.yml", repoConfig, IMMICH),
 	Context:     context.DEFAULT,
 	Priority:    7,
-	Init: func() error {
-		return nil
-	},
+	Init:        initImmich,
 }
 
 func initImmich() error {
