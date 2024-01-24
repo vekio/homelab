@@ -1,0 +1,14 @@
+package main
+
+import (
+	"log"
+	"os"
+
+	"github.com/vekio/homelab/internal/homelab"
+)
+
+func main() {
+	if err := homelab.Cmd.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}

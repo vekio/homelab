@@ -14,7 +14,7 @@ services:
     #   - 1143:143/tcp
     stdin_open: true
     tty: true
-    command: ${PROTONMAIL_BRIDGE_COMMAND}
+    command: "${PROTONMAIL_BRIDGE_COMMAND}"
     volumes:
       - "${SPRING_VOLUME}/protonmail-bridge:/root"
 
