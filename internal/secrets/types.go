@@ -1,6 +1,12 @@
 package secrets
 
-type secretsConfig struct {
+type secretsManager struct {
+	name string
+	dir  string
+	file string
+}
+
+type HomelabSecrets struct {
 	Authelia autheliaSecrets `yaml:"authelia"`
 	Gitea    giteaSecrets    `yaml:"gitea"`
 	Immich   immichSecrets   `yaml:"immich"`

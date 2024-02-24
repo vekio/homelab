@@ -2,7 +2,7 @@ version: '3'
 
 secrets:
   IMMICH_DB_PASS:
-    file: ${CONFIG}/immich/secrets/IMMICH_DB_PASS
+    file: ${CONFIG}/secrets/immich/IMMICH_DB_PASS
 
 services:
   ## Immich - Self-hosted photo and video backup
