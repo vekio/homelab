@@ -12,7 +12,7 @@ err() { printf "%b[error]%b %s\n" '\e[0;31m\033[1m' '\e[0m' "$*" >&2; exit 1; }
 # -----------------------------------------------------------------------------
 function dotenv () {
   set -a
-  [[ -f .env ]] && . .env-pro
+  [[ -f ./services/.env-pro ]] && . ./services/.env-pro
   set +a
 }
 
@@ -25,14 +25,16 @@ function upload-configs () {
     ${SPRING_VOLUME}/immich \
     ${SPRING_VOLUME}/jellyfin \
     ${SPRING_VOLUME}/lldap \
-    ${SPRING_VOLUME}/traefik"
+    ${SPRING_VOLUME}/traefik \
+    ${SPRING_VOLUME}/protonmail-bridge"
 
-  rsync -av --exclude='secrets' ${CONFIG}/authelia spring:${SPRING_VOLUME}/authelia
-  rsync -av --exclude='secrets' ${CONFIG}/gitea spring:${SPRING_VOLUME}/gitea
-  rsync -av --exclude='secrets' ${CONFIG}/immich spring:${SPRING_VOLUME}/immich
-  rsync -av --exclude='secrets' ${CONFIG}/jellyfin spring:${SPRING_VOLUME}/jellyfin
-  rsync -av --exclude='secrets' ${CONFIG}/lldap spring:${SPRING_VOLUME}/lldap
-  rsync -av --exclude='secrets' ${CONFIG}/traefik spring:${SPRING_VOLUME}/traefik
+  # rsync -av --exclude='secrets' ${CONFIG}/authelia spring:${SPRING_VOLUME}/authelia
+  # rsync -av --exclude='secrets' ${CONFIG}/gitea spring:${SPRING_VOLUME}/gitea
+  # rsync -av --exclude='secrets' ${CONFIG}/immich spring:${SPRING_VOLUME}/immich
+  # rsync -av --exclude='secrets' ${CONFIG}/jellyfin spring:${SPRING_VOLUME}/jellyfin
+  # rsync -av --exclude='secrets' ${CONFIG}/lldap spring:${SPRING_VOLUME}/lldap
+  # rsync -av --exclude='secrets' ${CONFIG}/traefik spring:${SPRING_VOLUME}/traefik
+  # scp -r ${CONFIG}/protonmail-bridge/ spring:${SPRING_VOLUME}/protonmail-bridge/
 }
 
 # Main

@@ -32,14 +32,16 @@ func init() {
 	}
 }
 
-var Cmd = &Z.Cmd{
-	Name:        `homelab`,
-	Commands:    buildCmds(),
-	Version:     Version,
-	License:     `Apache-2.0`,
-	Copyright:   `(c) Alberto Castañeiras <alberto@casta.me>`,
-	Summary:     `Manage my homelab server, services and configs`,
-	Description: `Enough of multiple scripts`,
+func Cmd() *Z.Cmd {
+	return &Z.Cmd{
+		Name:        `homelab`,
+		Commands:    buildCmds(),
+		Version:     Version,
+		License:     `Apache-2.0`,
+		Copyright:   `(c) Alberto Castañeiras <alberto@casta.me>`,
+		Summary:     `Manage my homelab server, services and configs`,
+		Description: `Enough of multiple scripts`,
+	}
 }
 
 func buildCmds() []*Z.Cmd {

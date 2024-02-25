@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	homelab.Cmd.Run()
+	homelab.Cmd().Run()
 }

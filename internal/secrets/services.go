@@ -71,12 +71,18 @@ func generateLldapSecrets() (lldapSecrets, error) {
 
 // generateGiteaSecrets generates secrets required for Gitea.
 func generateGiteaSecrets() (giteaSecrets, error) {
+	dbPass, err := _sgen.GenerateRandomAlphaNumeric(16)
+	if err != nil {
+		return giteaSecrets{}, fmt.Errorf("giteaSecrets: failed to generate db pass: %w", err)
+	}
+
 	oidcSecret, err := _sgen.GenerateRandomAlphaNumeric(64)
 	if err != nil {
 		return giteaSecrets{}, fmt.Errorf("giteaSecrets: failed to generate OIDC secret: %w", err)
 	}
 
 	giteaSecrets := giteaSecrets{
+		DBPass:     dbPass,
 		OIDCSecret: oidcSecret,
 	}
 

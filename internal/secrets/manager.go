@@ -56,7 +56,6 @@ func (sm secretsManager) SoftInit() error {
 
 // Init initializes service secrets and saves them in the specified file.
 func (sm secretsManager) Init() (err error) {
-
 	s := &HomelabSecrets{}
 
 	// Generate Authelia secrets

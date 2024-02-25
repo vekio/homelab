@@ -23,12 +23,13 @@ type autheliaSecrets struct {
 }
 
 type giteaSecrets struct {
-	OIDCSecret string
+	DBPass     string `yaml:"db_pass"`
+	OIDCSecret string `yaml:"oidc_secret"`
 }
 
 type immichSecrets struct {
 	DBPass     string `yaml:"db_pass"`
-	OIDCSecret string
+	OIDCSecret string `yaml:"oidc_secret"`
 }
 
 type lldapSecrets struct {

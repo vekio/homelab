@@ -1,5 +1,9 @@
 version: '3'
 
+secrets:
+  GITEA_DB_PASS:
+    file: ${CONFIG}/secrets/gitea/GITEA_DB_PASS
+
 services:
   ## Gitea - Self-hosted Git service
   ## Docker Hub: https://hub.docker.com/r/gitea/gitea/
@@ -11,6 +15,7 @@ services:
     networks:
       - proxy
       - smtp
+      - gitea
     # ports:
     #   - "3000:3000"
     #   - "666:22"
@@ -56,7 +61,30 @@ services:
       - traefik.tcp.routers.giteaSSH-rtr.service=giteaSSH-svc
       - traefik.tcp.services.giteaSSH-svc.loadbalancer.server.port=22
 
+  gitea-db:
+    image: postgres:${GITEA_DB_VERSION:-14-alpine}
+    container_name: gitea-db
+    restart: unless-stopped
+    networks:
+      - gitea
+    secrets: [ GITEA_DB_PASS ]
+    environment:
+      POSTGRES_DB: "${GITEA_DB_NAME:-giteadb}"
+      POSTGRES_USER: "${GITEA_DB_USER:-gitea}"
+      POSTGRES_PASSWORD: /run/secrets/GITEA_DB_PASS
+    volumes:
+      - "${SPRING_VOLUME}/gitea/db:/var/lib/postgresql/data"
+    labels:
+      - traefik.enable=false
+    healthcheck:
+      test: pg_isready -U "${GITEA_DB_USER:-gitea}" -d "${GITEA_DB_NAME:-giteadb}"
+      interval: 10s
+      timeout: 2s
+      retries: 10
+
 networks:
+  gitea:
+    name: gitea
   proxy:
     external: true
     name: proxy
