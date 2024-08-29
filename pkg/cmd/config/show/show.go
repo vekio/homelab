@@ -15,8 +15,8 @@ func NewCmdShow(conf config.ConfigManager) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			buf, err := conf.Content()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "error reading configuration: %v\n", err)
-				return
+				fmt.Fprintf(os.Stderr, "Error reading configuration file: %v\n", err)
+				os.Exit(1)
 			}
 			fmt.Print(string(buf))
 		},

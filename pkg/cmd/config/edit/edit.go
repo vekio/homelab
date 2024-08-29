@@ -1,6 +1,9 @@
 package edit
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/vekio/homelab/internal/config"
 
@@ -10,9 +13,13 @@ import (
 func NewCmdEdit(conf config.ConfigManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit",
-		Short: "Open configuration file on your favorite editor",
+		Short: "Edit the configuration file in the default system editor",
 		Run: func(cmd *cobra.Command, args []string) {
-			_file.Edit(conf.Path())
+			err := _file.Edit(conf.Path())
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error opening configuration file: %v\n", err)
+				os.Exit(1)
+			}
 		},
 	}
 	return cmd
