@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/spf13/cobra v1.8.1
-	github.com/vekio/fs v0.5.1
+	github.com/vekio/fs v0.5.2
 )
 
 require (

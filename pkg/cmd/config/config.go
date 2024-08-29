@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/vekio/homelab/internal/config"
+	cmdEdit "github.com/vekio/homelab/pkg/cmd/config/edit"
 	cmdInit "github.com/vekio/homelab/pkg/cmd/config/init"
 	cmdShow "github.com/vekio/homelab/pkg/cmd/config/show"
 )
@@ -21,8 +22,9 @@ func NewCmdConfig(conf config.ConfigManager) *cobra.Command {
 	}
 
 	// Subcommands
-	cmd.AddCommand(cmdShow.NewCmdShow(conf))
 	cmd.AddCommand(cmdInit.NewCmdInit())
+	cmd.AddCommand(cmdShow.NewCmdShow(conf))
+	cmd.AddCommand(cmdEdit.NewCmdEdit(conf))
 
 	return cmd
 }
