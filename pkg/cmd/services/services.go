@@ -8,7 +8,7 @@ import (
 
 func NewCmdServices(conf config.ConfigManager) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "services command",
+		Use:   "services <command>",
 		Short: "Manage homelab services",
 	}
 
