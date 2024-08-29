@@ -20,7 +20,7 @@ func NewCmdConfig(conf config.ConfigManager) *cobra.Command {
 		Long:  longDoc.String(),
 	}
 
-	// Subcommands
+	// Add subcommands to config command.
 	cmd.AddCommand(cmdShow.NewCmdShow(conf))
 	cmd.AddCommand(cmdEdit.NewCmdEdit(conf))
 

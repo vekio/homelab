@@ -7,6 +7,7 @@ import (
 	"github.com/vekio/homelab/internal/config"
 
 	configCmd "github.com/vekio/homelab/pkg/cmd/config"
+	servicesCmd "github.com/vekio/homelab/pkg/cmd/services"
 )
 
 func NewCmdRoot() (*cobra.Command, error) {
@@ -26,7 +27,7 @@ func NewCmdRoot() (*cobra.Command, error) {
 
 	// Add subcommands to the root command.
 	cmd.AddCommand(configCmd.NewCmdConfig(conf))
-	// cmd.AddCommand(servicesCmd.NewCmdServices())
+	cmd.AddCommand(servicesCmd.NewCmdServices(conf))
 
 	return cmd, nil
 }
