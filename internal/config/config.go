@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -10,11 +11,18 @@ import (
 )
 
 type Config struct {
-	Services map[string]ServiceConfig `yaml:",flow"`
+	Services   map[string]ServiceConfig `yaml:",flow"`
+	Repository RepositoryConfig         `yaml:"repo"`
+	Contexts   []string                 `yaml:"contexts"`
+}
+
+type RepositoryConfig struct {
+	URL    string
+	Branch string
 }
 
 type ServiceConfig struct {
-	Server string `yaml:"server"`
+	Server string `yaml:"context"`
 }
 
 // ConfigManager manages configuration files for an application.
@@ -26,32 +34,32 @@ type ConfigManager struct {
 
 // NewConfigManager creates a new instance of ConfigManager for an application.
 // It sets the directory to the user's config directory and initializes the configuration file name to "config.yml".
-func NewConfigManager(appName string) ConfigManager {
+func NewConfigManager(appName, configName string) *ConfigManager {
 	dir, _ := os.UserConfigDir() // TODO Handle error
 
-	conf := ConfigManager{
+	conf := &ConfigManager{
 		dir:     dir,
 		appName: appName,
-		file:    "config.yml",
+		file:    configName,
 	}
 	return conf
 }
 
 // DirPath returns the path to the directory where the configuration file is stored.
-func (cm ConfigManager) DirPath() string {
+func (cm *ConfigManager) DirPath() string {
 	return filepath.Join(cm.dir, cm.appName)
 }
 
 // Path returns the full path to the configuration file.
-func (cm ConfigManager) Path() string {
+func (cm *ConfigManager) Path() string {
 	return filepath.Join(cm.dir, cm.appName, cm.file)
 }
 
 // SoftInit checks for the existence of the config file and initializes it if it does not exist.
-func (cm ConfigManager) SoftInit() error {
+func (cm *ConfigManager) SoftInit() error {
 	exists, err := _file.Exists(cm.Path())
 	if err != nil {
-		return err
+		return err // TODO
 	}
 	if !exists {
 		return cm.Init()
@@ -61,7 +69,7 @@ func (cm ConfigManager) SoftInit() error {
 
 // Init creates the configuration file and its directory if they do not exist.
 // If the file already exists, Init truncates the content in the file.
-func (cm ConfigManager) Init() error {
+func (cm *ConfigManager) Init() error {
 	file, err := _fs.CreateFileWithDirs(cm.Path(), _fs.DefaultFilePerms)
 	if err != nil {
 		return err
@@ -79,11 +87,15 @@ func (cm ConfigManager) Init() error {
 }
 
 // Content reads and returns the contents of the configuration file.
-func (cm ConfigManager) Content() ([]byte, error) {
-	return os.ReadFile(cm.Path())
+func (cm *ConfigManager) Content() ([]byte, error) {
+	buf, err := os.ReadFile(cm.Path())
+	if err != nil {
+		return nil, fmt.Errorf("error reading configuration file: %w", err)
+	}
+	return buf, nil
 }
 
-func (cm ConfigManager) Data() (Config, error) {
+func (cm *ConfigManager) Data() (Config, error) {
 	buf, err := cm.Content()
 	if err != nil {
 		return Config{}, err

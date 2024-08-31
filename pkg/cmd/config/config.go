@@ -7,7 +7,7 @@ import (
 	cmdShow "github.com/vekio/homelab/pkg/cmd/config/show"
 )
 
-func NewCmdConfig(conf config.ConfigManager) *cobra.Command {
+func NewCmdConfig(conf *config.ConfigManager) *cobra.Command {
 	// longDoc := strings.Builder{}
 	// longDoc.WriteString("Display or change configuration settings for homelab.\n\n")
 	// longDoc.WriteString("Current respected settings:\n") // TODO: check optiones in gh

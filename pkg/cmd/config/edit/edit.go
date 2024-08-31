@@ -10,7 +10,7 @@ import (
 	_file "github.com/vekio/fs/file"
 )
 
-func NewCmdEdit(conf config.ConfigManager) *cobra.Command {
+func NewCmdEdit(conf *config.ConfigManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit",
 		Short: "Edit the configuration file in the default system editor",

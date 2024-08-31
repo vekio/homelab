@@ -1,8 +1,6 @@
 package root
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/vekio/homelab/internal/config"
 
@@ -10,15 +8,7 @@ import (
 	servicesCmd "github.com/vekio/homelab/pkg/cmd/services"
 )
 
-func NewCmdRoot() (*cobra.Command, error) {
-	// Create a new configManager instance for homelab.
-	conf := config.NewConfigManager("homelab")
-
-	// Initialize the configuration file.
-	if err := conf.SoftInit(); err != nil {
-		return nil, fmt.Errorf("failed to initialize configuration: %w", err)
-	}
-
+func NewCmdRoot(conf *config.ConfigManager) (*cobra.Command, error) {
 	// Create the root command for the CLI application.
 	cmd := &cobra.Command{
 		Use:   "homelab <command> <subcommand> [flags]",
