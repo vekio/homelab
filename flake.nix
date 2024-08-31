@@ -35,6 +35,7 @@
             # https://github.com/golangci/golangci-lint
             golangci-lint
           ];
+          HOMELAB_ENV = "develop";
         };
       });
     };
