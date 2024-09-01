@@ -3,18 +3,18 @@ package show
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
+	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/internal/config"
 )
 
-func NewCmdShow(conf *config.ConfigManager) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "show",
-		Short: "Display current configuration file",
-		RunE: func(cmd *cobra.Command, args []string) error {
+func NewCmdShow(conf *config.ConfigManager) *cli.Command {
+	cmd := &cli.Command{
+		Name:  "show",
+		Usage: "Display current configuration file",
+		Action: func(cCtx *cli.Context) error {
 			buf, err := conf.Content()
 			if err != nil {
-				// utils.ErrorMsg(err)
+				return err
 			}
 			fmt.Print(string(buf))
 			return nil

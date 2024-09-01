@@ -3,19 +3,19 @@ package list
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
+	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/internal/config"
 )
 
-func NewCmdList(conf *config.ConfigManager) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "list",
+func NewCmdList(conf *config.ConfigManager) *cli.Command {
+	cmd := &cli.Command{
+		Name:    "list",
 		Aliases: []string{"l"},
-		Short:   "Listing homelab services",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Usage:   "Listing available homelab services",
+		Action: func(cCtx *cli.Context) error {
 			config, err := conf.Data()
 			if err != nil {
-				return fmt.Errorf("error reading configuration file: %w", err)
+				return err
 			}
 			for srvName, srv := range config.Services {
 				fmt.Printf("[%s]\n", srvName)

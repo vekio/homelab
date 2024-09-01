@@ -1,25 +1,22 @@
 package edit
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/spf13/cobra"
+	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/internal/config"
 
 	_file "github.com/vekio/fs/file"
 )
 
-func NewCmdEdit(conf *config.ConfigManager) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "edit",
-		Short: "Edit the configuration file in the default system editor",
-		Run: func(cmd *cobra.Command, args []string) {
+func NewCmdEdit(conf *config.ConfigManager) *cli.Command {
+	cmd := &cli.Command{
+		Name:  "edit",
+		Usage: "Edit the configuration file",
+		Action: func(cCtx *cli.Context) error {
 			err := _file.Edit(conf.Path())
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error opening configuration file: %v\n", err)
-				os.Exit(1)
+				return err
 			}
+			return nil
 		},
 	}
 	return cmd

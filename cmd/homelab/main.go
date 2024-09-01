@@ -2,26 +2,35 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
 
+	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/internal/config"
-	"github.com/vekio/homelab/pkg/cmd/root"
+	"github.com/vekio/homelab/pkg/cmd/homelab"
 )
 
 func main() {
+	// Read, load and validate configuration.
 	conf, err := readConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v ❌\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
-	rootCmd, _ := root.NewCmdRoot(conf)
+	// Read and load configuration.
+	commands := homelab.NewCmdHomelab(conf)
 
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v ❌\n", err)
-		os.Exit(1)
+	// Homelab app.
+	app := &cli.App{
+		Name:     "homelab",
+		Usage:    "Manage homelab services",
+		Commands: commands,
+	}
+
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
 }
 
