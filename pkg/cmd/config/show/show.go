@@ -7,7 +7,7 @@ import (
 	"github.com/vekio/homelab/internal/config"
 )
 
-func NewCmdShow(conf *config.ConfigManager) *cli.Command {
+func NewCmdShow(conf *config.ConfigManager[config.Config]) *cli.Command {
 	cmd := &cli.Command{
 		Name:  "show",
 		Usage: "Display current configuration file",

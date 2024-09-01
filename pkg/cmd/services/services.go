@@ -6,7 +6,7 @@ import (
 	cmdList "github.com/vekio/homelab/pkg/cmd/services/list"
 )
 
-func NewCmdServices(conf *config.ConfigManager) *cli.Command {
+func NewCmdServices(conf *config.ConfigManager[config.Config]) *cli.Command {
 	cmd := &cli.Command{
 		Name:    "services",
 		Aliases: []string{"srv"},

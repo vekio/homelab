@@ -6,7 +6,7 @@ import (
 	cmdConfig "github.com/vekio/homelab/pkg/cmd/config"
 )
 
-func NewCmdHomelab(conf *config.ConfigManager) []*cli.Command {
+func NewCmdHomelab(conf *config.ConfigManager[config.Config]) []*cli.Command {
 	cmd := []*cli.Command{
 		cmdConfig.NewCmdConfig(conf),
 	}

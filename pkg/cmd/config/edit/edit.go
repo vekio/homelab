@@ -7,7 +7,7 @@ import (
 	_file "github.com/vekio/fs/file"
 )
 
-func NewCmdEdit(conf *config.ConfigManager) *cli.Command {
+func NewCmdEdit(conf *config.ConfigManager[config.Config]) *cli.Command {
 	cmd := &cli.Command{
 		Name:  "edit",
 		Usage: "Edit the configuration file",

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
-	"strings"
 
 	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/internal/config"
@@ -16,7 +14,7 @@ func main() {
 	// Read, load and validate configuration.
 	conf, err := readConfig()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error config homelab: %v", err)
 	}
 
 	// Read and load configuration.
@@ -30,54 +28,29 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		log.Fatalf("error homelab: %v", err)
 	}
 }
 
-func readConfig() (*config.ConfigManager, error) {
+func readConfig() (*config.ConfigManager[config.Config], error) {
 	configFile := "config.yml" // Default configuration file
-	if env := os.Getenv("HOMELAB_ENV"); env == "develop" {
+	env := os.Getenv("HOMELAB_ENV")
+	switch env {
+	case "develop":
 		configFile = "config.dev.yml"
-	} else if env != "" && env != "production" {
+	case "production":
+		// configFile stays default "config.yml"
+	case "":
+		// Handle empty env as default or error
+	default:
 		return nil, fmt.Errorf("unknown environment setting %s", env)
 	}
 
 	// Create a new configManager instance for homelab with the specific configuration file.
-	conf := config.NewConfigManager("homelab", configFile)
-
-	// Validate configuration.
-	if err := validate(conf); err != nil {
-		return nil, fmt.Errorf("configuration scheman invalid: %w", err)
-	}
-
-	// Initialize the configuration file.
-	if err := conf.SoftInit(); err != nil {
-		return nil, fmt.Errorf("failed to initialize configuration: %w", err)
+	conf, err := config.NewConfigManager[config.Config]("homelab", configFile)
+	if err != nil {
+		return nil, err
 	}
 
 	return conf, nil
-}
-
-func validate(conf *config.ConfigManager) error {
-	config, err := conf.Data()
-	if err != nil {
-		return err
-	}
-
-	// Validate contexts.
-	for _, context := range config.Contexts {
-		if context == "local" {
-			context = "default"
-		}
-		cmd := exec.Command("docker", "context", "inspect", context)
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			if strings.Contains(string(output), "not found") {
-				fmt.Fprintf(os.Stdout, "Warning: context '%s' not found ⚠️\n", context)
-			} else {
-				return fmt.Errorf("error inspecting docker context '%s': %w", context, err)
-			}
-		}
-	}
-	return nil
 }

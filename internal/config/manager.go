@@ -5,46 +5,75 @@ import (
 	"os"
 	"path/filepath"
 
-	_fs "github.com/vekio/fs"
+	_dir "github.com/vekio/fs/dir"
 	_file "github.com/vekio/fs/file"
 	"gopkg.in/yaml.v3"
 )
 
 // ConfigManager manages configuration files for an application.
-type ConfigManager struct {
+type ConfigManager[T Validatable] struct {
 	appName string // Name of the application
 	dir     string // Directory where the config files are stored
 	file    string // Configuration file name
+	Data    T      // Stored configuration data
+}
+
+// Validatable is an interface that should be implemented by all config types
+// that will be managed by ConfigManager.
+type Validatable interface {
+	Validate() error
 }
 
 // NewConfigManager creates a new instance of ConfigManager for an application.
-// It sets the directory to the user's config directory and initializes the configuration file name to "config.yml".
-func NewConfigManager(appName, configName string) *ConfigManager {
-	dir, _ := os.UserConfigDir() // TODO Handle error
+func NewConfigManager[T Validatable](appName, configName string) (*ConfigManager[T], error) {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user config directory: %w", err)
+	}
 
-	conf := &ConfigManager{
+	cm := &ConfigManager[T]{
 		dir:     dir,
 		appName: appName,
 		file:    configName,
 	}
-	return conf
+
+	// Initialize the configuration file.
+	if err := cm.SoftInit(); err != nil {
+		return nil, fmt.Errorf("failed to initialize configuration: %w", err)
+	}
+
+	// Deserialize the configuration file.
+	buf, err := cm.Content()
+	if err != nil {
+		return nil, err
+	}
+
+	var config T
+	err = yaml.Unmarshal(buf, &config)
+	if err != nil {
+		return nil, err
+	}
+
+	cm.Data = config
+
+	return cm, nil
 }
 
 // DirPath returns the path to the directory where the configuration file is stored.
-func (cm *ConfigManager) DirPath() string {
+func (cm *ConfigManager[T]) DirPath() string {
 	return filepath.Join(cm.dir, cm.appName)
 }
 
 // Path returns the full path to the configuration file.
-func (cm *ConfigManager) Path() string {
-	return filepath.Join(cm.dir, cm.appName, cm.file)
+func (cm *ConfigManager[T]) Path() string {
+	return filepath.Join(cm.DirPath(), cm.file)
 }
 
 // SoftInit checks for the existence of the config file and initializes it if it does not exist.
-func (cm *ConfigManager) SoftInit() error {
+func (cm *ConfigManager[T]) SoftInit() error {
 	exists, err := _file.Exists(cm.Path())
 	if err != nil {
-		return err // TODO
+		return err
 	}
 	if !exists {
 		return cm.Init()
@@ -53,43 +82,33 @@ func (cm *ConfigManager) SoftInit() error {
 }
 
 // Init creates the configuration file and its directory if they do not exist.
-// If the file already exists, Init truncates the content in the file.
-func (cm *ConfigManager) Init() error {
-	file, err := _fs.CreateFileWithDirs(cm.Path(), _fs.DefaultFilePerms)
+func (cm *ConfigManager[T]) Init() error {
+	err := _dir.EnsureDir(cm.DirPath(), _dir.DefaultDirPerms)
+	if err != nil {
+		return err
+	}
+
+	file, err := _file.Create(cm.Path(), _file.DefaultFilePerms)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	// TODO Escribir configuración predeterminada en el archivo.
-	// It handles file permissions and prepares the file to be written with default configuration data.
-	// _, err = file.WriteString("default config data")
+	// TODO Writing default configuration as YAML
+	// defaultConfig := new(T) // Create a zero value for T to marshal into YAML
+	// data, err := yaml.Marshal(defaultConfig)
 	// if err != nil {
-	// 	return fmt.Errorf("failed to write to config file %s: %w", cm.Path(), err)
+	// 	return fmt.Errorf("failed to marshal default config: %w", err)
+	// }
+	// _, err = file.Write(data)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to write default config to file %s: %w", cm.Path(), err)
 	// }
 
 	return nil
 }
 
 // Content reads and returns the contents of the configuration file.
-func (cm *ConfigManager) Content() ([]byte, error) {
-	buf, err := os.ReadFile(cm.Path())
-	if err != nil {
-		return nil, fmt.Errorf("error reading configuration file: %w", err)
-	}
-	return buf, nil
-}
-
-func (cm *ConfigManager) Data() (Config, error) {
-	buf, err := cm.Content()
-	if err != nil {
-		return Config{}, err
-	}
-
-	var config Config
-	err = yaml.Unmarshal(buf, &config)
-	if err != nil {
-		return Config{}, err
-	}
-	return config, nil
+func (cm *ConfigManager[T]) Content() ([]byte, error) {
+	return os.ReadFile(cm.Path())
 }

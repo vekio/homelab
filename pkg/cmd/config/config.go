@@ -7,7 +7,7 @@ import (
 	cmdShow "github.com/vekio/homelab/pkg/cmd/config/show"
 )
 
-func NewCmdConfig(conf *config.ConfigManager) *cli.Command {
+func NewCmdConfig(conf *config.ConfigManager[config.Config]) *cli.Command {
 	cmd := &cli.Command{
 		Name:    "config",
 		Aliases: []string{"conf"},
