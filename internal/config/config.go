@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	Services map[string]struct {
-		Server string `yaml:"context"`
+		Context string `yaml:"context"`
 	} `yaml:",flow"`
 	Repository struct {
 		URL    string `yaml:"url"`
