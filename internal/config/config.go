@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os/exec"
+	"slices"
 	"strings"
 )
 
@@ -31,6 +32,13 @@ func (c Config) Validate() error {
 			} else {
 				return fmt.Errorf("failed checking docker context '%s': %w", context, err)
 			}
+		}
+	}
+
+	// Validate services context.
+	for service, srv := range c.Services {
+		if !slices.Contains(c.Contexts, srv.Context) {
+			fmt.Printf("Warning: unkown context '%s' in '%s' ⚠️\n", srv.Context, service)
 		}
 	}
 	return nil

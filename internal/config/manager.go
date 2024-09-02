@@ -43,13 +43,18 @@ func NewConfigManager[T Validatable](appName, configName string) (*ConfigManager
 	}
 
 	// Deserialize the configuration file.
+	var config T
 	buf, err := cm.Content()
 	if err != nil {
 		return nil, err
 	}
-
-	var config T
 	err = yaml.Unmarshal(buf, &config)
+	if err != nil {
+		return nil, err
+	}
+
+	// Validate configuration data.
+	err = config.Validate()
 	if err != nil {
 		return nil, err
 	}
