@@ -3,15 +3,15 @@ package config
 import (
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 	"github.com/vekio/homelab/internal/config"
 )
 
-func newCmdShow(conf *config.ConfigManager[config.Config]) *cli.Command {
-	cmd := &cli.Command{
-		Name:  "show",
-		Usage: "Display current configuration file",
-		Action: func(cCtx *cli.Context) error {
+func newCmdShow(conf *config.ConfigManager[config.Config]) *cobra.Command {
+	showCmd := &cobra.Command{
+		Use:   "show",
+		Short: "Display current configuration file",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			buf, err := conf.Content()
 			if err != nil {
 				return err
@@ -20,5 +20,5 @@ func newCmdShow(conf *config.ConfigManager[config.Config]) *cli.Command {
 			return nil
 		},
 	}
-	return cmd
+	return showCmd
 }

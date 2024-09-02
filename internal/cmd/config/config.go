@@ -1,19 +1,19 @@
 package config
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 	"github.com/vekio/homelab/internal/config"
 )
 
-func NewCmdConfig(conf *config.ConfigManager[config.Config]) *cli.Command {
-	cmd := &cli.Command{
-		Name:    "config",
+func NewCmdConfig(conf *config.ConfigManager[config.Config]) *cobra.Command {
+	configCmd := &cobra.Command{
+		Use:     "config",
 		Aliases: []string{"conf"},
-		Usage:   "Manage configuration for homelab",
-		Subcommands: []*cli.Command{
-			newCmdShow(conf),
-			newCmdEdit(conf),
-		},
+		Short:   "Manage configuration for homelab",
 	}
-	return cmd
+
+	// Subcommands
+	configCmd.AddCommand(newCmdShow(conf))
+	configCmd.AddCommand(newCmdEdit(conf))
+	return configCmd
 }

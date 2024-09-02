@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/internal/cmd/homelab"
 	"github.com/vekio/homelab/internal/config"
 )
@@ -17,17 +16,10 @@ func main() {
 		log.Fatalf("error config homelab: %v", err)
 	}
 
-	// Read and load configuration.
-	commands := homelab.NewCmdHomelab(conf)
+	// Homelab root command.
+	rootCmd := homelab.NewCmdHomelab(conf)
 
-	// Homelab app.
-	app := &cli.App{
-		Name:     "homelab",
-		Usage:    "Manage homelab services",
-		Commands: commands,
-	}
-
-	if err := app.Run(os.Args); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("error homelab: %v", err)
 	}
 }

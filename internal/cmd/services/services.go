@@ -1,18 +1,19 @@
 package services
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 	"github.com/vekio/homelab/internal/config"
 )
 
-func NewCmdServices(conf *config.ConfigManager[config.Config]) *cli.Command {
-	cmd := &cli.Command{
-		Name:    "services",
+func NewCmdServices(conf *config.ConfigManager[config.Config]) *cobra.Command {
+	servicesCmd := &cobra.Command{
+		Use:     "services",
 		Aliases: []string{"srv"},
-		Usage:   "Manage homelab services",
-		Subcommands: []*cli.Command{
-			newCmdList(conf),
-		},
+		Short:   "Manage homelab services",
 	}
-	return cmd
+
+	// Subcommands
+	servicesCmd.AddCommand(newCmdList(conf))
+	servicesCmd.AddCommand(newCmdPull(conf))
+	return servicesCmd
 }

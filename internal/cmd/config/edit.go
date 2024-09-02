@@ -1,17 +1,17 @@
 package config
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/spf13/cobra"
 	"github.com/vekio/homelab/internal/config"
 
 	_file "github.com/vekio/fs/file"
 )
 
-func newCmdEdit(conf *config.ConfigManager[config.Config]) *cli.Command {
-	cmd := &cli.Command{
-		Name:  "edit",
-		Usage: "Edit the configuration file",
-		Action: func(cCtx *cli.Context) error {
+func newCmdEdit(conf *config.ConfigManager[config.Config]) *cobra.Command {
+	editCmd := &cobra.Command{
+		Use:   "edit",
+		Short: "Edit the configuration file",
+		RunE: func(cmd *cobra.Command, args []string) error {
 			err := _file.Edit(conf.Path())
 			if err != nil {
 				return err
@@ -19,5 +19,5 @@ func newCmdEdit(conf *config.ConfigManager[config.Config]) *cli.Command {
 			return nil
 		},
 	}
-	return cmd
+	return editCmd
 }
