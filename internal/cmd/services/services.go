@@ -3,7 +3,6 @@ package services
 import (
 	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/internal/config"
-	cmdList "github.com/vekio/homelab/pkg/cmd/services/list"
 )
 
 func NewCmdServices(conf *config.ConfigManager[config.Config]) *cli.Command {
@@ -12,7 +11,7 @@ func NewCmdServices(conf *config.ConfigManager[config.Config]) *cli.Command {
 		Aliases: []string{"srv"},
 		Usage:   "Manage homelab services",
 		Subcommands: []*cli.Command{
-			cmdList.NewCmdList(conf),
+			newCmdList(conf),
 		},
 	}
 	return cmd

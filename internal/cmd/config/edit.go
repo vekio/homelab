@@ -1,4 +1,4 @@
-package edit
+package config
 
 import (
 	"github.com/urfave/cli/v2"
@@ -7,7 +7,7 @@ import (
 	_file "github.com/vekio/fs/file"
 )
 
-func NewCmdEdit(conf *config.ConfigManager[config.Config]) *cli.Command {
+func newCmdEdit(conf *config.ConfigManager[config.Config]) *cli.Command {
 	cmd := &cli.Command{
 		Name:  "edit",
 		Usage: "Edit the configuration file",

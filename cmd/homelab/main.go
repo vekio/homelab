@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v2"
+	"github.com/vekio/homelab/internal/cmd/homelab"
 	"github.com/vekio/homelab/internal/config"
-	"github.com/vekio/homelab/pkg/cmd/homelab"
 )
 
 func main() {

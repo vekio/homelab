@@ -3,8 +3,6 @@ package config
 import (
 	"github.com/urfave/cli/v2"
 	"github.com/vekio/homelab/internal/config"
-	cmdEdit "github.com/vekio/homelab/pkg/cmd/config/edit"
-	cmdShow "github.com/vekio/homelab/pkg/cmd/config/show"
 )
 
 func NewCmdConfig(conf *config.ConfigManager[config.Config]) *cli.Command {
@@ -13,8 +11,8 @@ func NewCmdConfig(conf *config.ConfigManager[config.Config]) *cli.Command {
 		Aliases: []string{"conf"},
 		Usage:   "Manage configuration for homelab",
 		Subcommands: []*cli.Command{
-			cmdShow.NewCmdShow(conf),
-			cmdEdit.NewCmdEdit(conf),
+			newCmdShow(conf),
+			newCmdEdit(conf),
 		},
 	}
 	return cmd

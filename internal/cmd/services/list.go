@@ -1,4 +1,4 @@
-package list
+package services
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/vekio/homelab/internal/config"
 )
 
-func NewCmdList(conf *config.ConfigManager[config.Config]) *cli.Command {
+func newCmdList(conf *config.ConfigManager[config.Config]) *cli.Command {
 	cmd := &cli.Command{
 		Name:    "list",
 		Aliases: []string{"l"},
