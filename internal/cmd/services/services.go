@@ -14,6 +14,6 @@ func NewCmdServices(conf *config.ConfigManager[config.Config]) *cobra.Command {
 
 	// Subcommands
 	servicesCmd.AddCommand(newCmdList(conf))
-	servicesCmd.AddCommand(newCmdPull(conf))
+	servicesCmd.AddCommand(newCmdConfig(conf))
 	return servicesCmd
 }

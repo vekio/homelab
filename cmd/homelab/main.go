@@ -5,8 +5,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/vekio/homelab/internal/cmd/homelab"
+	cmdHomelab "github.com/vekio/homelab/internal/cmd/homelab"
 	"github.com/vekio/homelab/internal/config"
+	"github.com/vekio/homelab/internal/homelab"
 )
 
 func main() {
@@ -16,8 +17,14 @@ func main() {
 		log.Fatalf("error config homelab: %v", err)
 	}
 
+	// Clone or Update compose repo
+	err = homelab.NewHomelabApp(conf)
+	if err != nil {
+		log.Fatalf("error homelab: %v", err)
+	}
+
 	// Homelab root command.
-	rootCmd := homelab.NewCmdHomelab(conf)
+	rootCmd := cmdHomelab.NewCmdHomelab(conf)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("error homelab: %v", err)
