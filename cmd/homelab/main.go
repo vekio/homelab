@@ -18,10 +18,12 @@ func main() {
 	}
 
 	// Clone or Update compose repo
-	err = homelab.NewHomelabApp(conf)
+	homelab, err := homelab.NewHomelabApp(conf)
 	if err != nil {
 		log.Fatalf("error homelab: %v", err)
 	}
+
+	fmt.Println(homelab)
 
 	// Homelab root command.
 	rootCmd := cmdHomelab.NewCmdHomelab(conf)

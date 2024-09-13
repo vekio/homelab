@@ -9,7 +9,8 @@ import (
 
 type Config struct {
 	Services map[string]struct {
-		Context string `yaml:"context"`
+		Context      string   `yaml:"context"`
+		ComposeFiles []string `yaml:"compose_files"`
 	} `yaml:",flow"`
 	Repository struct {
 		URL    string `yaml:"url"`
