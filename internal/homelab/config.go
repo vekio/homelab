@@ -1,10 +1,12 @@
-package config
+package homelab
 
 import (
 	"fmt"
 	"os/exec"
 	"slices"
 	"strings"
+
+	"github.com/vekio/homelab/pkg/config"
 )
 
 type Config struct {
@@ -17,6 +19,12 @@ type Config struct {
 		Branch string `yaml:"branch"`
 	} `yaml:"repo"`
 	Contexts []string `yaml:"contexts"`
+}
+
+var conf Config
+
+func init() {
+	config.Load(&conf)
 }
 
 func (c Config) Validate() error {

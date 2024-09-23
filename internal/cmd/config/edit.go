@@ -2,17 +2,17 @@ package config
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/vekio/homelab/internal/config"
 
 	_file "github.com/vekio/fs/file"
+	"github.com/vekio/homelab/pkg/config"
 )
 
-func newCmdEdit(conf *config.ConfigManager[config.Config]) *cobra.Command {
+func newCmdEdit() *cobra.Command {
 	editCmd := &cobra.Command{
 		Use:   "edit",
 		Short: "Edit the configuration file",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := _file.Edit(conf.Path())
+			err := _file.Edit(config.Path())
 			if err != nil {
 				return err
 			}

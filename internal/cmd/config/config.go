@@ -2,10 +2,9 @@ package config
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/vekio/homelab/internal/config"
 )
 
-func NewCmdConfig(conf *config.ConfigManager[config.Config]) *cobra.Command {
+func NewCmdConfig() *cobra.Command {
 	configCmd := &cobra.Command{
 		Use:     "config",
 		Aliases: []string{"conf"},
@@ -13,7 +12,7 @@ func NewCmdConfig(conf *config.ConfigManager[config.Config]) *cobra.Command {
 	}
 
 	// Subcommands
-	configCmd.AddCommand(newCmdShow(conf))
-	configCmd.AddCommand(newCmdEdit(conf))
+	configCmd.AddCommand(newCmdShow())
+	configCmd.AddCommand(newCmdEdit())
 	return configCmd
 }

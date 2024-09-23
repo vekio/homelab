@@ -1,31 +1,27 @@
 package homelab
 
-import (
-	"sync"
-
-	"github.com/vekio/homelab/internal/config"
-)
+import "sync"
 
 type Homelab struct {
 	Services Services
 }
 
-func NewHomelabApp(conf *config.ConfigManager[config.Config]) (Homelab, error) {
+func NewHomelab() (Homelab, error) {
 	var services Services = make(Services)
 	var wg sync.WaitGroup
-	errCh := make(chan error, len(conf.Data.Services))
+	errCh := make(chan error, len(conf.Services))
 
-	for serviceName, serviceConfig := range conf.Data.Services {
+	for serviceName, serviceConfig := range conf.Services {
 		wg.Add(1)
-		go func(name, context string, composeFiles []string, conf *config.ConfigManager[config.Config]) {
+		go func(name, context string, composeFiles []string) {
 			defer wg.Done()
-			service, err := NewService(name, context, composeFiles, conf)
+			service, err := NewService(name, context, composeFiles)
 			if err != nil {
 				errCh <- err
 				return
 			}
 			services[name] = service
-		}(serviceName, serviceConfig.Context, serviceConfig.ComposeFiles, conf)
+		}(serviceName, serviceConfig.Context, serviceConfig.ComposeFiles)
 	}
 
 	wg.Wait()
@@ -42,4 +38,9 @@ func NewHomelabApp(conf *config.ConfigManager[config.Config]) (Homelab, error) {
 	}
 
 	return homelab, nil
+}
+
+func (h Homelab) HasService(service string) bool {
+	_, exists := h.Services[service]
+	return exists
 }

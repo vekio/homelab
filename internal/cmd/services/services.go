@@ -2,10 +2,10 @@ package services
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/vekio/homelab/internal/config"
+	"github.com/vekio/homelab/internal/homelab"
 )
 
-func NewCmdServices(conf *config.ConfigManager[config.Config]) *cobra.Command {
+func NewCmdServices(homelab homelab.Homelab) *cobra.Command {
 	servicesCmd := &cobra.Command{
 		Use:     "services",
 		Aliases: []string{"srv"},
@@ -13,7 +13,7 @@ func NewCmdServices(conf *config.ConfigManager[config.Config]) *cobra.Command {
 	}
 
 	// Subcommands
-	servicesCmd.AddCommand(newCmdList(conf))
-	servicesCmd.AddCommand(newCmdConfig(conf))
+	servicesCmd.AddCommand(newCmdList(homelab))
+	servicesCmd.AddCommand(newCmdPull(homelab))
 	return servicesCmd
 }
