@@ -58,7 +58,7 @@ func (s Service) ComposeFilesGithubURLs(repoURL, branch string) ([]string, error
 // It ensures that all compose files are fetched and stored in a specific directory based on the repository branch.
 func downloadComposeFiles(service *Service) error {
 	// Construct the directory path where the compose files will be stored.
-	dirPath := config.DirPath() + "/dockercompose-" + conf.Repository.Branch
+	dirPath := config.DirPath() + "/dockercompose-" + settings.Repository.Branch
 	if err := _dir.EnsureDir(dirPath, _dir.DefaultDirPerms); err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func downloadComposeFiles(service *Service) error {
 		return err
 	}
 
-	urls, err := service.ComposeFilesGithubURLs(conf.Repository.URL, conf.Repository.Branch)
+	urls, err := service.ComposeFilesGithubURLs(settings.Repository.URL, settings.Repository.Branch)
 	if err != nil {
 		return err
 	}

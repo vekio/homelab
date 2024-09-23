@@ -2,6 +2,7 @@ package homelab
 
 import (
 	"fmt"
+	"log"
 	"os/exec"
 	"slices"
 	"strings"
@@ -9,7 +10,7 @@ import (
 	"github.com/vekio/homelab/pkg/config"
 )
 
-type Config struct {
+type Settings struct {
 	Services map[string]struct {
 		Context      string   `yaml:"context"`
 		ComposeFiles []string `yaml:"compose_files"`
@@ -21,13 +22,15 @@ type Config struct {
 	Contexts []string `yaml:"contexts"`
 }
 
-var conf Config
+var settings Settings
 
 func init() {
-	config.Load(&conf)
+	if err := config.Load(&settings); err != nil {
+		log.Fatalf("error loading configuration: %v", err)
+	}
 }
 
-func (c Config) Validate() error {
+func (c Settings) Validate() error {
 	// Validate contexts.
 	for _, context := range c.Contexts {
 		if context == "local" {
@@ -37,7 +40,7 @@ func (c Config) Validate() error {
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			if strings.Contains(string(output), "not found") {
-				fmt.Printf("Warning: context '%s' not found ⚠️\n", context)
+				fmt.Printf("warning: context '%s' not found ⚠️\n", context)
 			} else {
 				return fmt.Errorf("failed checking docker context '%s': %w", context, err)
 			}
@@ -47,7 +50,7 @@ func (c Config) Validate() error {
 	// Validate services context.
 	for service, srv := range c.Services {
 		if !slices.Contains(c.Contexts, srv.Context) {
-			fmt.Printf("Warning: unkown context '%s' in '%s' ⚠️\n", srv.Context, service)
+			fmt.Printf("warning: unkown context '%s' in '%s' ⚠️\n", srv.Context, service)
 		}
 	}
 	return nil

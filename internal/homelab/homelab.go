@@ -9,9 +9,9 @@ type Homelab struct {
 func NewHomelab() (Homelab, error) {
 	var services Services = make(Services)
 	var wg sync.WaitGroup
-	errCh := make(chan error, len(conf.Services))
+	errCh := make(chan error, len(settings.Services))
 
-	for serviceName, serviceConfig := range conf.Services {
+	for serviceName, serviceConfig := range settings.Services {
 		wg.Add(1)
 		go func(name, context string, composeFiles []string) {
 			defer wg.Done()
