@@ -8,7 +8,7 @@ import (
 )
 
 func newCmdShow() *cobra.Command {
-	showCmd := &cobra.Command{
+	return &cobra.Command{
 		Use:   "show",
 		Short: "Display current configuration file",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -20,5 +20,4 @@ func newCmdShow() *cobra.Command {
 			return nil
 		},
 	}
-	return showCmd
 }

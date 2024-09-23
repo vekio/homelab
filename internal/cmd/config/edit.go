@@ -8,7 +8,7 @@ import (
 )
 
 func newCmdEdit() *cobra.Command {
-	editCmd := &cobra.Command{
+	return &cobra.Command{
 		Use:   "edit",
 		Short: "Edit the configuration file",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -19,5 +19,4 @@ func newCmdEdit() *cobra.Command {
 			return nil
 		},
 	}
-	return editCmd
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func newCmdPull(homelab homelab.Homelab) *cobra.Command {
-	cmdPull := &cobra.Command{
+	return &cobra.Command{
 		Use:   "config",
 		Short: "Parse, resolve and render compose file in canonical format",
 		Args:  cobra.ExactArgs(1),
@@ -27,5 +27,4 @@ func newCmdPull(homelab homelab.Homelab) *cobra.Command {
 			return nil
 		},
 	}
-	return cmdPull
 }

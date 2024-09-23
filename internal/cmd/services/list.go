@@ -8,17 +8,16 @@ import (
 )
 
 func newCmdList(homelab homelab.Homelab) *cobra.Command {
-	cmdList := &cobra.Command{
+	return &cobra.Command{
 		Use:     "list",
-		Aliases: []string{"l"},
+		Aliases: []string{"ls"},
 		Short:   "Listing available homelab services",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			for srvName, srv := range homelab.Services {
 				fmt.Printf("[%s]\n", srvName)
-				fmt.Printf("\t* %s\n", srv.Context)
+				fmt.Printf("  * %s\n", srv.Context)
 			}
 			return nil
 		},
 	}
-	return cmdList
 }
