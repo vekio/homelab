@@ -8,10 +8,10 @@ import (
 	"github.com/vekio/homelab/internal/homelab"
 )
 
-func newCmdPull(homelab homelab.Homelab) *cobra.Command {
+func newCmdStop(homelab homelab.Homelab) *cobra.Command {
 	return &cobra.Command{
-		Use:     "pull",
-		Short:   "Pull service images",
+		Use:     "stop",
+		Short:   "Stop services",
 		Args:    cobra.ExactArgs(1),
 		GroupID: "compose",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
@@ -26,7 +26,7 @@ func newCmdPull(homelab homelab.Homelab) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			service := homelab.Services[strings.TrimSpace(args[0])]
 
-			if err := service.Pull(); err != nil {
+			if err := service.Stop(); err != nil {
 				return err
 			}
 			return nil

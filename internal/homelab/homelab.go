@@ -39,8 +39,3 @@ func NewHomelab() (Homelab, error) {
 
 	return homelab, nil
 }
-
-func (h Homelab) HasService(service string) bool {
-	_, exists := h.Services[service]
-	return exists
-}

@@ -30,13 +30,25 @@ func NewService(name, context string, composeFiles []string) (*Service, error) {
 		ComposeFiles: composeFiles,
 	}
 
-	if err := downloadComposeFiles(service); err != nil {
+	if err := service.DownloadComposeFiles(); err != nil {
 		return nil, err
 	}
 	return service, nil
 }
 
-func (s Service) ComposeFilesGithubURLs(repoURL, branch string) ([]string, error) {
+func (s Service) ServicePath() string {
+	return fmt.Sprintf("%s/%s", config.DirPath(), s.Name)
+}
+
+func (s Service) ComposeFilesPath() []string {
+	var composeFilesPaths []string
+	for _, file := range s.ComposeFiles {
+		composeFilesPaths = append(composeFilesPaths, fmt.Sprintf("%s/%s", s.ServicePath(), file))
+	}
+	return composeFilesPaths
+}
+
+func (s Service) GithubURLs(repoURL, branch string) ([]string, error) {
 	parsedURL, err := url.Parse(repoURL)
 	if err != nil {
 		return nil, err
@@ -54,9 +66,9 @@ func (s Service) ComposeFilesGithubURLs(repoURL, branch string) ([]string, error
 	return urls, nil
 }
 
-// downloadComposeFiles downloads docker compose files for the service.
+// DownloadComposeFiles downloads docker compose files for the service.
 // It ensures that all compose files are fetched and stored in a specific directory based on the repository branch.
-func downloadComposeFiles(service *Service) error {
+func (s Service) DownloadComposeFiles() error {
 	// Construct the directory path where the compose files will be stored.
 	dirPath := config.DirPath() + "/dockercompose-" + settings.Repository.Branch
 	if err := _dir.EnsureDir(dirPath, _dir.DefaultDirPerms); err != nil {
@@ -64,18 +76,17 @@ func downloadComposeFiles(service *Service) error {
 	}
 
 	// Ensure directory for the service.
-	servicePath := dirPath + "/" + service.Name
-	if err := _dir.EnsureDir(servicePath, _dir.DefaultDirPerms); err != nil {
+	if err := _dir.EnsureDir(s.ServicePath(), _dir.DefaultDirPerms); err != nil {
 		return err
 	}
 
-	urls, err := service.ComposeFilesGithubURLs(settings.Repository.URL, settings.Repository.Branch)
+	urls, err := s.GithubURLs(settings.Repository.URL, settings.Repository.Branch)
 	if err != nil {
 		return err
 	}
 
 	var wg sync.WaitGroup
-	errCh := make(chan error, len(service.ComposeFiles)) // Error channel for concurrent error handling.
+	errCh := make(chan error, len(s.ComposeFiles)) // Error channel for concurrent error handling.
 
 	// Iterate over all service names and download their respective compose files.
 	for _, url := range urls {
@@ -104,7 +115,7 @@ func downloadComposeFiles(service *Service) error {
 			}
 
 			// Save file content.
-			filePath := fmt.Sprintf("%s/%s", servicePath, path.Base(url))
+			filePath := fmt.Sprintf("%s/%s", s.ServicePath(), path.Base(url))
 			if err := os.WriteFile(filePath, body, _file.DefaultFilePerms); err != nil {
 				errCh <- fmt.Errorf("failed to write file %s: %w", filePath, err)
 				return

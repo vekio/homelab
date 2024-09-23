@@ -13,7 +13,15 @@ func NewCmdServices(homelab homelab.Homelab) *cobra.Command {
 	}
 
 	// Subcommands
-	servicesCmd.AddCommand(newCmdList(homelab))
-	servicesCmd.AddCommand(newCmdPull(homelab))
+	servicesCmd.AddCommand(newCmdList(homelab), newCmdUpgrade(homelab))
+
+	// Compose Subcommands
+	servicesCmd.AddGroup(&cobra.Group{ID: "compose", Title: "Compose Commands"})
+	servicesCmd.AddCommand(
+		newCmdConfig(homelab), newCmdDown(homelab),
+		newCmdLogs(homelab), newCmdRestart(homelab),
+		newCmdStop(homelab), newCmdPull(homelab),
+		newCmdUp(homelab))
+
 	return servicesCmd
 }
