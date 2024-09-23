@@ -7,7 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
+
+	_dir "github.com/vekio/fs/dir"
+	_file "github.com/vekio/fs/file"
 )
 
 // Config manages configuration files for an application.
@@ -19,8 +23,11 @@ type Config struct {
 
 var config *Config
 
+var Cmd *cobra.Command
+
 func init() {
 	config = newConfig()
+	Cmd = newCmdConfig()
 }
 
 // Validatable is an interface that should be implemented by all config types
@@ -57,13 +64,28 @@ func newConfig() *Config {
 	return cm
 }
 
+func newCmdConfig() *cobra.Command {
+	short := fmt.Sprintf("Manage configuration for %s", config.appName)
+
+	configCmd := &cobra.Command{
+		Use:     "config",
+		Aliases: []string{"conf"},
+		Short:   short,
+	}
+
+	// Subcommands
+	configCmd.AddCommand(newCmdShow())
+	configCmd.AddCommand(newCmdEdit())
+	return configCmd
+}
+
 // DirPath returns the path to the directory where the configuration file is stored.
 func DirPath() string {
 	return config.dirPath()
 }
 
-func (cm *Config) dirPath() string {
-	return filepath.Join(cm.dir, cm.appName)
+func (c *Config) dirPath() string {
+	return filepath.Join(c.dir, c.appName)
 }
 
 // Path returns the full path to the configuration file.
@@ -71,8 +93,8 @@ func Path() string {
 	return config.path()
 }
 
-func (cm *Config) path() string {
-	return filepath.Join(cm.dirPath(), cm.file)
+func (c *Config) path() string {
+	return filepath.Join(c.dirPath(), c.file)
 }
 
 // Content reads and returns the contents of the configuration file.
@@ -80,8 +102,55 @@ func Content() ([]byte, error) {
 	return config.content()
 }
 
-func (cm *Config) content() ([]byte, error) {
-	return os.ReadFile(cm.path())
+func (c *Config) content() ([]byte, error) {
+	return os.ReadFile(c.path())
+}
+
+// SoftInit checks for the existence of the config file and initializes it if it does not exist.
+func SoftInit() error {
+	return config.softInit()
+}
+
+func (c *Config) softInit() error {
+	exists, err := _file.Exists(c.path())
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return c.init()
+	}
+	return nil
+}
+
+// Init creates the configuration file and its directory if they do not exist.
+func Init() error {
+	return config.init()
+}
+
+func (c *Config) init() error {
+	err := _dir.EnsureDir(c.dirPath(), _dir.DefaultDirPerms)
+	if err != nil {
+		return err
+	}
+
+	file, err := _file.Create(c.path(), _file.DefaultFilePerms)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// TODO Writing default configuration as YAML
+	// defaultConfig := new(T) // Create a zero value for T to marshal into YAML
+	// data, err := yaml.Marshal(defaultConfig)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to marshal default config: %w", err)
+	// }
+	// _, err = file.Write(data)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to write default config to file %s: %w", cm.Path(), err)
+	// }
+
+	return nil
 }
 
 func Load(data Validatable) error {
@@ -99,42 +168,3 @@ func Load(data Validatable) error {
 	}
 	return nil
 }
-
-// // SoftInit checks for the existence of the config file and initializes it if it does not exist.
-// func (cm *ConfigManager) SoftInit() error {
-// 	exists, err := _file.Exists(cm.Path())
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if !exists {
-// 		return cm.Init()
-// 	}
-// 	return nil
-// }
-
-// // Init creates the configuration file and its directory if they do not exist.
-// func (cm *ConfigManager) Init() error {
-// 	err := _dir.EnsureDir(cm.DirPath(), _dir.DefaultDirPerms)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	file, err := _file.Create(cm.Path(), _file.DefaultFilePerms)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer file.Close()
-
-// 	// TODO Writing default configuration as YAML
-// 	// defaultConfig := new(T) // Create a zero value for T to marshal into YAML
-// 	// data, err := yaml.Marshal(defaultConfig)
-// 	// if err != nil {
-// 	// 	return fmt.Errorf("failed to marshal default config: %w", err)
-// 	// }
-// 	// _, err = file.Write(data)
-// 	// if err != nil {
-// 	// 	return fmt.Errorf("failed to write default config to file %s: %w", cm.Path(), err)
-// 	// }
-
-// 	return nil
-// }

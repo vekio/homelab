@@ -25,6 +25,10 @@ type Settings struct {
 var settings Settings
 
 func init() {
+	if err := config.SoftInit(); err != nil {
+		log.Fatalf("error creating configuration file: %v", err)
+	}
+
 	if err := config.Load(&settings); err != nil {
 		log.Fatalf("error loading configuration: %v", err)
 	}
