@@ -6,15 +6,38 @@ import (
 	"os/exec"
 )
 
-func (s Service) ExecComposeCmd(command ...string) error {
-	var composeArgs []string
-	for _, file := range s.ComposeFilesPath() {
-		composeArgs = append(composeArgs, "-f", file)
-	}
-	composeArgs = append(composeArgs, command...)
+type Compose interface {
+	Config() error
+	Down() error
+	Logs() error
+	Pull() error
+	Restart() error
+	Stop() error
+	Up() error
+}
 
-	cmdArgs := []string{"docker", "compose"}
-	cmdArgs = append(cmdArgs, composeArgs...)
+type DockerComposeExecutor struct {
+	service *Service
+}
+
+func NewDockerComposeExecutor(service *Service) DockerComposeExecutor {
+	dockerComposeExecutor := DockerComposeExecutor{
+		service: service,
+	}
+	return dockerComposeExecutor
+}
+
+func (d *DockerComposeExecutor) composeFilesArgs() []string {
+	var args []string
+	for _, file := range d.service.ComposeFilesPath() {
+		args = append(args, "-f", file)
+	}
+	return args
+}
+
+func (d DockerComposeExecutor) execComposeCmd(command ...string) error {
+	cmdArgs := append([]string{"docker", "compose"}, d.composeFilesArgs()...)
+	cmdArgs = append(cmdArgs, command...)
 
 	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
 	cmd.Stdin = os.Stdin
@@ -27,40 +50,40 @@ func (s Service) ExecComposeCmd(command ...string) error {
 	return nil
 }
 
-func (s Service) Config() error {
-	return s.ExecComposeCmd("config")
+func (d DockerComposeExecutor) Config() error {
+	return d.execComposeCmd("config")
 }
 
-func (s Service) Down() error {
-	return s.ExecComposeCmd("down", "-v")
+func (d DockerComposeExecutor) Down() error {
+	return d.execComposeCmd("down", "-v")
 }
 
-func (s Service) Logs() error {
-	return s.ExecComposeCmd("logs", "-f")
+func (d DockerComposeExecutor) Logs() error {
+	return d.execComposeCmd("logs", "-f")
 }
 
-func (s Service) Pull() error {
-	return s.ExecComposeCmd("pull")
+func (d DockerComposeExecutor) Pull() error {
+	return d.execComposeCmd("pull")
 }
 
-func (s Service) Restart() error {
-	return s.ExecComposeCmd("restart")
+func (d DockerComposeExecutor) Restart() error {
+	return d.execComposeCmd("restart")
 }
 
-func (s Service) Stop() error {
-	return s.ExecComposeCmd("stop")
+func (d DockerComposeExecutor) Stop() error {
+	return d.execComposeCmd("stop")
 }
 
-func (s Service) Up() error {
-	return s.ExecComposeCmd("up", "-d")
+func (d DockerComposeExecutor) Up() error {
+	return d.execComposeCmd("up", "-d")
 }
 
-func (s Service) Upgrade() error {
-	// if err := s.Pull(); err != nil {
-	// 	return err
-	// }
-	// if err := s.Up(); err != nil {
-	// 	return err
-	// }
-	return nil
-}
+// func (d DockerComposeExecutor) Upgrade() error {
+// 	// if err := s.Pull(); err != nil {
+// 	// 	return err
+// 	// }
+// 	// if err := s.Up(); err != nil {
+// 	// 	return err
+// 	// }
+// 	return nil
+// }

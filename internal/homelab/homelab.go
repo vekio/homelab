@@ -1,6 +1,9 @@
 package homelab
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 type Homelab struct {
 	Services Services
@@ -38,4 +41,20 @@ func NewHomelab() (Homelab, error) {
 	}
 
 	return homelab, nil
+}
+
+func (h *Homelab) ServicesNames() []string {
+	keys := make([]string, 0, len(h.Services))
+	for k := range h.Services {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func (h *Homelab) ServiceByName(name string) (*Service, error) {
+	service, ok := h.Services[name]
+	if !ok {
+		return nil, fmt.Errorf("service %s not found", name)
+	}
+	return service, nil
 }
