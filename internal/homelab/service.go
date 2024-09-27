@@ -18,35 +18,41 @@ type Service struct {
 	ComposeFiles []string
 }
 
+// NewService initializes a new Service instance, ensures its directory exists,
+// builds the URLs for its compose files, and downloads those files.
 func NewService(name, context string, composeFiles []string) (*Service, error) {
+	// Create a new service instance with the given name, context, and compose files.
 	s := &Service{
 		Name:         name,
 		Context:      context,
 		ComposeFiles: composeFiles,
 	}
 
-	// Ensure directory for the service.
+	// Ensure that the directory for the service exists. If not, create it.
 	if err := _dir.EnsureDir(s.ServicePath(), _dir.DefaultDirPerms); err != nil {
 		return nil, err
 	}
 
-	// Concatenate service name to each compose file to generate the correct paths.
+	// Concatenate the service name with each compose file to generate the correct file paths.
 	var filePaths []string
 	for _, file := range s.ComposeFiles {
 		filePaths = append(filePaths, fmt.Sprintf("%s/%s", s.Name, file))
 	}
 
-	// Build Github URLs for the compose files.
+	// Build the GitHub URLs for each compose file using the repository URL and branch from settings.
 	urls, err := utils.GenerateGithubURLs(settings.Repository.URL, settings.Repository.Branch, filePaths)
 	if err != nil {
+		// Return an error if URL generation fails.
 		return nil, err
 	}
 
-	// Download the compose files.
+	// Download the compose files using the generated URLs, saving them in the service's directory.
 	if err := utils.DownloadFiles(urls, s.ServicePath()); err != nil {
+		// Return an error if the download fails.
 		return nil, err
 	}
 
+	// Return the newly created service instance.
 	return s, nil
 }
 
