@@ -2,16 +2,11 @@ package homelab
 
 import (
 	"fmt"
-	"io"
-	"net/http"
-	"net/url"
 	"os"
-	"path"
-	"strings"
-	"sync"
+	"os/exec"
 
 	_dir "github.com/vekio/fs/dir"
-	_file "github.com/vekio/fs/file"
+	"github.com/vekio/homelab/internal/utils"
 	"github.com/vekio/homelab/pkg/config"
 )
 
@@ -24,114 +19,110 @@ type Service struct {
 }
 
 func NewService(name, context string, composeFiles []string) (*Service, error) {
-	service := &Service{
+	s := &Service{
 		Name:         name,
 		Context:      context,
 		ComposeFiles: composeFiles,
 	}
 
-	if err := service.DownloadComposeFiles(); err != nil {
+	// Ensure directory for the service.
+	if err := _dir.EnsureDir(s.ServicePath(), _dir.DefaultDirPerms); err != nil {
 		return nil, err
 	}
-	return service, nil
+
+	// Concatenate service name to each compose file to generate the correct paths.
+	var filePaths []string
+	for _, file := range s.ComposeFiles {
+		filePaths = append(filePaths, fmt.Sprintf("%s/%s", s.Name, file))
+	}
+
+	// Build Github URLs for the compose files.
+	urls, err := utils.GenerateGithubURLs(settings.Repository.URL, settings.Repository.Branch, filePaths)
+	if err != nil {
+		return nil, err
+	}
+
+	// Download the compose files.
+	if err := utils.DownloadFiles(urls, s.ServicePath()); err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }
 
+// ServicePath returns the directory path where the docker compose files for the service are stored.
 func (s Service) ServicePath() string {
-	return fmt.Sprintf("%s/%s", config.DirPath(), s.Name)
+	return fmt.Sprintf("%s/%s/%s", composeFilesBasePath(), config.DirPath(), s.Name)
 }
 
-func (s Service) ComposeFilesPath() []string {
+// ComposeFilePaths returns a slice of file paths for the service's Docker Compose files.
+func (s Service) ComposeFilePaths() []string {
 	var composeFilesPaths []string
 	for _, file := range s.ComposeFiles {
+		// Append the full path for each compose file by combining the service path and file name.
 		composeFilesPaths = append(composeFilesPaths, fmt.Sprintf("%s/%s", s.ServicePath(), file))
 	}
 	return composeFilesPaths
 }
 
-func (s Service) GithubURLs(repoURL, branch string) ([]string, error) {
-	parsedURL, err := url.Parse(repoURL)
-	if err != nil {
-		return nil, err
+// execComposeCmd constructs and executes a docker compose command for the service.
+// It takes a variable number of command arguments and executes the Docker Compose command.
+func (s Service) execComposeCmd(command ...string) error {
+	// Build the list of arguments for the docker compose command by adding the -f flag for each compose file.
+	var composeFileArgs []string
+	for _, file := range s.ComposeFilePaths() {
+		composeFileArgs = append(composeFileArgs, "-f", file)
 	}
-	segments := strings.Split(parsedURL.String(), "/")
-	var githubRawContentURL = "https://raw.githubusercontent.com"
-	var username = segments[3]
-	var repository = segments[4]
 
-	var urls []string
-	for _, composeFile := range s.ComposeFiles {
-		url := fmt.Sprintf("%s/%s/%s/%s/%s/%s", githubRawContentURL, username, repository, branch, s.Name, composeFile)
-		urls = append(urls, url)
+	// Prepend "docker compose" to the arguments, followed by the compose file arguments.
+	cmdArgs := append([]string{"docker", "compose"}, composeFileArgs...)
+	// Append the actual command (e.g., "up", "down", "logs") passed as a variadic argument.
+	cmdArgs = append(cmdArgs, command...)
+
+	// Create the command to be executed.
+	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Execute the command and return any error if the execution fails.
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("error executing: %w", err)
 	}
-	return urls, nil
+	return nil
 }
 
-// DownloadComposeFiles downloads docker compose files for the service.
-// It ensures that all compose files are fetched and stored in a specific directory based on the repository branch.
-func (s Service) DownloadComposeFiles() error {
-	// Construct the directory path where the compose files will be stored.
-	dirPath := config.DirPath() + "/dockercompose-" + settings.Repository.Branch
-	if err := _dir.EnsureDir(dirPath, _dir.DefaultDirPerms); err != nil {
-		return err
-	}
+// Config runs the `docker compose config` command to validate and view the Compose file configuration.
+func (s Service) Config() error {
+	return s.execComposeCmd("config")
+}
 
-	// Ensure directory for the service.
-	if err := _dir.EnsureDir(s.ServicePath(), _dir.DefaultDirPerms); err != nil {
-		return err
-	}
+// Down runs the `docker compose down -v` command to stop and remove containers, networks, and volumes.
+func (s Service) Down() error {
+	return s.execComposeCmd("down", "-v")
+}
 
-	urls, err := s.GithubURLs(settings.Repository.URL, settings.Repository.Branch)
-	if err != nil {
-		return err
-	}
+// Logs runs the `docker compose logs -f` command to follow the logs of all running services.
+func (s Service) Logs() error {
+	return s.execComposeCmd("logs", "-f")
+}
 
-	var wg sync.WaitGroup
-	errCh := make(chan error, len(s.ComposeFiles)) // Error channel for concurrent error handling.
+// Pull runs the `docker compose pull` command to pull the latest images for the services.
+func (s Service) Pull() error {
+	return s.execComposeCmd("pull")
+}
 
-	// Iterate over all service names and download their respective compose files.
-	for _, url := range urls {
-		wg.Add(1)
-		go func(url string) { // Start the goroutine
-			defer wg.Done()
+// Restart runs the `docker compose restart` command to restart all running services.
+func (s Service) Restart() error {
+	return s.execComposeCmd("restart")
+}
 
-			resp, err := http.Get(url)
-			if err != nil {
-				errCh <- fmt.Errorf("error fetching %s: %w", url, err)
-				return
-			}
-			defer resp.Body.Close()
+// Stop runs the `docker compose stop` command to stop all running services without removing containers.
+func (s Service) Stop() error {
+	return s.execComposeCmd("stop")
+}
 
-			// Read the body of the response.
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				errCh <- fmt.Errorf("error reading response from %s: %w", url, err)
-				return
-			}
-
-			// Check the HTTP status code.
-			if resp.StatusCode != 200 {
-				errCh <- fmt.Errorf("HTTP error %d for %s: %s", resp.StatusCode, url, body)
-				return
-			}
-
-			// Save file content.
-			filePath := fmt.Sprintf("%s/%s", s.ServicePath(), path.Base(url))
-			if err := os.WriteFile(filePath, body, _file.DefaultFilePerms); err != nil {
-				errCh <- fmt.Errorf("failed to write file %s: %w", filePath, err)
-				return
-			}
-		}(url)
-	}
-
-	wg.Wait()    // Wait for all goroutines to finish.
-	close(errCh) // Close the channel after all goroutines report they are done.
-
-	// Check for errors from the error channel.
-	for err := range errCh {
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+// Up runs the `docker compose up -d` command to start services in detached mode.
+func (s Service) Up() error {
+	return s.execComposeCmd("up", "-d")
 }

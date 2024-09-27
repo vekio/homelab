@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/vekio/homelab/internal/homelab"
+	H "github.com/vekio/homelab/internal/homelab"
 )
 
-func NewCmdServices(h homelab.Homelab) *cobra.Command {
+func NewCmdServices(homelab H.Homelab) *cobra.Command {
 	servicesCmd := &cobra.Command{
 		Use:     "services",
 		Aliases: []string{"srv"},
@@ -15,36 +15,36 @@ func NewCmdServices(h homelab.Homelab) *cobra.Command {
 	}
 
 	// Subcommands
-	servicesCmd.AddCommand(newCmdList(h))
+	servicesCmd.AddCommand(newCmdList(homelab))
 
 	// Compose Subcommands
-	servicesCmd.AddGroup(&cobra.Group{ID: "compose", Title: "Compose Commands"})
 	servicesCmd.AddCommand(
-		newCmdConfig(h), newCmdDown(h),
-		newCmdLogs(h), newCmdRestart(h),
-		newCmdStop(h), newCmdPull(h),
-		newCmdUp(h))
+		newCmdConfig(homelab),
+		newCmdDown(homelab),
+		newCmdLogs(homelab),
+		newCmdRestart(homelab),
+		newCmdStop(homelab),
+		newCmdPull(homelab),
+		newCmdUp(homelab),
+	)
 
 	return servicesCmd
 }
 
-func newCmdCompose(name, shortDesc string, h homelab.Homelab, exec func(executor homelab.DockerComposeExecutor) error) *cobra.Command {
+func newCmdCompose(name, shortDesc string, homelab H.Homelab, exec func(s *H.Service) error) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:       fmt.Sprintf("%s SERVICE", name),
 		Short:     shortDesc,
 		Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 		GroupID:   "compose",
-		ValidArgs: h.ServicesNames(),
+		ValidArgs: homelab.ServicesNames(),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Extract service from first arg.
-			service, err := h.ServiceByName(args[0])
+			service, err := homelab.ServiceByName(args[0])
 			if err != nil {
 				return err
 			}
 
-			executor := homelab.NewDockerComposeExecutor(service)
-
-			if err := exec(executor); err != nil {
+			if err := exec(service); err != nil {
 				return err
 			}
 			return nil
@@ -53,51 +53,51 @@ func newCmdCompose(name, shortDesc string, h homelab.Homelab, exec func(executor
 	return cmd
 }
 
-func newCmdConfig(h homelab.Homelab) *cobra.Command {
-	return newCmdCompose("config", "Parse, resolve and render compose file in canonical format", h,
-		func(exec homelab.DockerComposeExecutor) error {
-			return exec.Config()
+func newCmdConfig(homelab H.Homelab) *cobra.Command {
+	return newCmdCompose("config", "Parse, resolve and render compose file in canonical format", homelab,
+		func(s *H.Service) error {
+			return s.Config()
 		})
 }
 
-func newCmdDown(h homelab.Homelab) *cobra.Command {
-	return newCmdCompose("down", "Stop and remove containers, networks", h,
-		func(exec homelab.DockerComposeExecutor) error {
-			return exec.Down()
+func newCmdDown(homelab H.Homelab) *cobra.Command {
+	return newCmdCompose("down", "Stop and remove containers, networks", homelab,
+		func(s *H.Service) error {
+			return s.Down()
 		})
 }
 
-func newCmdLogs(h homelab.Homelab) *cobra.Command {
-	return newCmdCompose("logs", "View output from containers", h,
-		func(exec homelab.DockerComposeExecutor) error {
-			return exec.Logs()
+func newCmdLogs(homelab H.Homelab) *cobra.Command {
+	return newCmdCompose("logs", "View output from containers", homelab,
+		func(s *H.Service) error {
+			return s.Logs()
 		})
 }
 
-func newCmdPull(h homelab.Homelab) *cobra.Command {
-	return newCmdCompose("pull", "Pull service images", h,
-		func(exec homelab.DockerComposeExecutor) error {
-			return exec.Pull()
+func newCmdPull(homelab H.Homelab) *cobra.Command {
+	return newCmdCompose("pull", "Pull service images", homelab,
+		func(s *H.Service) error {
+			return s.Pull()
 		})
 }
 
-func newCmdRestart(h homelab.Homelab) *cobra.Command {
-	return newCmdCompose("restart", "Restart service containers", h,
-		func(exec homelab.DockerComposeExecutor) error {
-			return exec.Restart()
+func newCmdRestart(homelab H.Homelab) *cobra.Command {
+	return newCmdCompose("restart", "Restart service containers", homelab,
+		func(s *H.Service) error {
+			return s.Restart()
 		})
 }
 
-func newCmdStop(h homelab.Homelab) *cobra.Command {
-	return newCmdCompose("stop", "Stop services", h,
-		func(exec homelab.DockerComposeExecutor) error {
-			return exec.Stop()
+func newCmdStop(homelab H.Homelab) *cobra.Command {
+	return newCmdCompose("stop", "Stop services", homelab,
+		func(s *H.Service) error {
+			return s.Stop()
 		})
 }
 
-func newCmdUp(h homelab.Homelab) *cobra.Command {
-	return newCmdCompose("up", "Create and start containers", h,
-		func(exec homelab.DockerComposeExecutor) error {
-			return exec.Up()
+func newCmdUp(homelab H.Homelab) *cobra.Command {
+	return newCmdCompose("up", "Create and start containers", homelab,
+		func(s *H.Service) error {
+			return s.Up()
 		})
 }
