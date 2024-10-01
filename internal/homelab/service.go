@@ -7,7 +7,6 @@ import (
 
 	_dir "github.com/vekio/fs/dir"
 	"github.com/vekio/homelab/internal/utils"
-	"github.com/vekio/homelab/pkg/config"
 )
 
 type Services = map[string]*Service
@@ -58,7 +57,7 @@ func NewService(name, context string, composeFiles []string) (*Service, error) {
 
 // ServicePath returns the directory path where the docker compose files for the service are stored.
 func (s Service) ServicePath() string {
-	return fmt.Sprintf("%s/%s/%s", composeFilesBasePath(), config.DirPath(), s.Name)
+	return fmt.Sprintf("%s/%s", composeFilesBasePath(), s.Name)
 }
 
 // ComposeFilePaths returns a slice of file paths for the service's Docker Compose files.

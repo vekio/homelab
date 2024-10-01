@@ -38,10 +38,10 @@ func NewCmdServices(homelab H.Homelab) *cobra.Command {
 func newCmdCompose(name, shortDesc string, homelab H.Homelab, exec func(s *H.Service) error) *cobra.Command {
 	// Define the command with usage, short description, and argument validation.
 	cmd := &cobra.Command{
-		Use:       fmt.Sprintf("%s SERVICE", name),
-		Short:     shortDesc,
-		Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
-		GroupID:   "compose",               // Grouping for docker compose-related commands.
+		Use:   fmt.Sprintf("%s SERVICE", name),
+		Short: shortDesc,
+		Args:  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
+		// GroupID:   "compose",               // Grouping for docker compose-related commands.
 		ValidArgs: homelab.ServicesNames(), // Set the valid service names as arguments.
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Get the service by its name from the homelab.
