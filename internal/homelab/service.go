@@ -202,6 +202,10 @@ func (s Service) execComposeCmd(command ...string) error {
 
 	// Prepend "docker compose" to the arguments, followed by the compose file arguments.
 	cmdArgs := append([]string{"docker", "compose"}, composeFileArgs...)
+
+	// Append the env-file path.
+	cmdArgs = append(cmdArgs, "--env-file", envFilePath())
+
 	// Append the actual command (e.g., "up", "down", "logs") passed as a variadic argument.
 	cmdArgs = append(cmdArgs, command...)
 
