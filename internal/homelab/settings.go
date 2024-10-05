@@ -59,3 +59,14 @@ func (c Settings) Validate() error {
 	}
 	return nil
 }
+
+// composeFilesBasePath returns the base directory path where Docker Compose files are stored.
+// This path is based on the repository's branch name.
+func composeFilesBasePath() string {
+	return fmt.Sprintf("%s/dockercomposefiles-%s", config.DirPath(), settings.Repository.Branch)
+}
+
+// envFilePath
+func envFilePath() string {
+	return fmt.Sprintf("%s/.env-%s", config.DirPath(), settings.Repository.Branch)
+}

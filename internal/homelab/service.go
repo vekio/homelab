@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync"
 
 	_dir "github.com/vekio/fs/dir"
 	"github.com/vekio/homelab/internal/utils"
@@ -20,6 +21,12 @@ type Service struct {
 // NewService initializes a new Service instance, ensures its directory exists,
 // builds the URLs for its compose files, and downloads those files.
 func NewService(name, context string, composeFiles []string) (*Service, error) {
+	// Check if the context is set to "local". If so, switch it to "default".
+	// "local" is treated as an alias for the "default" docker context.
+	if context == "local" {
+		context = "default"
+	}
+
 	// Create a new service instance with the given name, context, and compose files.
 	s := &Service{
 		Name:         name,
@@ -32,27 +39,59 @@ func NewService(name, context string, composeFiles []string) (*Service, error) {
 		return nil, err
 	}
 
-	// Concatenate the service name with each compose file to generate the correct file paths.
-	var filePaths []string
-	for _, file := range s.ComposeFiles {
-		filePaths = append(filePaths, fmt.Sprintf("%s/%s", s.Name, file))
-	}
-
-	// Build the GitHub URLs for each compose file using the repository URL and branch from settings.
-	urls, err := utils.GenerateGithubURLs(settings.Repository.URL, settings.Repository.Branch, filePaths)
-	if err != nil {
-		// Return an error if URL generation fails.
-		return nil, err
-	}
-
-	// Download the compose files using the generated URLs, saving them in the service's directory.
-	if err := utils.DownloadFiles(urls, s.ServicePath()); err != nil {
-		// Return an error if the download fails.
+	// Download compose files.
+	if err := s.DownloadComposeFiles(); err != nil {
 		return nil, err
 	}
 
 	// Return the newly created service instance.
 	return s, nil
+}
+
+// Concatenate the service name with each compose file to generate the correct file paths and download them in parallel.
+func (s Service) DownloadComposeFiles() error {
+	var wg sync.WaitGroup
+	errCh := make(chan error, len(s.ComposeFiles)) // Channel to handle any errors that occur concurrently.
+
+	// Iterate over the compose files and process each in a separate goroutine.
+	for _, file := range s.ComposeFiles {
+		wg.Add(1)
+
+		go func(file string) {
+			defer wg.Done()
+
+			// Concatenate the service name with the compose file to generate the correct file path.
+			filePath := fmt.Sprintf("%s/%s", s.Name, file)
+
+			// Build the GitHub URL for the compose file using the repository URL and branch from settings.
+			url, err := utils.GenerateGithubURL(settings.Repository.URL, settings.Repository.Branch, filePath)
+			if err != nil {
+				// Send the error to the error channel if URL generation fails.
+				errCh <- fmt.Errorf("error generating URL for file %s: %w", file, err)
+				return
+			}
+
+			// Download the compose file using the generated URL, saving it in the service's directory.
+			if err := utils.DownloadFile(url, s.ServicePath()); err != nil {
+				// Send the error to the error channel if the download fails.
+				errCh <- fmt.Errorf("error downloading file %s: %w", file, err)
+				return
+			}
+		}(file)
+	}
+
+	// Wait for all goroutines to complete.
+	wg.Wait()
+	close(errCh) // Close the error channel after all tasks have completed.
+
+	// Check for any errors that may have occurred during execution.
+	for err := range errCh {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // ServicePath returns the directory path where the docker compose files for the service are stored.
@@ -73,6 +112,19 @@ func (s Service) ComposeFilePaths() []string {
 // execComposeCmd constructs and executes a docker compose command for the service.
 // It takes a variable number of command arguments and executes the Docker Compose command.
 func (s Service) execComposeCmd(command ...string) error {
+	// Change to the service context
+	// TODO mejorar el cambio de contexto
+	// Change Docker context using "docker context use"
+	contextCmd := exec.Command("docker", "context", "use", s.Context)
+	contextCmd.Stdin = os.Stdin
+	contextCmd.Stdout = os.Stdout
+	contextCmd.Stderr = os.Stderr
+
+	// Execute the context change command
+	if err := contextCmd.Run(); err != nil {
+		return err
+	}
+
 	// Build the list of arguments for the docker compose command by adding the -f flag for each compose file.
 	var composeFileArgs []string
 	for _, file := range s.ComposeFilePaths() {

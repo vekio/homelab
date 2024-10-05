@@ -112,7 +112,7 @@ func SoftInit() error {
 }
 
 func (c *Config) softInit() error {
-	exists, err := _file.Exists(c.path())
+	exists, err := _file.FileExists(c.path())
 	if err != nil {
 		return err
 	}
@@ -133,11 +133,9 @@ func (c *Config) init() error {
 		return err
 	}
 
-	file, err := _file.Create(c.path(), _file.DefaultFilePerms)
-	if err != nil {
+	if err := _file.CreateFile(c.path(), _file.DefaultFilePerms); err != nil {
 		return err
 	}
-	defer file.Close()
 
 	// TODO Writing default configuration as YAML
 	// defaultConfig := new(T) // Create a zero value for T to marshal into YAML

@@ -11,7 +11,7 @@ func newCmdEdit() *cobra.Command {
 		Use:   "edit",
 		Short: "Edit the configuration file",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := _file.Edit(config.path())
+			err := _file.EditFile(config.path())
 			if err != nil {
 				return err
 			}
