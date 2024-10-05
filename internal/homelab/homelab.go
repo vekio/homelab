@@ -90,11 +90,11 @@ func (h *Homelab) createServices() error {
 	// Iterate over all services defined in the settings.
 	for serviceName, serviceConfig := range settings.Services {
 		wg.Add(1)
-		go func(name, context string, composeFiles []string) {
+		go func(name, context string, composeFiles, extraFiles []string) {
 			defer wg.Done()
 
 			// Create a new service using the provided name, context, and compose file list.
-			service, err := NewService(name, context, composeFiles)
+			service, err := NewService(name, context, composeFiles, extraFiles)
 			if err != nil {
 				// If an error occurs, send it to the error channel.
 				errCh <- err
@@ -103,7 +103,7 @@ func (h *Homelab) createServices() error {
 
 			// Add the service to the Homelab's Services map.
 			h.Services[name] = service
-		}(serviceName, serviceConfig.Context, serviceConfig.ComposeFiles)
+		}(serviceName, serviceConfig.Context, serviceConfig.ComposeFiles, serviceConfig.ExtraFiles)
 	}
 
 	// Wait for all goroutines to complete.

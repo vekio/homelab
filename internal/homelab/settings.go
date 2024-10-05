@@ -14,6 +14,7 @@ type Settings struct {
 	Services map[string]struct {
 		Context      string   `yaml:"context"`
 		ComposeFiles []string `yaml:"compose_files"`
+		ExtraFiles   []string `yaml:"extras"`
 	} `yaml:",flow"`
 	Repository struct {
 		URL    string `yaml:"url"`

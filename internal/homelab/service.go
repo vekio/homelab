@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sync"
 
 	_dir "github.com/vekio/fs/dir"
@@ -16,11 +17,12 @@ type Service struct {
 	Name         string
 	Context      string
 	ComposeFiles []string
+	ExtraFiles   []string
 }
 
 // NewService initializes a new Service instance, ensures its directory exists,
 // builds the URLs for its compose files, and downloads those files.
-func NewService(name, context string, composeFiles []string) (*Service, error) {
+func NewService(name, context string, composeFiles, extraFiles []string) (*Service, error) {
 	// Check if the context is set to "local". If so, switch it to "default".
 	// "local" is treated as an alias for the "default" docker context.
 	if context == "local" {
@@ -32,6 +34,7 @@ func NewService(name, context string, composeFiles []string) (*Service, error) {
 		Name:         name,
 		Context:      context,
 		ComposeFiles: composeFiles,
+		ExtraFiles:   extraFiles,
 	}
 
 	// Ensure that the directory for the service exists. If not, create it.
@@ -44,8 +47,64 @@ func NewService(name, context string, composeFiles []string) (*Service, error) {
 		return nil, err
 	}
 
+	// Download extra files.
+	if err := s.DownloadExtraFiles(); err != nil {
+		return nil, err
+	}
+
 	// Return the newly created service instance.
 	return s, nil
+}
+
+func (s Service) DownloadExtraFiles() error {
+	var wg sync.WaitGroup
+	errCh := make(chan error, len(s.ExtraFiles)) // Channel to handle any errors that occur concurrently.
+
+	// Iterate over the extra files and process each in a separate goroutine.
+	for _, file := range s.ExtraFiles {
+		wg.Add(1)
+
+		go func(file string) {
+			defer wg.Done()
+
+			// Concatenate the service name with the extra file to generate the correct file path.
+			fileURLPath := fmt.Sprintf("%s/%s", s.Name, file)
+
+			// Build the GitHub URL for the extra file using the repository URL and branch from settings.
+			url, err := utils.GenerateGithubURL(settings.Repository.URL, settings.Repository.Branch, fileURLPath)
+			if err != nil {
+				// Send the error to the error channel if URL generation fails.
+				errCh <- fmt.Errorf("error generating URL for file %s: %w", file, err)
+				return
+			}
+
+			extraPath := fmt.Sprintf("%s/%s", s.ServicePath(), filepath.Dir(file))
+
+			if err := _dir.EnsureDir(extraPath, _dir.DefaultDirPerms); err != nil {
+				errCh <- err
+			}
+
+			// Download the extra file using the generated URL, saving it in the service's directory.
+			if err := utils.DownloadFile(url, extraPath); err != nil {
+				// Send the error to the error channel if the download fails.
+				errCh <- fmt.Errorf("error downloading file %s: %w", file, err)
+				return
+			}
+		}(file)
+	}
+
+	// Wait for all goroutines to complete.
+	wg.Wait()
+	close(errCh) // Close the error channel after all tasks have completed.
+
+	// Check for any errors that may have occurred during execution.
+	for err := range errCh {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Concatenate the service name with each compose file to generate the correct file paths and download them in parallel.
@@ -61,10 +120,10 @@ func (s Service) DownloadComposeFiles() error {
 			defer wg.Done()
 
 			// Concatenate the service name with the compose file to generate the correct file path.
-			filePath := fmt.Sprintf("%s/%s", s.Name, file)
+			fileURLPath := fmt.Sprintf("%s/%s", s.Name, file)
 
 			// Build the GitHub URL for the compose file using the repository URL and branch from settings.
-			url, err := utils.GenerateGithubURL(settings.Repository.URL, settings.Repository.Branch, filePath)
+			url, err := utils.GenerateGithubURL(settings.Repository.URL, settings.Repository.Branch, fileURLPath)
 			if err != nil {
 				// Send the error to the error channel if URL generation fails.
 				errCh <- fmt.Errorf("error generating URL for file %s: %w", file, err)
@@ -94,12 +153,12 @@ func (s Service) DownloadComposeFiles() error {
 	return nil
 }
 
-// ServicePath returns the directory path where the docker compose files for the service are stored.
+// ServicePath returns the service directory path where service's files are stored.
 func (s Service) ServicePath() string {
 	return fmt.Sprintf("%s/%s", composeFilesBasePath(), s.Name)
 }
 
-// ComposeFilePaths returns a slice of file paths for the service's Docker Compose files.
+// ComposeFilePaths returns a slice of file paths for the service's docker compose files.
 func (s Service) ComposeFilePaths() []string {
 	var composeFilesPaths []string
 	for _, file := range s.ComposeFiles {
@@ -107,6 +166,16 @@ func (s Service) ComposeFilePaths() []string {
 		composeFilesPaths = append(composeFilesPaths, fmt.Sprintf("%s/%s", s.ServicePath(), file))
 	}
 	return composeFilesPaths
+}
+
+// ExtraFilePaths returns a slice of file paths for the service's extra files.
+func (s Service) ExtraFilePaths() []string {
+	var extraFilesPaths []string
+	for _, file := range s.ExtraFiles {
+		// Append the full path for each extra file by combining the service path and file name.
+		extraFilesPaths = append(extraFilesPaths, fmt.Sprintf("%s/%s", s.ServicePath(), file))
+	}
+	return extraFilesPaths
 }
 
 // execComposeCmd constructs and executes a docker compose command for the service.
