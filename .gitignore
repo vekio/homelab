@@ -1,4 +1,4 @@
+.direnv
+.envrc
 .env
-.env-dev
-.env-pro
-tmp/
+bin/

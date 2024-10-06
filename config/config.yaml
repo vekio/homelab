@@ -1,6 +1,6 @@
-repository: "/home/user/homelab/services"
-env_file: "/path/to/dev-env-file"
+repo:
+  url: https://github.com/vekio/dockercomposefiles
+  branch: develop
 services:
   traefik:
-    context: "default"
-    priority: 1
+    server: local
