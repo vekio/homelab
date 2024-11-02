@@ -3,3 +3,6 @@ build:
 
 run: build
 	@./bin/homelab
+
+config:
+	@bash config.sh

@@ -34,6 +34,9 @@
 
             # https://github.com/golangci/golangci-lint
             golangci-lint
+
+            ansible
+            ansible-lint
           ];
           HOMELAB_ENV = "develop";
         };
