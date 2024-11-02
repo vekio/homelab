@@ -1,5 +1,5 @@
 ---
-- name: Configuración en localhost
+- name: Config traefik service
   hosts: localhost
   vars:
     domain: "{{ lookup('env', 'DOMAIN') }}"
@@ -7,13 +7,9 @@
     acme_letsencrypt_url: "{{ lookup('env', 'ACME_LETSENCRYPT_URL') }}"
     oberon_path: "{{ lookup('env', 'OBERON_PATH') }}"
   tasks:
-    # - name: Verificar variables de entorno
-    #   ansible.builtin.debug:
-    #     msg: "DOMAIN={{ domain }}, ACME_CERT_EMAIL={{ acme_cert_email }}, ACME_LETSENCRYPT_URL={{ acme_letsencrypt_url }}, OBERON_PATH={{ oberon_path }}"
-
-    - name: Crear directorios necesarios
+    - name: Make directories
       ansible.builtin.file:
-        path: "/home/vekio/.config/homelab/volume/{{ item }}"
+        path: "{{ oberon_path }}/{{ item }}"
         state: directory
         mode: '0755'
       loop:
@@ -21,10 +17,10 @@
         - traefik/cetificates
         - traefik/config/dynamic
 
-    - name: Copiar archivos y reemplazar placeholders
+    - name: Copy files
       ansible.builtin.template:
-        src: "/home/vekio/source/homelab/traefik/config/{{ item }}"
-        dest: "/home/vekio/.config/homelab/volume/traefik/config/{{ item }}"
+        src: "../traefik/config/{{ item }}"
+        dest: "{{ oberon_path }}/traefik/config/{{ item }}"
         mode: '0644'
       loop:
         - traefik.yml
