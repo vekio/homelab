@@ -1,5 +1,11 @@
 .direnv
 .envrc
+
+# enviroments
 .env
+.env-dev
 .envold
-bin/
+
+# Ansible
+pro.ini
+dev.ini
