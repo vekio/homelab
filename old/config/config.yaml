@@ -1,6 +1,0 @@
-repository: "/home/user/homelab/services"
-env_file: "/path/to/dev-env-file"
-services:
-  traefik:
-    context: "default"
-    priority: 1

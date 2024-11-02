@@ -1,6 +1,0 @@
-repo:
-  url: https://github.com/vekio/dockercomposefiles
-  branch: develop
-services:
-  traefik:
-    server: local
