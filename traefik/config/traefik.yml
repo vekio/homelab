@@ -1,0 +1,65 @@
+global:
+  # Enable Traefik to check for new updates
+  checkNewVersion: true
+  # Disable sending anonymous usage statistics
+  sendAnonymousUsage: false
+
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          # Redirect all HTTP traffic to HTTPS (websecure)
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: :443
+    http:
+      tls:
+        # Automatically issue wildcard certificates via the digitalocean certificate resolver
+        certResolver: digitalocean
+        domains:
+          - main: "{{ domain }}"
+            sans:
+              - "*.{{ domain }}"
+      middlewares:
+        # Apply custom middlewares like secure headers
+        - secure-headers@file
+
+  ssh:
+    address: :666 # Custom port for SSH entry point (used by some services)
+
+providers:
+  # Configure provider options to handle dynamic configurations
+  providersThrottleDuration: 2s # Prevent excessive reloads by setting a throttle time for provider updates
+  file:
+    directory: /etc/traefik/dynamic # Dynamic configuration directory
+    watch: true # Automatically reload configuration when files in this directory change
+
+  docker:
+    # Enable watching Docker events and auto-discover services
+    watch: true
+    # Only expose services explicitly marked in Docker labels
+    exposedByDefault: false
+    # Ensure Traefik connects to the 'proxy' Docker network
+    network: proxy
+
+api:
+  # Enable the Traefik dashboard for monitoring and management
+  dashboard: true
+
+certificatesResolvers:
+  digitalocean:
+    acme:
+      # Email for Let's Encrypt notifications (e.g., certificate expiration)
+      email: "{{ acme_cert_email }}"
+      # Let's Encrypt ACME server endpoint (set to production or staging environment)
+      caServer: "{{ acme_letsencrypt_url }}"
+      # File where Let's Encrypt certificates are stored
+      storage: /letsencrypt/acme.json
+      dnsChallenge:
+        # Use DigitalOcean's DNS provider for DNS-01 challenges to verify domain ownership
+        provider: digitalocean

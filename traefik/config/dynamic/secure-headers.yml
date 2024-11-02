@@ -1,0 +1,50 @@
+http:
+  middlewares:
+    secure-headers:
+      headers:
+        # Custom response headers for enhanced security and SEO control
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"  # Prevents search engine indexing
+          X-Forwarded-Proto: "https"  # Indicate that the request was forwarded as HTTPS
+
+        # Headers for SSL proxy support
+        sslProxyHeaders:
+          X-Forwarded-Proto: https  # Ensure all traffic is considered as HTTPS
+
+        # Referrer policy for improved privacy
+        referrerPolicy: "same-origin"  # Only send referrer information for same-origin requests
+
+        # Headers to identify the original host
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"  # Proxy the original host header
+
+        # Custom headers for client requests
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"  # Ensure all requests are treated as HTTPS
+
+        # Control browser options for framing
+        customFrameOptionsValue: SAMEORIGIN  # Prevents other sites from embedding your site in a frame (clickjacking protection)
+
+        # Force SSL redirection
+        sslRedirect: true  # Automatically redirect all HTTP requests to HTTPS
+
+        # Prevent the page from being embedded in a frame (clickjacking protection)
+        frameDeny: true
+
+        # Prevent browsers from MIME-sniffing a response away from the declared content type
+        contentTypeNosniff: true
+
+        # Enable the built-in XSS protection in browsers
+        browserXssFilter: true  # Protects against reflected XSS attacks
+
+        # Enforce Strict Transport Security (HSTS) to ensure HTTPS usage
+        forceSTSHeader: true
+
+        # Apply HSTS to all subdomains
+        stsIncludeSubdomains: true  # Force HTTPS on all subdomains
+
+        # Set the HSTS max-age to 2 years (in seconds)
+        stsSeconds: 63072000  # HSTS policy duration set to 2 years
+
+        # Enable HSTS preload list inclusion
+        stsPreload: true  # Allows the domain to be included in browsers' HSTS preload list
