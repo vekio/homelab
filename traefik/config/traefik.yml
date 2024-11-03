@@ -1,7 +1,7 @@
 global:
-  # Enable Traefik to check for new versions
+  # Enable Traefik to check for new updates
   checkNewVersion: true
-  # Disable sending anonymous usage data
+  # Disable sending anonymous usage statistics
   sendAnonymousUsage: false
 
 entryPoints:
@@ -10,7 +10,7 @@ entryPoints:
     http:
       redirections:
         entryPoint:
-          # Redirect HTTP traffic to HTTPS
+          # Redirect all HTTP traffic to HTTPS (websecure)
           to: websecure
           scheme: https
           permanent: true
@@ -19,47 +19,50 @@ entryPoints:
     address: :443
     http:
       tls:
-        # Generate a wildcard domain certificate using the digitalocean certificate resolver
-        certResolver: digitalocean
+        # Automatically issue wildcard certificates via the cloudflare certificate resolver
+        certResolver: cloudflare
         domains:
-          - main: DOMAIN
+          - main: "{{ domain }}"
             sans:
-              - '*.DOMAIN'
+              - "*.{{ domain }}"
       middlewares:
-        # Apply secure headers and expose whitelist middleware
+        # Apply custom middlewares like secure headers
         - secure-headers@file
-        # - exposeWhiteList@file
 
-  ssh:
-    address: :666
+  # ssh:
+  #   address: :666 # Custom port for SSH entry point (used by some services)
 
 providers:
-  # Set a throttle duration for providers to avoid excessive configuration reloads
-  providersThrottleDuration: 2s
+  # Configure provider options to handle dynamic configurations
+  providersThrottleDuration: 2s # Prevent excessive reloads by setting a throttle time for provider updates
   file:
-    directory: /etc/traefik/dynamic
-    watch: true
+    directory: /etc/traefik/dynamic # Dynamic configuration directory
+    watch: true # Automatically reload configuration when files in this directory change
 
   docker:
-    # Watch for Docker events and automatically discover services
+    # Enable watching Docker events and auto-discover services
     watch: true
-    # Don't expose containers by default; configure explicitly in labels
+    # Only expose services explicitly marked in Docker labels
     exposedByDefault: false
-    # Connect Traefik to the specified Docker network
-    network: PROJECT_proxy
+    # Ensure Traefik connects to the 'proxy' Docker network
+    network: proxy
 
 api:
-  # Enable Traefik dashboard
+  # Enable the Traefik dashboard for monitoring and management
   dashboard: true
 
 certificatesResolvers:
-  digitalocean:
+  cloudflare:
     acme:
-      email: TRAEFIK_CERT_EMAIL
-      # Let's Encrypt ACME server endpoint
-      caServer: https://acme-v02.api.letsencrypt.org/directory
-      # Store Let's Encrypt certificates in acme.json file
+      # Email for Let's Encrypt notifications (e.g., certificate expiration)
+      email: "{{ acme_cert_email }}"
+      # Let's Encrypt ACME server endpoint (set to production or staging environment)
+      caServer: "{{ acme_letsencrypt_url }}"
+      # File where Let's Encrypt certificates are stored
       storage: /letsencrypt/acme.json
       dnsChallenge:
-        # Use DigitalOcean as the DNS challenge provider for Let's Encrypt
-        provider: digitalocean
+        # Use Cloudflare's DNS provider for DNS-01 challenges to verify domain ownership
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"

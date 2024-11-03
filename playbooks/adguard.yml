@@ -1,0 +1,17 @@
+---
+- name: Config adguard service
+  hosts: adguard
+  vars:
+    calisto_path: "{{ lookup('env', 'CALISTO_PATH') }}"
+  tasks:
+    - name: Make directories
+      ansible.builtin.file:
+        path: "{{ calisto_path }}/{{ item }}"
+        state: directory
+        mode: '0700'
+      loop:
+        - adguard
+        - adguard/config
+        - adguard/data
+      become: true
+      become_user: root

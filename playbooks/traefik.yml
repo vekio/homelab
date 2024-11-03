@@ -1,0 +1,32 @@
+---
+- name: Config traefik service
+  hosts: traefik
+  vars:
+    domain: "{{ lookup('env', 'DOMAIN') }}"
+    acme_cert_email: "{{ lookup('env', 'ACME_CERT_EMAIL') }}"
+    acme_letsencrypt_url: "{{ lookup('env', 'ACME_LETSENCRYPT_URL') }}"
+    calisto_path: "{{ lookup('env', 'CALISTO_PATH') }}"
+  tasks:
+    - name: Make directories
+      ansible.builtin.file:
+        path: "{{ calisto_path }}/{{ item }}"
+        state: directory
+        mode: '0711'
+      loop:
+        - traefik
+        - traefik/certificates
+        - traefik/config/dynamic
+      become: true
+      become_user: root
+
+    - name: Copy files
+      ansible.builtin.template:
+        src: "../traefik/config/{{ item }}"
+        dest: "{{ calisto_path }}/traefik/config/{{ item }}"
+        mode: '0644'
+      loop:
+        - traefik.yml
+        - dynamic/secure-headers.yml
+        - dynamic/tls.yml
+      become: true
+      become_user: root

@@ -2,36 +2,49 @@ http:
   middlewares:
     secure-headers:
       headers:
-        # Custom response headers
+        # Custom response headers for enhanced security and SEO control
         customResponseHeaders:
-          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
-          X-Forwarded-Proto: "https"
-        # SSL proxy headers
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"  # Prevents search engine indexing
+          X-Forwarded-Proto: "https"  # Indicate that the request was forwarded as HTTPS
+
+        # Headers for SSL proxy support
         sslProxyHeaders:
-          X-Forwarded-Proto: https
-        # Referrer policy set to "same-origin"
-        referrerPolicy: "same-origin"
-        # Proxy headers for hosts
+          X-Forwarded-Proto: https  # Ensure all traffic is considered as HTTPS
+
+        # Referrer policy for improved privacy
+        referrerPolicy: "same-origin"  # Only send referrer information for same-origin requests
+
+        # Headers to identify the original host
         hostsProxyHeaders:
-          - "X-Forwarded-Host"
-        # Custom request headers
+          - "X-Forwarded-Host"  # Proxy the original host header
+
+        # Custom headers for client requests
         customRequestHeaders:
-          X-Forwarded-Proto: "https"
-        # Custom frame options set to "SAMEORIGIN"
-        customFrameOptionsValue: SAMEORIGIN
-        # SSL redirect enabled
-        sslRedirect: true
-        # Frame deny to prevent framing attacks
+          X-Forwarded-Proto: "https"  # Ensure all requests are treated as HTTPS
+
+        # Control browser options for framing
+        customFrameOptionsValue: SAMEORIGIN  # Prevents other sites from embedding your site in a frame (clickjacking protection)
+
+        # Force SSL redirection
+        sslRedirect: true  # Automatically redirect all HTTP requests to HTTPS
+
+        # Prevent the page from being embedded in a frame (clickjacking protection)
         frameDeny: true
-        # Content Type Nosniff to prevent MIME-sniffing attacks
+
+        # Prevent browsers from MIME-sniffing a response away from the declared content type
         contentTypeNosniff: true
-        # Enable browser XSS filter
-        browserXssFilter: true
-        # Force Strict Transport Security (HSTS) header
+
+        # Enable the built-in XSS protection in browsers
+        browserXssFilter: true  # Protects against reflected XSS attacks
+
+        # Enforce Strict Transport Security (HSTS) to ensure HTTPS usage
         forceSTSHeader: true
-        # Include subdomains in HSTS policy
-        stsIncludeSubdomains: true
-        # HSTS policy duration in seconds (2 years)
-        stsSeconds: 63072000
-        # Enable HSTS preload list
-        stsPreload: true
+
+        # Apply HSTS to all subdomains
+        stsIncludeSubdomains: true  # Force HTTPS on all subdomains
+
+        # Set the HSTS max-age to 2 years (in seconds)
+        stsSeconds: 63072000  # HSTS policy duration set to 2 years
+
+        # Enable HSTS preload list inclusion
+        stsPreload: true  # Allows the domain to be included in browsers' HSTS preload list
