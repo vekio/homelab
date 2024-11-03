@@ -35,7 +35,8 @@ function main () {
     fi
 
     # Configs
-    info "traefik config" && ansible-playbook playbooks/traefik_config.yml -i "$inventory_file"
+    info "traefik config" && ansible-playbook playbooks/traefik.yml -i "$inventory_file"
+    info "adguard config" && ansible-playbook playbooks/adguard.yml -i "$inventory_file"
 }
 
 main "$@"

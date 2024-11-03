@@ -14,6 +14,7 @@
           f {
             pkgs = import nixpkgs {
               inherit system;
+              config = { allowUnfree = true; };
               overlays = [ self.overlays.default ];
             };
           });
@@ -25,19 +26,7 @@
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
           name = "homelab";
-          packages = with pkgs; [
-            # go (version is specified by overlay)
-            go
-
-            # goimports, godoc, etc.
-            gotools
-
-            # https://github.com/golangci/golangci-lint
-            golangci-lint
-
-            ansible
-            ansible-lint
-          ];
+          packages = with pkgs; [ ansible ansible-lint terraform ];
           HOMELAB_ENV = "develop";
         };
       });

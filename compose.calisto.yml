@@ -1,0 +1,63 @@
+services:
+  # Traefik - Reverse Proxy
+  # Docker Hub: https://hub.docker.com/_/traefik
+  # Docs: https://doc.traefik.io/traefik/
+  traefik:
+    image: traefik:${TRAEFIK_VERSION:-latest}
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - 443:443
+    networks:
+      - proxy
+    environment:
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+      TZ: ${TZ:-Europe/London}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CALISTO_PATH}/traefik/certificates:/letsencrypt:rw
+      - ${CALISTO_PATH}/traefik/config:/etc/traefik:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik-rtr.entrypoints=websecure
+      - traefik.http.routers.traefik-rtr.rule=Host(`traefik.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.traefik-rtr.service=api@internal
+
+  ## AdGuard Home - Network-wide ads & trackers blocking DNS server
+  ## Docker Hub: https://hub.docker.com/r/adguard/adguardhome
+  ## Docs: https://adguard-dns.io/kb/adguard-home/overview/
+  adguard:
+    image: adguard/adguardhome:${ADGUARD_VERSION:-latest}
+    container_name: adguard
+    restart: unless-stopped
+    ports:
+      # - 53:53/tcp         # Plain DNS port
+      - 53:53/udp         # Plain DNS port
+      # - 67:67/udp         # DHCP port (optional)
+      # - 68:68/tcp         # DHCP port (optional)
+      # - 68:68/udp         # DHCP port (optional)
+      # - 8083:80/tcp
+      # - 443:443/tcp
+      # - 443:443/udp
+      # - 3000:3000/tcp     # Admin panel port for initial installation
+      # - 853:853/tcp
+      # - 784:784/udp
+      # - 853:853/udp
+      # - 8853:8853/udp
+      # - 5443:5443/tcp
+      # - 5443:5443/udp
+    networks:
+      - proxy
+    volumes:
+      - ${CALISTO_PATH}/adguard/data:/opt/adguardhome/work
+      - ${CALISTO_PATH}/adguard/config:/opt/adguardhome/conf
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.adguard-rtr.entrypoints=websecure
+      - traefik.http.routers.adguard-rtr.rule=Host(`adguard.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.adguard-rtr.service=adguard-svc
+      - traefik.http.services.adguard-svc.loadbalancer.server.port=80
+
+networks:
+  proxy:
+    name: proxy

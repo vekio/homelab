@@ -1,11 +1,17 @@
 .direnv
 .envrc
 
-# enviroments
+### Environment ###
 .env
 .env-dev
 .envold
 
-# Ansible
+### Ansible ###
 pro.ini
 dev.ini
+
+### Terraform ###
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
