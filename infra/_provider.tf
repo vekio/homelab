@@ -14,5 +14,5 @@ provider "adguard" {
   username = var.adguard_username
   password = var.adguard_password
   scheme   = var.adguard_scheme
-  timeout  = 10
+  timeout  = 30
 }
