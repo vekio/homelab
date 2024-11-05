@@ -1,4 +1,11 @@
-## AdGuard provider configuration
+### Configuration ###
+variable "domain" {
+  description = "Homelab domain"
+  type        = string
+}
+
+
+### AdGuard provider configuration ###
 variable "adguard_host" {
   description = "Address of your AdGuard Home server"
   type        = string
@@ -20,7 +27,7 @@ variable "adguard_scheme" {
   type        = string
 }
 
-## DNS records
+### DNS records ###
 variable "oberon_ip" {
   description = "IP address of the oberon server"
   type        = string

@@ -4,16 +4,16 @@ resource "adguard_rewrite" "proxy_record" {
 }
 
 resource "adguard_rewrite" "traefik_record" {
-  domain = "traefik.vekio.dev"
+  domain = "traefik.${var.domain}"
   answer = "proxy.home.local"
 }
 
 resource "adguard_rewrite" "adguard_record" {
-  domain = "adguard.vekio.dev"
+  domain = "adguard.${var.domain}"
   answer = "proxy.home.local"
 }
 
 resource "adguard_rewrite" "media_record" {
-  domain = "media.vekio.dev"
+  domain = "media.${var.domain}"
   answer = "proxy.home.local"
 }
