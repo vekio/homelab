@@ -1,0 +1,34 @@
+http:
+  routers:
+    whoami:
+      entryPoints:
+        - websecure
+      rule: "Host(`whoami.{{ domain }}`)"
+      service: oberon-service
+      # middlewares: check-oberon
+
+  services:
+    oberon-service:
+      loadBalancer:
+        servers:
+          - url: "https://traefik2.{{ domain }}"
+  #       healthCheck:
+  #         path: "/ping"
+  #         interval: "10s"
+  #         timeout: "3s"
+
+  #   # Servicio de fallback 404
+  #   fallback:
+  #     loadBalancer:
+  #       servers:
+  #         - url: https://192.168.0.100 # Servidor local con página 404
+
+  # middlewares:
+  #   check-oberon:
+  #     circuitBreaker:
+  #       expression: "LatencyAtQuantileMS(50.0) > 100"
+  #     errorPage:
+  #       status:
+  #         - "500-599"
+  #       service: fallback
+  #       query: "/404"
