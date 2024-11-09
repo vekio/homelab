@@ -50,6 +50,10 @@ providers:
 api:
   # Enable the Traefik dashboard for monitoring and management
   dashboard: true
+  insecure: false
+
+ping:
+  entryPoint: websecure
 
 certificatesResolvers:
   cloudflare:

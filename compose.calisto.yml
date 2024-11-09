@@ -15,12 +15,12 @@ services:
       TZ: ${TZ:-Europe/London}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${CALISTO_PATH}/traefik/certificates:/letsencrypt:rw
-      - ${CALISTO_PATH}/traefik/config:/etc/traefik:ro
+      - ${VOLPATH}/traefik/certificates:/letsencrypt:rw
+      - ${VOLPATH}/traefik/config:/etc/traefik:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik-rtr.entrypoints=websecure
-      - traefik.http.routers.traefik-rtr.rule=Host(`traefik.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.traefik-rtr.rule=Host(`traefik1.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.traefik-rtr.service=api@internal
 
   ## AdGuard Home - Network-wide ads & trackers blocking DNS server
@@ -31,32 +31,38 @@ services:
     container_name: adguard
     restart: unless-stopped
     ports:
-      # - 53:53/tcp         # Plain DNS port
       - 53:53/udp         # Plain DNS port
-      # - 67:67/udp         # DHCP port (optional)
-      # - 68:68/tcp         # DHCP port (optional)
-      # - 68:68/udp         # DHCP port (optional)
-      # - 8083:80/tcp
-      # - 443:443/tcp
-      # - 443:443/udp
       # - 3000:3000/tcp     # Admin panel port for initial installation
-      # - 853:853/tcp
-      # - 784:784/udp
-      # - 853:853/udp
-      # - 8853:8853/udp
-      # - 5443:5443/tcp
-      # - 5443:5443/udp
     networks:
       - proxy
     volumes:
-      - ${CALISTO_PATH}/adguard/data:/opt/adguardhome/work
-      - ${CALISTO_PATH}/adguard/config:/opt/adguardhome/conf
+      - ${VOLPATH}/adguard/data:/opt/adguardhome/work
+      - ${VOLPATH}/adguard/config:/opt/adguardhome/conf
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard-rtr.entrypoints=websecure
       - traefik.http.routers.adguard-rtr.rule=Host(`adguard.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.adguard-rtr.service=adguard-svc
       - traefik.http.services.adguard-svc.loadbalancer.server.port=80
+
+  ## Nginx - Web Server
+  ## Docker Hub: https://hub.docker.com/_/nginx
+  ## Docs: https://nginx.org/en/docs/
+  status:
+    image: nginx:${NGINX_VERSION:-latest}
+    container_name: status
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - ${VOLPATH}/status/html:/usr/share/nginx/html:rw
+      - ${VOLPATH}/status/config:/etc/nginx/conf.d:rw
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.status-rtr.entrypoints=websecure
+      - traefik.http.routers.status-rtr.rule=Host(`status.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.status-rtr.service=status-svc
+      - traefik.http.services.status-svc.loadbalancer.server.port=80
 
 networks:
   proxy:

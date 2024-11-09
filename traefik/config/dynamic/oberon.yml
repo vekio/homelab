@@ -1,0 +1,20 @@
+http:
+  routers:
+    oberon:
+      entryPoints:
+        - websecure
+      rule: "Host(`traefik2.{{ domain }}`) || Host(`whoami.{{ domain }}`)"
+      service: oberon-service
+      middlewares:
+        - fallback
+
+  services:
+    # Service to check oberon server is up
+    oberon-service:
+      loadBalancer:
+        servers:
+          - url: https://traefik2.{{ domain }}
+        healthCheck:
+          path: /ping
+          interval: 10s
+          timeout: 5s

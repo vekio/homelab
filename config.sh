@@ -14,29 +14,16 @@ function dotenv () {
   set +a
 }
 
-# Load .env-dev file
-# -----------------------------------------------------------------------------
-function dotenvdev () {
-  set -a
-  [[ -f .env-dev ]] && . .env-dev
-  set +a
-}
-
 # Main
 # -----------------------------------------------------------------------------
 function main () {
     local inventory_file="pro.ini"
-
-    if [[ "$1" == "--dev" ]]; then
-        info "loading .env-dev" && dotenvdev
-        inventory_file="dev.ini"
-    else
-        info "loading .env" && dotenv
-    fi
+    info "loading .env" && dotenv
 
     # Configs
     info "traefik config" && ansible-playbook playbooks/traefik.yml -i "$inventory_file"
     info "adguard config" && ansible-playbook playbooks/adguard.yml -i "$inventory_file"
+    info "status config" && ansible-playbook playbooks/status.yml -i "$inventory_file"
 }
 
 main "$@"

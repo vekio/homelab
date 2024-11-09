@@ -5,16 +5,17 @@
     domain: "{{ lookup('env', 'DOMAIN') }}"
     acme_cert_email: "{{ lookup('env', 'ACME_CERT_EMAIL') }}"
     acme_letsencrypt_url: "{{ lookup('env', 'ACME_LETSENCRYPT_URL') }}"
-    calisto_path: "{{ lookup('env', 'CALISTO_PATH') }}"
+    path: "{{ lookup('env', 'VOLPATH') }}"
   tasks:
     - name: Make directories
       ansible.builtin.file:
-        path: "{{ calisto_path }}/{{ item }}"
+        path: "{{ path }}/{{ item }}"
         state: directory
-        mode: '0711'
+        mode: '0700'
       loop:
         - traefik
         - traefik/certificates
+        - traefik/config
         - traefik/config/dynamic
       become: true
       become_user: root
@@ -22,7 +23,7 @@
     - name: Copy files
       ansible.builtin.template:
         src: "../traefik/config/{{ item }}"
-        dest: "{{ calisto_path }}/traefik/config/{{ item }}"
+        dest: "{{ path }}/traefik/config/{{ item }}"
         mode: '0644'
       loop:
         - traefik.yml
@@ -30,3 +31,15 @@
         - dynamic/tls.yml
       become: true
       become_user: root
+
+    - name: Copy files
+      ansible.builtin.template:
+        src: "../traefik/config/dynamic/{{ item }}"
+        dest: "{{ path }}/traefik/config/dynamic/{{ item }}"
+        mode: '0644'
+      loop:
+        - oberon.yml
+        - fallback.yml
+      become: true
+      become_user: root
+      when: inventory_hostname == 'calisto'
