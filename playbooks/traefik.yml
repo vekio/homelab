@@ -5,11 +5,11 @@
     domain: "{{ lookup('env', 'DOMAIN') }}"
     acme_cert_email: "{{ lookup('env', 'ACME_CERT_EMAIL') }}"
     acme_letsencrypt_url: "{{ lookup('env', 'ACME_LETSENCRYPT_URL') }}"
-    calisto_path: "{{ lookup('env', 'CALISTO_PATH') }}"
+    path: "{{ lookup('env', 'PATH') }}"
   tasks:
     - name: Make directories
       ansible.builtin.file:
-        path: "{{ calisto_path }}/{{ item }}"
+        path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0711'
       loop:
@@ -22,7 +22,7 @@
     - name: Copy files
       ansible.builtin.template:
         src: "../traefik/config/{{ item }}"
-        dest: "{{ calisto_path }}/traefik/config/{{ item }}"
+        dest: "{{ path }}/traefik/config/{{ item }}"
         mode: '0644'
       loop:
         - traefik.yml
