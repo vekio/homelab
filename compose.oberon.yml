@@ -15,8 +15,8 @@ services:
       TZ: ${TZ:-Europe/London}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${OBERON_PATH}/traefik/certificates:/letsencrypt:rw
-      - ${OBERON_PATH}/traefik/config:/etc/traefik:ro
+      - ${PATH}/traefik/certificates:/letsencrypt:rw
+      - ${PATH}/traefik/config:/etc/traefik:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik-rtr.entrypoints=websecure
