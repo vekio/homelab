@@ -11,10 +11,11 @@
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
-        mode: '0711'
+        mode: '0700'
       loop:
         - traefik
         - traefik/certificates
+        - traefik/config
         - traefik/config/dynamic
       become: true
       become_user: root
@@ -33,11 +34,11 @@
 
     - name: Copy files
       ansible.builtin.template:
-        src: "../traefik/config/{{ item }}"
-        dest: "{{ path }}/traefik/config/{{ item }}"
+        src: "../traefik/config/dynamic/{{ item }}"
+        dest: "{{ path }}/traefik/config/dynamic/{{ item }}"
         mode: '0644'
       loop:
-        - dynamic/redirect.yml
+        - redirect.yml
       become: true
       become_user: root
       when: inventory_hostname == 'calisto'
