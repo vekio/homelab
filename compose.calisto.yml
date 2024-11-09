@@ -15,8 +15,8 @@ services:
       TZ: ${TZ:-Europe/London}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${PATH}/traefik/certificates:/letsencrypt:rw
-      - ${PATH}/traefik/config:/etc/traefik:ro
+      - ${VOLPATH}/traefik/certificates:/letsencrypt:rw
+      - ${VOLPATH}/traefik/config:/etc/traefik:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik-rtr.entrypoints=websecure
@@ -49,8 +49,8 @@ services:
     networks:
       - proxy
     volumes:
-      - ${PATH}/adguard/data:/opt/adguardhome/work
-      - ${PATH}/adguard/config:/opt/adguardhome/conf
+      - ${VOLPATH}/adguard/data:/opt/adguardhome/work
+      - ${VOLPATH}/adguard/config:/opt/adguardhome/conf
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard-rtr.entrypoints=websecure

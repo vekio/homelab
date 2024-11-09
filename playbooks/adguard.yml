@@ -2,7 +2,7 @@
 - name: Config adguard service
   hosts: adguard
   vars:
-    path: "{{ lookup('env', 'PATH') }}"
+    path: "{{ lookup('env', 'VOLPATH') }}"
   tasks:
     - name: Make directories
       ansible.builtin.file:
