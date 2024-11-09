@@ -45,6 +45,25 @@ services:
       - traefik.http.routers.adguard-rtr.service=adguard-svc
       - traefik.http.services.adguard-svc.loadbalancer.server.port=80
 
+  ## Nginx - Web Server
+  ## Docker Hub: https://hub.docker.com/_/nginx
+  ## Docs: https://nginx.org/en/docs/
+  status:
+    image: nginx:${NGINX_VERSION:-latest}
+    container_name: status
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - ${VOLPATH}/status/html:/usr/share/nginx/html:rw
+      - ${VOLPATH}/status/config:/etc/nginx/conf.d:rw
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.status-rtr.entrypoints=websecure
+      - traefik.http.routers.status-rtr.rule=Host(`status.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.status-rtr.service=status-svc
+      - traefik.http.services.status-svc.loadbalancer.server.port=80
+
 networks:
   proxy:
     name: proxy
