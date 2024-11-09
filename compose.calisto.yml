@@ -15,12 +15,12 @@ services:
       TZ: ${TZ:-Europe/London}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${CALISTO_PATH}/traefik/certificates:/letsencrypt:rw
-      - ${CALISTO_PATH}/traefik/config:/etc/traefik:ro
+      - ${PATH}/traefik/certificates:/letsencrypt:rw
+      - ${PATH}/traefik/config:/etc/traefik:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik-rtr.entrypoints=websecure
-      - traefik.http.routers.traefik-rtr.rule=Host(`traefik.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.traefik-rtr.rule=Host(`traefik1.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.traefik-rtr.service=api@internal
 
   ## AdGuard Home - Network-wide ads & trackers blocking DNS server
@@ -49,8 +49,8 @@ services:
     networks:
       - proxy
     volumes:
-      - ${CALISTO_PATH}/adguard/data:/opt/adguardhome/work
-      - ${CALISTO_PATH}/adguard/config:/opt/adguardhome/conf
+      - ${PATH}/adguard/data:/opt/adguardhome/work
+      - ${PATH}/adguard/config:/opt/adguardhome/conf
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard-rtr.entrypoints=websecure
