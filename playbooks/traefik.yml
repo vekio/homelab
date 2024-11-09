@@ -38,7 +38,8 @@
         dest: "{{ path }}/traefik/config/dynamic/{{ item }}"
         mode: '0644'
       loop:
-        - redirect.yml
+        - oberon.yml
+        - fallback.yml
       become: true
       become_user: root
       when: inventory_hostname == 'calisto'

@@ -1,0 +1,16 @@
+http:
+  services:
+    # Service to redirect after errors
+    fallback:
+      loadBalancer:
+        servers:
+          - url: https://status.{{ domain }}
+
+  middlewares:
+    # Middleware to handle error fallback
+    fallback:
+      errors:
+        status:
+          - 500-599
+        service: fallback
+        query: /404 # {status}.html
