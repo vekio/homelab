@@ -1,0 +1,49 @@
+---
+- name: Config status service
+  hosts: status
+  vars:
+    domain: "{{ lookup('env', 'DOMAIN') }}"
+    path: "{{ lookup('env', 'VOLPATH') }}"
+  tasks:
+    - name: Make directories
+      ansible.builtin.file:
+        path: "{{ path }}/{{ item }}"
+        state: directory
+        mode: '0700'
+      loop:
+        - status
+        - status/html
+        - status/config
+      become: true
+      become_user: root
+
+    - name: Make html directory
+      ansible.builtin.file:
+        path: "{{ path }}/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - status/html
+      become: true
+      become_user: root
+
+    - name: Copy html files
+      ansible.builtin.template:
+        src: "../status/html/{{ item }}"
+        dest: "{{ path }}/status/html/{{ item }}"
+        mode: '0644'
+      loop:
+        - index.html
+        - 404.html
+      become: true
+      become_user: root
+
+    - name: Copy config files
+      ansible.builtin.template:
+        src: "../status/config/{{ item }}"
+        dest: "{{ path }}/status/config/{{ item }}"
+        mode: '0644'
+      loop:
+        - nginx.conf
+      become: true
+      become_user: root
