@@ -5,7 +5,7 @@
     domain: "{{ lookup('env', 'DOMAIN') }}"
     acme_cert_email: "{{ lookup('env', 'ACME_CERT_EMAIL') }}"
     acme_letsencrypt_url: "{{ lookup('env', 'ACME_LETSENCRYPT_URL') }}"
-    path: "{{ lookup('env', 'VOLPATH') }}"
+    path: "{{ lookup('env', 'VOL_PATH') }}"
   tasks:
     - name: Make directories
       ansible.builtin.file:

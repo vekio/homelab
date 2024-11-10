@@ -1,7 +1,5 @@
 services:
-  # Traefik - Reverse Proxy
-  # Docker Hub: https://hub.docker.com/_/traefik
-  # Docs: https://doc.traefik.io/traefik/
+
   traefik:
     image: traefik:${TRAEFIK_VERSION:-latest}
     container_name: traefik
@@ -15,29 +13,26 @@ services:
       TZ: ${TZ:-Europe/London}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${VOLPATH}/traefik/certificates:/letsencrypt:rw
-      - ${VOLPATH}/traefik/config:/etc/traefik:ro
+      - ${VOL_PATH}/traefik/certificates:/letsencrypt:rw
+      - ${VOL_PATH}/traefik/config:/etc/traefik:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik-rtr.entrypoints=websecure
       - traefik.http.routers.traefik-rtr.rule=Host(`traefik1.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.traefik-rtr.service=api@internal
 
-  ## AdGuard Home - Network-wide ads & trackers blocking DNS server
-  ## Docker Hub: https://hub.docker.com/r/adguard/adguardhome
-  ## Docs: https://adguard-dns.io/kb/adguard-home/overview/
   adguard:
     image: adguard/adguardhome:${ADGUARD_VERSION:-latest}
     container_name: adguard
     restart: unless-stopped
     ports:
-      - 53:53/udp         # Plain DNS port
+      - 53:53/udp
       # - 3000:3000/tcp     # Admin panel port for initial installation
     networks:
       - proxy
     volumes:
-      - ${VOLPATH}/adguard/data:/opt/adguardhome/work
-      - ${VOLPATH}/adguard/config:/opt/adguardhome/conf
+      - ${VOL_PATH}/adguard/data:/opt/adguardhome/work
+      - ${VOL_PATH}/adguard/config:/opt/adguardhome/conf
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard-rtr.entrypoints=websecure
@@ -45,9 +40,6 @@ services:
       - traefik.http.routers.adguard-rtr.service=adguard-svc
       - traefik.http.services.adguard-svc.loadbalancer.server.port=80
 
-  ## Nginx - Web Server
-  ## Docker Hub: https://hub.docker.com/_/nginx
-  ## Docs: https://nginx.org/en/docs/
   status:
     image: nginx:${NGINX_VERSION:-latest}
     container_name: status
@@ -55,8 +47,8 @@ services:
     networks:
       - proxy
     volumes:
-      - ${VOLPATH}/status/html:/usr/share/nginx/html:rw
-      - ${VOLPATH}/status/config:/etc/nginx/conf.d:rw
+      - ${VOL_PATH}/status/html:/usr/share/nginx/html:rw
+      - ${VOL_PATH}/status/config:/etc/nginx/conf.d:rw
     labels:
       - traefik.enable=true
       - traefik.http.routers.status-rtr.entrypoints=websecure
