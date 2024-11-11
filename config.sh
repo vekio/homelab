@@ -21,10 +21,10 @@ function main () {
     info "loading .env" && dotenv
 
     # Configs
-    info "traefik config" && ansible-playbook playbooks/traefik.yml -i "$inventory_file"
-    info "adguard config" && ansible-playbook playbooks/adguard.yml -i "$inventory_file"
-    info "status config" && ansible-playbook playbooks/status.yml -i "$inventory_file"
-    info "jellyfin config" && ansible-playbook playbooks/jellyfin.yml -i "$inventory_file"
+    # info "traefik config" && ansible-playbook playbooks/traefik.yml -i "$inventory_file"
+    # info "adguard config" && ansible-playbook playbooks/adguard.yml -i "$inventory_file"
+    # info "status config" && ansible-playbook playbooks/status.yml -i "$inventory_file"
+    # info "jellyfin config" && ansible-playbook playbooks/jellyfin.yml -i "$inventory_file"
 }
 
 main "$@"
