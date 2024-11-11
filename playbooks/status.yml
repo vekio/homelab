@@ -3,7 +3,7 @@
   hosts: status
   vars:
     domain: "{{ lookup('env', 'DOMAIN') }}"
-    path: "{{ lookup('env', 'VOLPATH') }}"
+    path: "{{ lookup('env', 'VOL_PATH') }}"
   tasks:
     - name: Make directories
       ansible.builtin.file:
@@ -27,7 +27,7 @@
       become_user: root
 
     - name: Copy html files
-      ansible.builtin.file:
+      ansible.builtin.copy:
         src: "../status/html/{{ item }}"
         dest: "{{ path }}/status/html/{{ item }}"
         mode: '0644'
