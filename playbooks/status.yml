@@ -12,7 +12,6 @@
         mode: '0700'
       loop:
         - status
-        - status/html
         - status/config
       become: true
       become_user: root
@@ -28,7 +27,7 @@
       become_user: root
 
     - name: Copy html files
-      ansible.builtin.template:
+      ansible.builtin.file:
         src: "../status/html/{{ item }}"
         dest: "{{ path }}/status/html/{{ item }}"
         mode: '0644'
