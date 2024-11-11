@@ -3,7 +3,7 @@ http:
     oberon:
       entryPoints:
         - websecure
-      rule: "Host(`traefik2.{{ domain }}`) || Host(`whoami.{{ domain }}`) || Host(`media.{{ domain }}`)"
+      rule: "Host(`whoami.{{ domain }}`) || Host(`media.{{ domain }}`)"
       service: oberon-service
       middlewares:
         - fallback
