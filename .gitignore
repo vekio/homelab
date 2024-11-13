@@ -1,16 +1,20 @@
+# Secrets
+**/secrets/*
+
+# direnv
 .direnv
 .envrc
 
-### Environment ###
+# Environment
 .env
 .env-dev
 .envold
 
-### Ansible ###
+# Ansible
 pro.ini
 dev.ini
 
-### Terraform ###
+# Terraform
 **/.terraform/*
 *.tfstate
 *.tfstate.*
