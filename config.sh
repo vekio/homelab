@@ -25,8 +25,8 @@ function main () {
     # info "adguard config" && ansible-playbook playbooks/adguard.yml -i "$inventory_file"
     # info "status config" && ansible-playbook playbooks/status.yml -i "$inventory_file"
     # info "jellyfin config" && ansible-playbook playbooks/jellyfin.yml -i "$inventory_file"
-    # info "authelia config" && ansible-playbook playbooks/authelia.yml -i "$inventory_file"
-    info "secrets config" && ansible-playbook playbooks/secrets.yml -i "$inventory_file"
+    info "authelia config" && ansible-playbook playbooks/authelia.yml -i "$inventory_file"
+    # info "secrets config" && ansible-playbook playbooks/secrets.yml -i "$inventory_file"
 }
 
 main "$@"
