@@ -22,7 +22,7 @@
 
     - name: Copy files
       ansible.builtin.template:
-        src: "../traefik/config/{{ item }}"
+        src: "../services/traefik/config/{{ item }}"
         dest: "{{ path }}/traefik/config/{{ item }}"
         mode: '0644'
       loop:
@@ -34,7 +34,7 @@
 
     - name: Copy files
       ansible.builtin.template:
-        src: "../traefik/config/dynamic/{{ item }}"
+        src: "../services/traefik/config/dynamic/{{ item }}"
         dest: "{{ path }}/traefik/config/dynamic/{{ item }}"
         mode: '0644'
       loop:

@@ -28,7 +28,7 @@
 
     - name: Copy html files
       ansible.builtin.copy:
-        src: "../status/html/{{ item }}"
+        src: "../services/status/html/{{ item }}"
         dest: "{{ path }}/status/html/{{ item }}"
         mode: '0644'
       loop:
@@ -39,7 +39,7 @@
 
     - name: Copy config files
       ansible.builtin.template:
-        src: "../status/config/{{ item }}"
+        src: "../services/status/config/{{ item }}"
         dest: "{{ path }}/status/config/{{ item }}"
         mode: '0644'
       loop:
