@@ -32,3 +32,8 @@ resource "adguard_rewrite" "media_record" {
   domain = "media.${var.domain}"
   answer = "proxy.home.local"
 }
+
+resource "adguard_rewrite" "auth_record" {
+  domain = "auth.${var.domain}"
+  answer = "proxy.home.local"
+}
