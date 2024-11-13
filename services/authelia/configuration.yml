@@ -1,0 +1,62 @@
+server:
+  address: tcp://0.0.0.0:9091
+
+log:
+  level: info
+
+theme: dark
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+
+session:
+  name: authelia_session
+  # secret: /run/secrets/SESSION_SECRET
+  expiration: 3600
+  inactivity: 300
+  cookies:
+    - domain: "{{ domain }}"
+      authelia_url: "https://auth.{{ domain }}"
+      default_redirection_url: "https://status.{{ domain }}"
+
+identity_validation:
+  reset_password:
+    jwt_lifespan: "5 minutes"
+    jwt_algorithm: "HS256"
+    # jwt_secret: /run/secrets/JWT_SECRET
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: "traefik.{{ domain }}"
+      policy: one_factor
+
+regulation:
+  max_retries: 3
+  find_time: 120
+  ban_time: 300
+
+storage:
+  # encryption_key: /run/secrets/STORAGE_ENCRYPTION_KEY
+  local:
+    path: /data/db.sqlite3
+
+notifier:
+  smtp:
+    address: "submission://{{ smtp_host }}:{{ smtp_port }}"
+    username: "{{ smtp_user }}"
+    # password: /run/secrets/SMTP_PASSWORD
+    sender: "Homelab <{{ smtp_sender }}>"
+    subject: "[Authelia] - {title}"
+    startup_check_address: "test@{{ domain }}"
+# identity_providers:
+#   oidc:
+#     # hmac_secret: /run/secrets/OIDC_HMAC_SECRET
+#     issuer: "https://auth.{{ domain }}"
+#     jwks:
+#       keys:
+#         - use: sig
+#           kty: oct
+#           kid: authelia-signing-key
+#           k:

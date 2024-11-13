@@ -1,5 +1,16 @@
-services:
+secrets:
+  JWT_SECRET:
+    file: ${VOL_PATH}/authelia/secrets/JWT_SECRET
+  SESSION_SECRET:
+    file: ${VOL_PATH}/authelia/secrets/SESSION_SECRET
+  STORAGE_ENCRYPTION_KEY:
+    file: ${VOL_PATH}/authelia/secrets/STORAGE_ENCRYPTION_KEY
+  # OIDC_HMAC_SECRET:
+  #   file: ${VOL_PATH}/authelia/secrets/OIDC_HMAC_SECRET
+  SMTP_PASSWORD:
+    file: ${VOL_PATH}/smtp/secrets/SMTP_PASSWORD
 
+services:
   traefik:
     image: traefik:${TRAEFIK_VERSION:-latest}
     container_name: traefik
@@ -27,9 +38,12 @@ services:
     restart: unless-stopped
     ports:
       - 53:53/udp
+      # - 80:80
       # - 3000:3000/tcp     # Admin panel port for initial installation
     networks:
       - proxy
+    environment:
+      TZ: ${TZ:-Europe/London}
     volumes:
       - ${VOL_PATH}/adguard/data:/opt/adguardhome/work
       - ${VOL_PATH}/adguard/config:/opt/adguardhome/conf
@@ -39,6 +53,33 @@ services:
       - traefik.http.routers.adguard-rtr.rule=Host(`adguard.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.adguard-rtr.service=adguard-svc
       - traefik.http.services.adguard-svc.loadbalancer.server.port=80
+
+  authelia:
+    image: authelia/authelia:${AUTHELIA_VERSION:-latest}
+    container_name: authelia
+    restart: unless-stopped
+    expose:
+      - 9091
+    networks:
+      - proxy
+    secrets: [JWT_SECRET, SESSION_SECRET, STORAGE_ENCRYPTION_KEY, SMTP_PASSWORD]
+    environment:
+      TZ: ${TZ:-Europe/London}
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /run/secrets/JWT_SECRET
+      AUTHELIA_SESSION_SECRET_FILE: /run/secrets/SESSION_SECRET
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/STORAGE_ENCRYPTION_KEY
+      # AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /run/secrets/OIDC_HMAC_SECRET
+      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: /run/secrets/SMTP_PASSWORD
+    volumes:
+      - ${VOL_PATH}/authelia/config:/config:rw
+      - ${VOL_PATH}/authelia/data:/data:rw
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.authelia-rtr.entrypoints=websecure
+      - traefik.http.routers.authelia-rtr.rule=Host(`auth.${DOMAIN:-docker.localhost}`)
+      - traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.${DOMAIN:-docker.localhost}
+      - traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
 
   status:
     image: nginx:${NGINX_VERSION:-latest}
