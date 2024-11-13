@@ -1,6 +1,9 @@
 # Secrets
 **/secrets/*
 
+# Authelia
+users_database.yml
+
 # direnv
 .direnv
 .envrc
