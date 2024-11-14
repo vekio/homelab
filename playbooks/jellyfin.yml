@@ -1,6 +1,6 @@
 ---
-- name: Config adguard service
-  hosts: adguard
+- name: Config jellyfin service
+  hosts: jellyfin
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
   tasks:
@@ -10,8 +10,8 @@
         state: directory
         mode: '0700'
       loop:
-        - adguard
-        - adguard/config
-        - adguard/data
+        - jellyfin
+        - jellyfin/cache
+        - jellyfin/config
       become: true
       become_user: root

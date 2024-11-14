@@ -1,7 +1,5 @@
 services:
-  # Traefik - Reverse Proxy
-  # Docker Hub: https://hub.docker.com/_/traefik
-  # Docs: https://doc.traefik.io/traefik/
+
   traefik:
     image: traefik:${TRAEFIK_VERSION:-latest}
     container_name: traefik
@@ -15,13 +13,40 @@ services:
       TZ: ${TZ:-Europe/London}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${VOLPATH}/traefik/certificates:/letsencrypt:rw
-      - ${VOLPATH}/traefik/config:/etc/traefik:ro
+      - ${VOL_PATH}/traefik/certificates:/letsencrypt:rw
+      - ${VOL_PATH}/traefik/config:/etc/traefik:ro
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.traefik-rtr.entrypoints=websecure
+    #   - traefik.http.routers.traefik-rtr.rule=Host(`traefik2.${DOMAIN:-docker.localhost}`)
+    #   - traefik.http.routers.traefik-rtr.service=api@internal
+
+  jellyfin:
+    image: jellyfin/jellyfin:${JELLYFIN_VERSION:-latest}
+    container_name: jellyfin
+    restart: unless-stopped
+    networks:
+      - proxy
+    environment:
+      JELLYFIN_PublishedServerUrl: https://media.${DOMAIN:-docker.localhost}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      TZ: ${TZ:-Europe/London}
+    volumes:
+      - ${VOL_PATH}/jellyfin/config:/config:rw
+      - ${VOL_PATH}/jellyfin/cache:/cache:rw
+      - ${MEDIA_PATH}:/media:ro
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
     labels:
       - traefik.enable=true
-      - traefik.http.routers.traefik-rtr.entrypoints=websecure
-      - traefik.http.routers.traefik-rtr.rule=Host(`traefik2.${DOMAIN:-docker.localhost}`)
-      - traefik.http.routers.traefik-rtr.service=api@internal
+      - traefik.http.routers.jellyfin-rtr.entrypoints=websecure
+      - traefik.http.routers.jellyfin-rtr.rule=Host(`media.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.jellyfin-rtr.service=jellyfin-svc
+      - traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096
 
   whoami:
     container_name: whoami

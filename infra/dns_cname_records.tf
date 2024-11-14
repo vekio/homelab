@@ -10,7 +10,7 @@ resource "adguard_rewrite" "traefik1_record" {
 
 resource "adguard_rewrite" "traefik2_record" {
   domain = "traefik2.${var.domain}"
-  answer = "proxy.home.local"
+  answer = "oberon.home.local"
 }
 
 resource "adguard_rewrite" "whoami_record" {
@@ -30,5 +30,15 @@ resource "adguard_rewrite" "adguard_record" {
 
 resource "adguard_rewrite" "media_record" {
   domain = "media.${var.domain}"
+  answer = "proxy.home.local"
+}
+
+resource "adguard_rewrite" "auth_record" {
+  domain = "auth.${var.domain}"
+  answer = "proxy.home.local"
+}
+
+resource "adguard_rewrite" "error_record" {
+  domain = "error.${var.domain}"
   answer = "proxy.home.local"
 }

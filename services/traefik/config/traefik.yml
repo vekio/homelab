@@ -26,7 +26,6 @@ entryPoints:
             sans:
               - "*.{{ domain }}"
       middlewares:
-        # Apply custom middlewares like secure headers
         - secure-headers@file
 
   # ssh:
@@ -49,11 +48,12 @@ providers:
 
 api:
   # Enable the Traefik dashboard for monitoring and management
+  debug: true
   dashboard: true
   insecure: false
 
-ping:
-  entryPoint: websecure
+# ping:
+#   entryPoint: websecure
 
 certificatesResolvers:
   cloudflare:

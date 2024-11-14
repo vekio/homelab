@@ -1,7 +1,16 @@
+secrets:
+  JWT_SECRET:
+    file: ${VOL_PATH}/authelia/secrets/JWT_SECRET
+  SESSION_SECRET:
+    file: ${VOL_PATH}/authelia/secrets/SESSION_SECRET
+  STORAGE_ENCRYPTION_KEY:
+    file: ${VOL_PATH}/authelia/secrets/STORAGE_ENCRYPTION_KEY
+  # OIDC_HMAC_SECRET:
+  #   file: ${VOL_PATH}/authelia/secrets/OIDC_HMAC_SECRET
+  SMTP_PASSWORD:
+    file: ${VOL_PATH}/smtp/secrets/SMTP_PASSWORD
+
 services:
-  # Traefik - Reverse Proxy
-  # Docker Hub: https://hub.docker.com/_/traefik
-  # Docs: https://doc.traefik.io/traefik/
   traefik:
     image: traefik:${TRAEFIK_VERSION:-latest}
     container_name: traefik
@@ -10,44 +19,72 @@ services:
       - 443:443
     networks:
       - proxy
+    depends_on:
+      authelia:
+        condition: service_started
     environment:
       CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
       TZ: ${TZ:-Europe/London}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${VOLPATH}/traefik/certificates:/letsencrypt:rw
-      - ${VOLPATH}/traefik/config:/etc/traefik:ro
+      - ${VOL_PATH}/traefik/certificates:/letsencrypt:rw
+      - ${VOL_PATH}/traefik/config:/etc/traefik:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik-rtr.entrypoints=websecure
       - traefik.http.routers.traefik-rtr.rule=Host(`traefik1.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.traefik-rtr.service=api@internal
 
-  ## AdGuard Home - Network-wide ads & trackers blocking DNS server
-  ## Docker Hub: https://hub.docker.com/r/adguard/adguardhome
-  ## Docs: https://adguard-dns.io/kb/adguard-home/overview/
   adguard:
     image: adguard/adguardhome:${ADGUARD_VERSION:-latest}
     container_name: adguard
     restart: unless-stopped
     ports:
-      - 53:53/udp         # Plain DNS port
+      - 53:53/udp
+      # - 80:80
       # - 3000:3000/tcp     # Admin panel port for initial installation
     networks:
       - proxy
+    environment:
+      TZ: ${TZ:-Europe/London}
     volumes:
-      - ${VOLPATH}/adguard/data:/opt/adguardhome/work
-      - ${VOLPATH}/adguard/config:/opt/adguardhome/conf
+      - ${VOL_PATH}/adguard/data:/opt/adguardhome/work
+      - ${VOL_PATH}/adguard/config:/opt/adguardhome/conf
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard-rtr.entrypoints=websecure
       - traefik.http.routers.adguard-rtr.rule=Host(`adguard.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.adguard-rtr.service=adguard-svc
+      - traefik.http.routers.adguard-rtr.middlewares=authelia@docker
       - traefik.http.services.adguard-svc.loadbalancer.server.port=80
 
-  ## Nginx - Web Server
-  ## Docker Hub: https://hub.docker.com/_/nginx
-  ## Docs: https://nginx.org/en/docs/
+  authelia:
+    image: authelia/authelia:${AUTHELIA_VERSION:-latest}
+    container_name: authelia
+    restart: unless-stopped
+    expose:
+      - 9091
+    networks:
+      - proxy
+    secrets: [JWT_SECRET, SESSION_SECRET, STORAGE_ENCRYPTION_KEY, SMTP_PASSWORD]
+    environment:
+      TZ: ${TZ:-Europe/London}
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /run/secrets/JWT_SECRET
+      AUTHELIA_SESSION_SECRET_FILE: /run/secrets/SESSION_SECRET
+      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/STORAGE_ENCRYPTION_KEY
+      # AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /run/secrets/OIDC_HMAC_SECRET
+      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: /run/secrets/SMTP_PASSWORD
+    volumes:
+      - ${VOL_PATH}/authelia/config:/config:rw
+      - ${VOL_PATH}/authelia/data:/data:rw
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.authelia-rtr.entrypoints=websecure
+      - traefik.http.routers.authelia-rtr.rule=Host(`auth.${DOMAIN:-docker.localhost}`)
+      - traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth
+      - traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Email,Remote-Name
+
   status:
     image: nginx:${NGINX_VERSION:-latest}
     container_name: status
@@ -55,8 +92,8 @@ services:
     networks:
       - proxy
     volumes:
-      - ${VOLPATH}/status/html:/usr/share/nginx/html:rw
-      - ${VOLPATH}/status/config:/etc/nginx/conf.d:rw
+      - ${VOL_PATH}/status/html:/usr/share/nginx/html:rw
+      - ${VOL_PATH}/status/config:/etc/nginx/conf.d:rw
     labels:
       - traefik.enable=true
       - traefik.http.routers.status-rtr.entrypoints=websecure

@@ -1,0 +1,33 @@
+---
+- name: Config authelia service
+  hosts: authelia
+  vars:
+    path: "{{ lookup('env', 'VOL_PATH') }}"
+    domain: "{{ lookup('env', 'DOMAIN') }}"
+    smtp_user: "{{ lookup('env', 'SMTP_USER') }}"
+    smtp_host: "{{ lookup('env', 'SMTP_HOST') }}"
+    smtp_port: "{{ lookup('env', 'SMTP_PORT') }}"
+    smtp_sender: "{{ lookup('env', 'SMTP_SENDER') }}"
+  tasks:
+    - name: Make directories
+      ansible.builtin.file:
+        path: "{{ path }}/{{ item }}"
+        state: directory
+        mode: '0700'
+      loop:
+        - authelia
+        - authelia/config
+        - authelia/data
+      become: true
+      become_user: root
+
+    - name: Copy files
+      ansible.builtin.template:
+        src: "../services/authelia/{{ item }}"
+        dest: "{{ path }}/authelia/config/{{ item }}"
+        mode: '0644'
+      loop:
+        - configuration.yml
+        - users_database.yml
+      become: true
+      become_user: root
