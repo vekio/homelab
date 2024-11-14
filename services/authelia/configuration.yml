@@ -29,8 +29,10 @@ identity_validation:
 access_control:
   default_policy: deny
   rules:
-    - domain: "traefik.{{ domain }}"
+    - domain: "adguard.{{ domain }}"
       policy: one_factor
+      subject:
+        - "group:admins"
 
 regulation:
   max_retries: 3

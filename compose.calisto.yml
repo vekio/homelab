@@ -19,6 +19,9 @@ services:
       - 443:443
     networks:
       - proxy
+    depends_on:
+      authelia:
+        condition: service_started
     environment:
       CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
       TZ: ${TZ:-Europe/London}
@@ -52,6 +55,7 @@ services:
       - traefik.http.routers.adguard-rtr.entrypoints=websecure
       - traefik.http.routers.adguard-rtr.rule=Host(`adguard.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.adguard-rtr.service=adguard-svc
+      - traefik.http.routers.adguard-rtr.middlewares=authelia@docker
       - traefik.http.services.adguard-svc.loadbalancer.server.port=80
 
   authelia:
@@ -77,9 +81,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.authelia-rtr.entrypoints=websecure
       - traefik.http.routers.authelia-rtr.rule=Host(`auth.${DOMAIN:-docker.localhost}`)
-      - traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.${DOMAIN:-docker.localhost}
+      - traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth
       - traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true
-      - traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email
+      - traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Email,Remote-Name
 
   status:
     image: nginx:${NGINX_VERSION:-latest}
