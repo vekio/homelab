@@ -37,3 +37,8 @@ resource "adguard_rewrite" "auth_record" {
   domain = "auth.${var.domain}"
   answer = "proxy.home.local"
 }
+
+resource "adguard_rewrite" "error_record" {
+  domain = "error.${var.domain}"
+  answer = "proxy.home.local"
+}
