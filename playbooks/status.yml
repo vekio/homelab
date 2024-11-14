@@ -34,6 +34,7 @@
       loop:
         - index.html
         - 404.html
+        - unregistered.html
       become: true
       become_user: root
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error 404 - Page Not Found</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .error-container {
+            text-align: center;
+        }
+
+        .ghost {
+            width: 120px;
+            height: 120px;
+            background: url('https://w7.pngwing.com/pngs/407/275/png-transparent-a-christmas-carol-ghost-halloween-drawing-halloween-ghost-white-child-face-thumbnail.png') no-repeat center center;
+            background-size: contain;
+            margin: 0 auto 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .details {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-container">
+        <div class="ghost"></div>
+        <h1>ERROR 404</h1>
+        <p>The server cannot find the requested page</p>
+        <div class="details">
+            <p>Host: <span id="hostName">example.com</span></p>
+            <p>Forwarded for: <span id="forwardedFor">x.x.x.x</span></p>
+            <p>Timestamp: <span id="timestamp"></span></p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('hostName').textContent = window.location.hostname;
+        document.getElementById('forwardedFor').textContent = window.location.hostname; // This should be set by the server if needed
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+    </script>
+</body>
+
+</html>
