@@ -39,8 +39,6 @@
         mode: '0644'
       loop:
         - oberon.yml
-        - fallback.yml
-        - catch-all.yml
       become: true
       become_user: root
       when: inventory_hostname == 'calisto'

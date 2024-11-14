@@ -4,6 +4,9 @@ global:
   # Disable sending anonymous usage statistics
   sendAnonymousUsage: false
 
+log:
+  level: INFO
+
 entryPoints:
   web:
     address: :80
@@ -46,11 +49,10 @@ providers:
     # Ensure Traefik connects to the 'proxy' Docker network
     network: proxy
 
-api:
-  # Enable the Traefik dashboard for monitoring and management
-  debug: true
-  dashboard: true
-  insecure: false
+# api:
+#   debug: true
+#   dashboard: true
+#   insecure: false
 
 # ping:
 #   entryPoint: websecure
