@@ -1,0 +1,17 @@
+---
+- name: Config portainer service
+  hosts: portainer
+  become: true
+  vars:
+    path: "{{ lookup('env', 'VOL_PATH') }}"
+  tasks:
+    - name: Make portainer directories
+      ansible.builtin.file:
+        path: "{{ path }}/{{ item }}"
+        state: directory
+        mode: '0700'
+        owner: homelab
+        group: homelab
+      loop:
+        - portainer
+        - portainer/data
