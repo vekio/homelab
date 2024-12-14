@@ -52,13 +52,55 @@ notifier:
     sender: "Homelab <{{ smtp_sender }}>"
     subject: "[Authelia] - {title}"
     startup_check_address: "test@{{ domain }}"
-# identity_providers:
-#   oidc:
-#     # hmac_secret: /run/secrets/OIDC_HMAC_SECRET
-#     issuer: "https://auth.{{ domain }}"
-#     jwks:
-#       keys:
-#         - use: sig
-#           kty: oct
-#           kid: authelia-signing-key
-#           k:
+
+identity_providers:
+  oidc:
+    # hmac_secret: /run/secrets/OIDC_HMAC_SECRET
+    jwks:
+      - key_id: "homelab"
+        algorithm: "RS256"
+        use: "sig"
+        key: |
+          -----BEGIN PRIVATE KEY-----
+          MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDzmml7n1+RS/O8
+          1THVunQpckxaS4DgNgp169GPfXShtPEZkhs+HfXd2YHFqVRFTqFqV1sBjFD0oInR
+          fKpcste5N6O7GtXNglVruVV+YJfFK3HIeFhcdGdjJUrVhwJj/l7YogQd7Wo0TybG
+          qsZ38ZYKZ44EPWXX/rmJxbK3Rrgx5Ik8RKBhpY4O5bnEYKE6yDH8Qb12gbbNPNlR
+          U/4wFqjeSa+BKtKUzqJUwxeqPvgh5UOlUmkN4Yp2kCsQ+2pLd3JPUM4p53mqi0JS
+          PYhRKSuf9K7inBPhxielKawu8gz1JK5c/1msAPsnxCRhj9yB34Su6lz/3LYCRajN
+          x9ZMpVHfAgMBAAECggEAau/qhVfJqq1mYotOdK4Ep1sjFHJXsVVX0ztBw9VFeWVG
+          f7ypU+PwFkMQ2lYChehGKLoPW8celLzSs1EgMlBaLdc0e4MEv1ILMJ5r3u4FQgtX
+          yDK4S2HYLuhkiQba8E1uknfRCdg6ipsCgSzfsjCt9oRODiNrzV1nUokkcptLaa63
+          l68KIYy1f+85DPvWwTOuu13rCIJZZPTRveNqFF9OXlnZbtN2UpWpk16oY0uWkSm/
+          QPJKYLe0QpbsQ07q8ZdLH90w9SwFuMFCjFEBcLOXSWLPd5rxFSqnXUi3RuViOkcR
+          HLT5n498P7GZOvcJ4vmwJtD/BjZEmbu4C3CEEKdlNQKBgQD/TQS0RxacTEDGQvc9
+          TxvSr+JKwKK8SJmSIB01ce20gHXefiiASnmzuLAFriaYNba6s6Yc6GFr9d4R6X2Y
+          xmoyOPWG9wMqW/1UtQFwqDtGTDioFQH0hW643lb8FMCks2tHaGRRZkWIszWmyx1F
+          DKuSzOhnS3kfU0ZriD8o8UV0bQKBgQD0RTFgDEcrjtvPNj+lbfsUE3U5ICq2hf0K
+          4dAewp+dqPMQlrDbJ6aWBI1MtINQ2wJ66gQBVprmGSBpdaA+Z2MakhW0LFahvig+
+          lW4xLIfVD6lZrsm6D7UIprnf2YOhicaTvP6sNKfHcQVYlDvnZ5MREkZ13XzbZpoa
+          ZK1tWrP3+wKBgQCCzck9PLb++aquah0W0nNk7Sy6NBys712PmticS3UI6FB74JOL
+          t5zHUjcNkf7AObUXz3eqk/1mPSC8eK8bGX3LoZdawTBkAaG4Rs0oFWnZSLA2nhzU
+          VZE3MuPKYC+bszmh6oCLnCTAN2GjxamHeUhm/ImOcwLp49bOvY3uwj9duQKBgCjn
+          +XfLNpPtzZOq0wfCHjzjcUsKvvxn/dM3s6GjGBXP+Dx778wTnMscogkJZcBBnO22
+          iMsslK4Z4RqoDxjEOY12j1nn3u4hKR4p6hUkDu84OzUAl1moTbnQKep5w5hmuTF+
+          geuWuc4leC64TDvZVYCTXedZGxKm4QGwgHaCrQbHAoGAZ1FX73uJlB/+2BxHCdZl
+          W0bq6ERX7Tlf8mi9WMBydAM17oCgDlyZb7v4eghx9AVuAs8uJzT/ozBEBO51rWcA
+          q/PjQf6Uv1WczWBoA8uBTfquDm0cqXxrJAxUhvyS1TCvnzv18bOGMkBuE+Jna1aW
+          FqYsqRJ4vGQsUiq5FVoHriM=
+          -----END PRIVATE KEY-----
+    clients:
+      - client_id: "{{ jellyfin_client_id }}"
+        client_name: Jellyfin Media Server
+        client_secret: "{{ jellyfin_client_secret }}"
+        token_endpoint_auth_method: client_secret_post
+        authorization_policy: one_factor
+        scopes:
+          - openid
+          - groups
+          - email
+          - profile
+        redirect_uris:
+          - https://media.{{ domain }}/sso/OID/redirect/authelia
+          - https://media.{{ domain }}/sso/OID/r/authelia
+        consent_mode: explicit
