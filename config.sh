@@ -21,11 +21,13 @@ function main () {
     info "loading .env" && dotenv
 
     # Configs
-    info "traefik config" && ansible-playbook playbooks/traefik.yml -i "$inventory_file"
+    # info "traefik config" && ansible-playbook playbooks/traefik.yml -i "$inventory_file"
     # info "adguard config" && ansible-playbook playbooks/adguard.yml -i "$inventory_file"
     # info "status config" && ansible-playbook playbooks/status.yml -i "$inventory_file"
     # info "jellyfin config" && ansible-playbook playbooks/jellyfin.yml -i "$inventory_file"
     info "authelia config" && ansible-playbook playbooks/authelia.yml -i "$inventory_file"
+    info "portainer config" && ansible-playbook playbooks/portainer.yml -i "$inventory_file"
+    # info "homelab config" && ansible-playbook playbooks/homelab.yml -i "$inventory_file"
     # info "qbittorrent config" && ansible-playbook playbooks/qbittorrent.yml -i "$inventory_file"
     # info "secrets config" && ansible-playbook playbooks/secrets.yml -i "$inventory_file"
 }
