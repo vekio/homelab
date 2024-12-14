@@ -1,6 +1,7 @@
 ---
 - name: Config status service
   hosts: status
+  become: true
   vars:
     domain: "{{ lookup('env', 'DOMAIN') }}"
     path: "{{ lookup('env', 'VOL_PATH') }}"
@@ -10,40 +11,40 @@
         path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0700'
+        owner: homelab
+        group: homelab
       loop:
         - status
         - status/config
-      become: true
-      become_user: root
 
     - name: Make html directory
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0755'
+        owner: homelab
+        group: homelab
       loop:
         - status/html
-      become: true
-      become_user: root
 
     - name: Copy html files
       ansible.builtin.copy:
         src: "../services/status/html/{{ item }}"
         dest: "{{ path }}/status/html/{{ item }}"
         mode: '0644'
+        owner: homelab
+        group: homelab
       loop:
         - index.html
         - 404.html
         - unregistered.html
-      become: true
-      become_user: root
 
     - name: Copy config files
       ansible.builtin.template:
         src: "../services/status/config/{{ item }}"
         dest: "{{ path }}/status/config/{{ item }}"
         mode: '0644'
+        owner: homelab
+        group: homelab
       loop:
         - nginx.conf
-      become: true
-      become_user: root

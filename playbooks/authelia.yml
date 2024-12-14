@@ -1,6 +1,7 @@
 ---
 - name: Config authelia service
   hosts: authelia
+  become: true
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
     domain: "{{ lookup('env', 'DOMAIN') }}"
@@ -10,6 +11,8 @@
     smtp_sender: "{{ lookup('env', 'SMTP_SENDER') }}"
     jellyfin_client_id: "{{ lookup('env', 'JELLYFIN_CLIENT_ID') }}"
     jellyfin_client_secret: "{{ lookup('env', 'JELLYFIN_CLIENT_SECRET') }}"
+    portainer_client_id: "{{ lookup('env', 'PORTAINER_CLIENT_ID') }}"
+    portainer_client_secret: "{{ lookup('env', 'PORTAINER_CLIENT_SECRET') }}"
     # oidc_jwks_key: "{{ lookup('env', 'AUTHELIA_OIDC_JWKS_KEY') | b64decode }}"
   tasks:
     - name: Make directories
@@ -17,20 +20,20 @@
         path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0700'
+        owner: homelab
+        group: homelab
       loop:
         - authelia
         - authelia/config
         - authelia/data
-      become: true
-      become_user: root
 
     - name: Copy files
       ansible.builtin.template:
         src: "../services/authelia/{{ item }}"
         dest: "{{ path }}/authelia/config/{{ item }}"
         mode: '0644'
+        owner: homelab
+        group: homelab
       loop:
         - configuration.yml
         - users_database.yml
-      become: true
-      become_user: root

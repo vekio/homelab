@@ -1,6 +1,7 @@
 ---
 - name: Config adguard service
   hosts: adguard
+  become: true
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
   tasks:
@@ -9,9 +10,9 @@
         path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0700'
+        owner: homelab
+        group: homelab
       loop:
         - adguard
         - adguard/config
         - adguard/data
-      become: true
-      become_user: root
