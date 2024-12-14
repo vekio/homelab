@@ -18,7 +18,7 @@ services:
     # labels:
     #   - traefik.enable=true
     #   - traefik.http.routers.traefik-rtr.entrypoints=websecure
-    #   - traefik.http.routers.traefik-rtr.rule=Host(`traefik2.${DOMAIN:-docker.localhost}`)
+    #   - traefik.http.routers.traefik-rtr.rule=Host(`traefik-int.${DOMAIN:-docker.localhost}`)
     #   - traefik.http.routers.traefik-rtr.service=api@internal
 
   jellyfin:

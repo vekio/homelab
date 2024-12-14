@@ -49,13 +49,13 @@ providers:
     # Ensure Traefik connects to the 'proxy' Docker network
     network: proxy
 
-# api:
-#   debug: true
-#   dashboard: true
-#   insecure: false
+api:
+  debug: true
+  dashboard: true
+  insecure: false
 
-# ping:
-#   entryPoint: websecure
+ping:
+  entryPoint: websecure
 
 certificatesResolvers:
   cloudflare:

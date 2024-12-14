@@ -29,11 +29,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${VOL_PATH}/traefik/certificates:/letsencrypt:rw
       - ${VOL_PATH}/traefik/config:/etc/traefik:ro
-    # labels:
-    #   - traefik.enable=true
-    #   - traefik.http.routers.traefik-rtr.entrypoints=websecure
-    #   - traefik.http.routers.traefik-rtr.rule=Host(`traefik1.${DOMAIN:-docker.localhost}`)
-    #   - traefik.http.routers.traefik-rtr.service=api@internal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik-rtr.entrypoints=websecure
+      - traefik.http.routers.traefik-rtr.rule=Host(`traefik.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.traefik-rtr.service=api@internal
+      - traefik.http.routers.traefik-rtr.middlewares=authelia@docker
 
   adguard:
     image: adguard/adguardhome:${ADGUARD_VERSION:-latest}

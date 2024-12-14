@@ -3,12 +3,20 @@ http:
     oberon:
       entryPoints:
         - websecure
-      rule: "Host(`whoami.{{ domain }}`) || Host(`media.{{ domain }}`) || Host(`torrent.{{ domain }}`)"
+      rule: "Host(`whoami.{{ domain }}`) || Host(`media.{{ domain }}`)"
       service: oberon-service
+
+    oberon-auth:
+      entryPoints:
+        - websecure
+      rule: "Host(`torrent.{{ domain }}`)"
+      service: oberon-service
+      middlewares:
+        - authelia@docker
 
   services:
     # Service to check oberon server is up
     oberon-service:
       loadBalancer:
         servers:
-          - url: https://traefik2.{{ domain }}
+          - url: https://traefik-int.{{ domain }}

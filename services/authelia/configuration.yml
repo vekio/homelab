@@ -33,6 +33,14 @@ access_control:
       policy: one_factor
       subject:
         - "group:admins"
+    - domain: "traefik.{{ domain }}"
+      policy: one_factor
+      subject:
+        - "group:admins"
+    - domain: "torrent.{{ domain }}"
+      policy: one_factor
+      subject:
+        - "group:download"
 
 regulation:
   max_retries: 3

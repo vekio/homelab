@@ -3,13 +3,13 @@ resource "adguard_rewrite" "proxy_record" {
   answer = "calisto.home.local"
 }
 
-resource "adguard_rewrite" "traefik1_record" {
-  domain = "traefik1.${var.domain}"
+resource "adguard_rewrite" "traefik_record" {
+  domain = "traefik.${var.domain}"
   answer = "proxy.home.local"
 }
 
-resource "adguard_rewrite" "traefik2_record" {
-  domain = "traefik2.${var.domain}"
+resource "adguard_rewrite" "traefik_int_record" {
+  domain = "traefik-int.${var.domain}"
   answer = "oberon.home.local"
 }
 
@@ -35,11 +35,6 @@ resource "adguard_rewrite" "media_record" {
 
 resource "adguard_rewrite" "auth_record" {
   domain = "auth.${var.domain}"
-  answer = "proxy.home.local"
-}
-
-resource "adguard_rewrite" "error_record" {
-  domain = "error.${var.domain}"
   answer = "proxy.home.local"
 }
 
