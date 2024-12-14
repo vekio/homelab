@@ -48,6 +48,32 @@ services:
       - traefik.http.routers.jellyfin-rtr.service=jellyfin-svc
       - traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096
 
+  qbittorrent:
+    image: linuxserver/qbittorrent:${QBITTORRENT_VERSION:-latest}
+    container_name: qbittorrent
+    ports:
+      - 6881:6881
+      - 6881:6881/udp
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: ${TZ}
+      WEBUI_PORT: 8080
+      TORRENTING_PORT: 6881
+    volumes:
+      - ${VOL_PATH}/qbittorrent/config:/config:rw
+      - ${DOWNLOAD_PATH}/qbittorrent:/downloads:rw
+      - ${DOWNLOAD_PATH}/qbittorrent/watch:/watch:rw
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.qbittorrent-rtr.entrypoints=web
+      - traefik.http.routers.qbittorrent-rtr.rule=Host(`torrent.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc
+      - traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080
+    restart: unless-stopped
+
   whoami:
     container_name: whoami
     hostname: whoami
