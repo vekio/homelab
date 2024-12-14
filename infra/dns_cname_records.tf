@@ -42,3 +42,8 @@ resource "adguard_rewrite" "torrent_record" {
   domain = "torrent.${var.domain}"
   answer = "proxy.home.local"
 }
+
+resource "adguard_rewrite" "portainer_record" {
+  domain = "portainer.${var.domain}"
+  answer = "proxy.home.local"
+}
