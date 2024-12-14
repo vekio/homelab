@@ -3,6 +3,7 @@
 
 # Authelia
 users_database.yml
+*.pem
 
 # direnv
 .direnv
