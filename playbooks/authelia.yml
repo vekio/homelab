@@ -8,6 +8,9 @@
     smtp_host: "{{ lookup('env', 'SMTP_HOST') }}"
     smtp_port: "{{ lookup('env', 'SMTP_PORT') }}"
     smtp_sender: "{{ lookup('env', 'SMTP_SENDER') }}"
+    jellyfin_client_id: "{{ lookup('env', 'JELLYFIN_CLIENT_ID') }}"
+    jellyfin_client_secret: "{{ lookup('env', 'JELLYFIN_CLIENT_SECRET') }}"
+    # oidc_jwks_key: "{{ lookup('env', 'AUTHELIA_OIDC_JWKS_KEY') | b64decode }}"
   tasks:
     - name: Make directories
       ansible.builtin.file:
