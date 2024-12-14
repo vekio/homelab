@@ -1,0 +1,28 @@
+---
+- name: Config qbittorrent service
+  hosts: qbittorrent
+  vars:
+    path: "{{ lookup('env', 'VOL_PATH') }}"
+    download_path: "{{ lookup('env', 'DOWNLOAD_PATH') }}"
+  tasks:
+    - name: Make config directory
+      ansible.builtin.file:
+        path: "{{ path }}/{{ item }}"
+        state: directory
+        mode: '0700'
+        owner: alberto
+        group: users
+      loop:
+        - qbittorrent
+        - qbittorrent/config
+
+    - name: Make download directories
+      ansible.builtin.file:
+        path: "{{ download_path }}/{{ item }}"
+        state: directory
+        mode: '0770'
+        owner: media
+        group: users
+      loop:
+        - qbittorrent
+        - qbittorrent/watch
