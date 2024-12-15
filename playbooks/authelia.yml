@@ -1,6 +1,7 @@
 ---
 - name: Config authelia service
   hosts: authelia
+  become: true
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
     domain: "{{ lookup('env', 'DOMAIN') }}"
@@ -17,20 +18,20 @@
         path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0700'
+        owner: homelab
+        group: homelab
       loop:
         - authelia
         - authelia/config
         - authelia/data
-      become: true
-      become_user: root
 
     - name: Copy files
       ansible.builtin.template:
         src: "../services/authelia/{{ item }}"
         dest: "{{ path }}/authelia/config/{{ item }}"
         mode: '0644'
+        owner: homelab
+        group: homelab
       loop:
         - configuration.yml
         - users_database.yml
-      become: true
-      become_user: root

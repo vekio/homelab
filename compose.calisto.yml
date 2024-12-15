@@ -1,80 +1,55 @@
 secrets:
   JWT_SECRET:
     file: ${VOL_PATH}/authelia/secrets/JWT_SECRET
-  SESSION_SECRET:
-    file: ${VOL_PATH}/authelia/secrets/SESSION_SECRET
-  STORAGE_ENCRYPTION_KEY:
-    file: ${VOL_PATH}/authelia/secrets/STORAGE_ENCRYPTION_KEY
   OIDC_HMAC_SECRET:
     file: ${VOL_PATH}/authelia/secrets/OIDC_HMAC_SECRET
+  SESSION_SECRET:
+    file: ${VOL_PATH}/authelia/secrets/SESSION_SECRET
   SMTP_PASSWORD:
     file: ${VOL_PATH}/smtp/secrets/SMTP_PASSWORD
+  STORAGE_ENCRYPTION_KEY:
+    file: ${VOL_PATH}/authelia/secrets/STORAGE_ENCRYPTION_KEY
 
 services:
-  traefik:
-    image: traefik:${TRAEFIK_VERSION:-latest}
-    container_name: traefik
-    restart: unless-stopped
-    ports:
-      - 443:443
-    networks:
-      - proxy
-    depends_on:
-      authelia:
-        condition: service_started
-    environment:
-      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
-      TZ: ${TZ:-Europe/London}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${VOL_PATH}/traefik/certificates:/letsencrypt:rw
-      - ${VOL_PATH}/traefik/config:/etc/traefik:ro
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.traefik-rtr.entrypoints=websecure
-      - traefik.http.routers.traefik-rtr.rule=Host(`traefik.${DOMAIN:-docker.localhost}`)
-      - traefik.http.routers.traefik-rtr.service=api@internal
-      - traefik.http.routers.traefik-rtr.middlewares=authelia@docker
-
   adguard:
     image: adguard/adguardhome:${ADGUARD_VERSION:-latest}
     container_name: adguard
     restart: unless-stopped
+    user: 1100:1100
     ports:
       - 53:53/udp
-      # - 80:80
       # - 3000:3000/tcp     # Admin panel port for initial installation
     networks:
       - proxy
     environment:
-      TZ: ${TZ:-Europe/London}
+      - TZ=${TZ:-Europe/London}
     volumes:
-      - ${VOL_PATH}/adguard/data:/opt/adguardhome/work
-      - ${VOL_PATH}/adguard/config:/opt/adguardhome/conf
+      - ${VOL_PATH}/adguard/data:/opt/adguardhome/work:rw
+      - ${VOL_PATH}/adguard/config:/opt/adguardhome/conf:rw
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard-rtr.entrypoints=websecure
       - traefik.http.routers.adguard-rtr.rule=Host(`adguard.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.adguard-rtr.service=adguard-svc
-      # - traefik.http.routers.adguard-rtr.middlewares=authelia@docker
       - traefik.http.services.adguard-svc.loadbalancer.server.port=80
 
   authelia:
     image: authelia/authelia:${AUTHELIA_VERSION:-latest}
     container_name: authelia
     restart: unless-stopped
+    user: 1100:1100
     expose:
       - 9091
     networks:
       - proxy
     secrets: [JWT_SECRET, SESSION_SECRET, STORAGE_ENCRYPTION_KEY, OIDC_HMAC_SECRET, SMTP_PASSWORD]
     environment:
-      TZ: ${TZ:-Europe/London}
-      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: /run/secrets/JWT_SECRET
-      AUTHELIA_SESSION_SECRET_FILE: /run/secrets/SESSION_SECRET
-      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: /run/secrets/STORAGE_ENCRYPTION_KEY
-      AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE: /run/secrets/OIDC_HMAC_SECRET
-      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE: /run/secrets/SMTP_PASSWORD
+      - TZ=${TZ:-Europe/London}
+      - AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE=/run/secrets/JWT_SECRET
+      - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/SESSION_SECRET
+      - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE=/run/secrets/STORAGE_ENCRYPTION_KEY
+      - AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE=/run/secrets/OIDC_HMAC_SECRET
+      - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/run/secrets/SMTP_PASSWORD
     volumes:
       - ${VOL_PATH}/authelia/config:/config:rw
       - ${VOL_PATH}/authelia/data:/data:rw
@@ -86,10 +61,30 @@ services:
       - traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true
       - traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Email,Remote-Name
 
+  portainer:
+    image: portainer/portainer-ce:${PORTAINER_VERSION:-latest}
+    container_name: portainer
+    restart: unless-stopped
+    # user: 1100:1100
+    networks:
+      - proxy
+    environment:
+      - TZ=${TZ:-Europe/London}
+    volumes:
+      - ${VOL_PATH}/portainer/data:/data:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer-rtr.entrypoints=websecure
+      - traefik.http.routers.portainer-rtr.rule=Host(`portainer.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.portainer-rtr.service=portainer-svc
+      - traefik.http.services.portainer-svc.loadbalancer.server.port=9000
+
   status:
     image: nginx:${NGINX_VERSION:-latest}
     container_name: status
     restart: unless-stopped
+    user: 1100:1100
     networks:
       - proxy
     volumes:
@@ -101,6 +96,32 @@ services:
       - traefik.http.routers.status-rtr.rule=Host(`status.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.status-rtr.service=status-svc
       - traefik.http.services.status-svc.loadbalancer.server.port=80
+
+  traefik:
+    image: traefik:${TRAEFIK_VERSION:-latest}
+    container_name: traefik
+    restart: unless-stopped
+    # user: 1100:1100
+    ports:
+      - 443:443
+    networks:
+      - proxy
+    depends_on:
+      authelia:
+        condition: service_started
+    environment:
+      - TZ=${TZ:-Europe/London}
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${VOL_PATH}/traefik/certificates:/letsencrypt:rw
+      - ${VOL_PATH}/traefik/config:/etc/traefik:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik-rtr.entrypoints=websecure
+      - traefik.http.routers.traefik-rtr.rule=Host(`traefik.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.traefik-rtr.service=api@internal
+      - traefik.http.routers.traefik-rtr.middlewares=authelia@docker
 
 networks:
   proxy:

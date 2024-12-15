@@ -1,6 +1,7 @@
 ---
 - name: Config traefik service
   hosts: traefik
+  become: true
   vars:
     domain: "{{ lookup('env', 'DOMAIN') }}"
     acme_cert_email: "{{ lookup('env', 'ACME_CERT_EMAIL') }}"
@@ -12,31 +13,33 @@
         path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0700'
+        owner: homelab
+        group: homelab
       loop:
         - traefik
         - traefik/certificates
         - traefik/config
         - traefik/config/dynamic
-      become: true
-      become_user: root
 
     - name: Copy files
       ansible.builtin.template:
         src: "../services/traefik/config/{{ item }}"
         dest: "{{ path }}/traefik/config/{{ item }}"
         mode: '0644'
+        owner: homelab
+        group: homelab
       loop:
         - traefik.yml
         - dynamic/secure-headers.yml
         - dynamic/tls.yml
-      become: true
-      become_user: root
 
     - name: Copy files
       ansible.builtin.template:
         src: "../services/traefik/config/dynamic/{{ item }}"
         dest: "{{ path }}/traefik/config/dynamic/{{ item }}"
         mode: '0644'
+        owner: homelab
+        group: homelab
       loop:
         - oberon.yml
       become: true

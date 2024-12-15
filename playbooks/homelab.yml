@@ -1,0 +1,46 @@
+---
+- name: Configure homelab user and set permissions for /mnt/user/appdata/homelab
+  hosts: homelab
+  become: true
+
+  tasks:
+    - name: Create the 'homelab' user
+      ansible.builtin.user:
+        name: homelab
+        uid: 1100
+        home: /nonexistent
+        create_home: false
+        shell: /sbin/nologin  # Assign a valid shell
+        state: present
+
+    - name: Ensure the 'docker' group exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Add the 'homelab' user to the 'docker' group
+      ansible.builtin.user:
+        name: homelab
+        groups: docker
+        append: true
+
+    - name: Set permissions for intermediate directories to 755
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: '0755'
+        state: directory
+        owner: root
+        group: root
+      with_items:
+        - /mnt
+        - /mnt/user
+        - /mnt/user/appdata
+
+    - name: Set ownership of /mnt/user/appdata/homelab to 'homelab'
+      ansible.builtin.file:
+        path: /mnt/user/appdata/homelab
+        mode: '0700'
+        owner: homelab
+        group: homelab
+        recurse: true
+        state: directory

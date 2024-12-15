@@ -1,11 +1,11 @@
 ---
-- name: Config adguard service
-  hosts: adguard
+- name: Config portainer service
+  hosts: portainer
   become: true
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
   tasks:
-    - name: Make directories
+    - name: Make portainer directories
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
@@ -13,6 +13,5 @@
         owner: homelab
         group: homelab
       loop:
-        - adguard
-        - adguard/config
-        - adguard/data
+        - portainer
+        - portainer/data
