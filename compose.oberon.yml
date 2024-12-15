@@ -29,10 +29,10 @@ services:
     networks:
       - proxy
     environment:
-      JELLYFIN_PublishedServerUrl: https://media.${DOMAIN:-docker.localhost}
-      NVIDIA_VISIBLE_DEVICES: all
-      NVIDIA_DRIVER_CAPABILITIES: all
-      TZ: ${TZ:-Europe/London}
+      - JELLYFIN_PublishedServerUrl=https://media.${DOMAIN:-docker.localhost}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - TZ=${TZ:-Europe/London}
     volumes:
       - ${VOL_PATH}/jellyfin/config:/config:rw
       - ${VOL_PATH}/jellyfin/cache:/cache:rw
@@ -42,12 +42,21 @@ services:
       - /dev/nvidia0:/dev/nvidia0
       - /dev/nvidiactl:/dev/nvidiactl
       - /dev/nvidia-uvm:/dev/nvidia-uvm
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin-rtr.entrypoints=websecure
       - traefik.http.routers.jellyfin-rtr.rule=Host(`media.${DOMAIN:-docker.localhost}`)
       - traefik.http.routers.jellyfin-rtr.service=jellyfin-svc
       - traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   qbittorrent:
     image: linuxserver/qbittorrent:${QBITTORRENT_VERSION:-latest}
