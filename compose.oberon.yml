@@ -9,8 +9,8 @@ services:
     networks:
       - proxy
     environment:
-      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
-      TZ: ${TZ:-Europe/London}
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+      - TZ=${TZ:-Europe/London}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${VOL_PATH}/traefik/certificates:/letsencrypt:rw
@@ -65,11 +65,11 @@ services:
       - 6881:6881
       - 6881:6881/udp
     environment:
-      PUID: ${MEDIAUID:-1000}
-      PGID: ${MEDIAGID:-1000}
-      TZ: ${TZ}
-      WEBUI_PORT: 8080
-      TORRENTING_PORT: 6881
+      - PUID=${MEDIAUID:-1000}
+      - PGID=${MEDIAGID:-1000}
+      - TZ=${TZ}
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
     volumes:
       - ${VOL_PATH}/qbittorrent/config:/config:rw
       - ${DOWNLOAD_PATH}/qbittorrent:/downloads:rw
