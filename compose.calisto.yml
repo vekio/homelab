@@ -87,6 +87,8 @@ services:
     user: 1100:1100
     networks:
       - proxy
+    environment:
+      - TZ=${TZ:-Europe/London}
     volumes:
       - ${VOL_PATH}/status/html:/usr/share/nginx/html:rw
       - ${VOL_PATH}/status/config:/etc/nginx/conf.d:rw
