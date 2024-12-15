@@ -1,6 +1,6 @@
 ---
 - name: Config authelia service
-  hosts: authelia
+  hosts: calisto
   become: true
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
@@ -13,7 +13,7 @@
     jellyfin_client_secret: "{{ lookup('env', 'JELLYFIN_CLIENT_SECRET') }}"
     # oidc_jwks_key: "{{ lookup('env', 'AUTHELIA_OIDC_JWKS_KEY') | b64decode }}"
   tasks:
-    - name: Make directories
+    - name: Create authelia config directories
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
@@ -25,7 +25,7 @@
         - authelia/config
         - authelia/data
 
-    - name: Copy files
+    - name: Copy authelia config files
       ansible.builtin.template:
         src: "../services/authelia/{{ item }}"
         dest: "{{ path }}/authelia/config/{{ item }}"

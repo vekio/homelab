@@ -1,11 +1,11 @@
 ---
 - name: Config qbittorrent service
-  hosts: qbittorrent
+  hosts: oberon
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
     download_path: "{{ lookup('env', 'DOWNLOAD_PATH') }}"
   tasks:
-    - name: Make config directory
+    - name: Create qbittorrent config directories
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
@@ -16,7 +16,7 @@
         - qbittorrent
         - qbittorrent/config
 
-    - name: Make download directories
+    - name: Create directories for qbittorrent downloads
       ansible.builtin.file:
         path: "{{ download_path }}/{{ item }}"
         state: directory

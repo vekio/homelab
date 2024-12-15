@@ -1,11 +1,11 @@
 ---
 - name: Config adguard service
-  hosts: adguard
+  hosts: calisto
   become: true
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
   tasks:
-    - name: Make directories
+    - name: Create adguard config directories
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory

@@ -1,12 +1,12 @@
 ---
 - name: Config status service
-  hosts: status
+  hosts: calisto
   become: true
   vars:
     domain: "{{ lookup('env', 'DOMAIN') }}"
     path: "{{ lookup('env', 'VOL_PATH') }}"
   tasks:
-    - name: Make directories
+    - name: Create status config directories
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
@@ -17,7 +17,7 @@
         - status
         - status/config
 
-    - name: Make html directory
+    - name: Create status html directory
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
@@ -27,7 +27,7 @@
       loop:
         - status/html
 
-    - name: Copy html files
+    - name: Copy status html files
       ansible.builtin.copy:
         src: "../services/status/html/{{ item }}"
         dest: "{{ path }}/status/html/{{ item }}"
@@ -39,7 +39,7 @@
         - 404.html
         - unregistered.html
 
-    - name: Copy config files
+    - name: Copy status config files
       ansible.builtin.template:
         src: "../services/status/config/{{ item }}"
         dest: "{{ path }}/status/config/{{ item }}"

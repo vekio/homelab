@@ -7,7 +7,7 @@
   hosts: calisto
   become: true
   vars:
-    target_user: pi  # Define the user to add to the docker group
+    target_user: vekio  # Define the user to add to the docker group
 
   tasks:
     # Update and upgrade all packages to the latest version

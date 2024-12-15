@@ -6,7 +6,7 @@
     path: "{{ lookup('env', 'VOL_PATH') }}"
     media_path: "{{ lookup('env', 'MEDIA_PATH') }}"
   tasks:
-    - name: Make directories
+    - name: Create jellyfin config directories
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
@@ -18,7 +18,7 @@
         - jellyfin/cache
         - jellyfin/config
 
-    - name: Make media directories
+    - name: Create media directories for movies and tvshows
       ansible.builtin.file:
         path: "{{ media_path }}/{{ item }}"
         state: directory
