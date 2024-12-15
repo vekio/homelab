@@ -17,7 +17,7 @@ function dotenv () {
 # Main
 # -----------------------------------------------------------------------------
 function main () {
-    local inventory_file="pro.ini"
+    local inventory_file="inventory.ini"
     info "loading .env" && dotenv
 
     # Configs

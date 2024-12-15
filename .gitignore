@@ -15,8 +15,7 @@ users_database.yml
 .envold
 
 # Ansible
-pro.ini
-dev.ini
+inventory.ini
 
 # Terraform
 **/.terraform/*

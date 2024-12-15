@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based Go 1.22 development environment";
+  description = "homelab development environment";
 
   inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
 
@@ -27,7 +27,6 @@
         default = pkgs.mkShell {
           name = "homelab";
           packages = with pkgs; [ ansible ansible-lint terraform ];
-          HOMELAB_ENV = "develop";
         };
       });
     };
