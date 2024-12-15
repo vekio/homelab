@@ -20,18 +20,20 @@
         - traefik/certificates
         - traefik/config
         - traefik/config/dynamic
+      when: inventory_hostname == 'calisto'
 
     - name: Copy files
       ansible.builtin.template:
         src: "../services/traefik/config/{{ item }}"
         dest: "{{ path }}/traefik/config/{{ item }}"
-        mode: '0644'
+        mode: '0600'
         owner: homelab
         group: homelab
       loop:
         - traefik.yml
         - dynamic/secure-headers.yml
         - dynamic/tls.yml
+      when: inventory_hostname == 'calisto'
 
     - name: Copy files
       ansible.builtin.template:
@@ -42,6 +44,31 @@
         group: homelab
       loop:
         - oberon.yml
-      become: true
-      become_user: root
       when: inventory_hostname == 'calisto'
+
+    - name: Make directories
+      ansible.builtin.file:
+        path: "{{ path }}/{{ item }}"
+        state: directory
+        mode: '0700'
+        owner: homelab
+        group: users
+      loop:
+        - traefik
+        - traefik/certificates
+        - traefik/config
+        - traefik/config/dynamic
+      when: inventory_hostname == 'oberon'
+
+    - name: Copy files
+      ansible.builtin.template:
+        src: "../services/traefik/config/{{ item }}"
+        dest: "{{ path }}/traefik/config/{{ item }}"
+        mode: '0600'
+        owner: homelab
+        group: users
+      loop:
+        - traefik.yml
+        - dynamic/secure-headers.yml
+        - dynamic/tls.yml
+      when: inventory_hostname == 'oberon'

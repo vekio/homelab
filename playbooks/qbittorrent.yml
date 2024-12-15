@@ -10,7 +10,7 @@
         path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0700'
-        owner: alberto
+        owner: homelab
         group: users
       loop:
         - qbittorrent
@@ -21,8 +21,12 @@
         path: "{{ download_path }}/{{ item }}"
         state: directory
         mode: '0770'
-        owner: media
+        owner: homelab
         group: users
+        recurse: true
       loop:
         - qbittorrent
         - qbittorrent/watch
+        - qbittorrent/complete
+        - qbittorrent/incomplete
+        - qbittorrent/torrents

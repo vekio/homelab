@@ -1,17 +1,31 @@
 ---
 - name: Config jellyfin service
-  hosts: jellyfin
+  hosts: oberon
+  become: true
   vars:
     path: "{{ lookup('env', 'VOL_PATH') }}"
+    media_path: "{{ lookup('env', 'MEDIA_PATH') }}"
   tasks:
     - name: Make directories
       ansible.builtin.file:
         path: "{{ path }}/{{ item }}"
         state: directory
         mode: '0700'
+        owner: homelab
+        group: users
       loop:
         - jellyfin
         - jellyfin/cache
         - jellyfin/config
-      become: true
-      become_user: root
+
+    - name: Make media directories
+      ansible.builtin.file:
+        path: "{{ media_path }}/{{ item }}"
+        state: directory
+        mode: '0770'
+        owner: homelab
+        group: users
+        recurse: true
+      loop:
+        - movies
+        - tvshows
