@@ -1,0 +1,29 @@
+---
+- name: Config immich service
+  hosts: oberon
+  become: true
+  vars:
+    path: "{{ lookup('env', 'VOL_PATH') }}"
+    gallery: "{{ lookup('env', 'GALLERY_PATH') }}"
+  tasks:
+    - name: Create immich config directories
+      ansible.builtin.file:
+        path: "{{ path }}/{{ item }}"
+        state: directory
+        mode: '0700'
+        owner: homelab
+        group: users
+      loop:
+        - immich/data
+        - immich/config
+
+    - name: Create immich gallery directory
+      ansible.builtin.file:
+        path: "{{ gallery }}/{{ item }}"
+        state: directory
+        mode: '0770'
+        owner: homelab
+        group: users
+      loop:
+        - immich
+        - upload

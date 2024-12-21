@@ -3,7 +3,7 @@ http:
     oberon:
       entryPoints:
         - websecure
-      rule: "Host(`whoami.{{ domain }}`) || Host(`media.{{ domain }}`)"
+      rule: "Host(`whoami.{{ domain }}`) || Host(`media.{{ domain }}`) || Host(`photos.{{ domain }}`)"
       service: oberon-service
 
     oberon-auth:

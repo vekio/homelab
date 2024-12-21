@@ -58,6 +58,79 @@ services:
               count: all
               capabilities: [gpu]
 
+  immich:
+    image: ghcr.io/imagegenius/immich:${IMMICH_VERSION:-latest}
+    container_name: immich
+    restart: unless-stopped
+    networks:
+      - proxy
+      - immich
+    depends_on:
+      immich-redis:
+        condition: service_healthy
+      immich-database:
+        condition: service_healthy
+    environment:
+      - PUID=${HOMELABUID:-1000}
+      - PGID=${USERSGID:-1000}
+      - TZ=${TZ}
+      - DB_HOSTNAME=${IMMICH_DB_HOST:-immich-database}
+      - DB_USERNAME=${IMMICH_DB_USER:-immich}
+      - DB_PASSWORD=${IMMICH_DB_PASS:-insecurePass}
+      - DB_DATABASE_NAME=${IMMICH_DB_NAME:-immichdb}
+      - REDIS_HOSTNAME=${IMMICH_REDIS_HOST:-immich-redis}
+    volumes:
+      - ${VOL_PATH}/immich/config:/config
+      - ${GALLERY_PATH}/immich:/photos
+      - ${GALLERY_PATH}/upload:/libraries
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.immich-rtr.rule=Host(`photos.${DOMAIN:-docker.localhost}`)
+      - traefik.http.routers.immich-rtr.entrypoints=websecure
+      - traefik.http.routers.immich-rtr.service=immich-svc
+      - traefik.http.services.immich-svc.loadbalancer.server.port=8080
+
+  immich-redis:
+    image: redis:6.2-alpine
+    container_name: immich_redis
+    restart: unless-stopped
+    networks:
+      - immich
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  immich-database:
+    image: tensorchord/pgvecto-rs:pg14-v0.2.0
+    container_name: immich_database
+    restart: unless-stopped
+    user: 1003:100
+    networks:
+      - immich
+    environment:
+      - POSTGRES_PASSWORD=${IMMICH_DB_PASS:-insecurePass}
+      - POSTGRES_USER=${IMMICH_DB_USER:-immich}
+      - POSTGRES_DB=${IMMICH_DB_NAME:-immichdb}
+      - POSTGRES_INITDB_ARGS='--data-checksums'
+    volumes:
+      - ${VOL_PATH}/immich/data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: pg_isready -U ${IMMICH_DB_USER:-immich} -d ${IMMICH_DB_NAME:-immichdb}
+      interval: 10s
+      timeout: 2s
+      retries: 10
+    command: >-
+      postgres
+      -c shared_preload_libraries=vectors.so
+      -c 'search_path="$$user", public, vectors'
+      -c logging_collector=on
+      -c max_wal_size=2GB
+      -c shared_buffers=512MB
+      -c wal_compression=on
+
   qbittorrent:
     image: linuxserver/qbittorrent:${QBITTORRENT_VERSION:-latest}
     container_name: qbittorrent
@@ -65,8 +138,8 @@ services:
       - 6881:6881
       - 6881:6881/udp
     environment:
-      - PUID=${MEDIAUID:-1000}
-      - PGID=${MEDIAGID:-1000}
+      - PUID=${HOMELABUID:-1000}
+      - PGID=${USERSGID:-1000}
       - TZ=${TZ}
       - WEBUI_PORT=8080
       - TORRENTING_PORT=6881
@@ -84,7 +157,12 @@ services:
       - traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080
     restart: unless-stopped
 
+volumes:
+  immich-cache:
+
 networks:
+  immich:
+    name: immich
   proxy:
     name: proxy
     driver: bridge

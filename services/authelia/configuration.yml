@@ -112,3 +112,17 @@ identity_providers:
           - https://media.{{ domain }}/sso/OID/redirect/authelia
           - https://media.{{ domain }}/sso/OID/r/authelia
         consent_mode: explicit
+      - client_id: "{{ immich_client_id }}"
+        client_name: Immich
+        client_secret: "{{ immich_client_secret }}"
+        authorization_policy: one_factor
+        scopes:
+          - openid
+          - groups
+          - email
+          - profile
+        redirect_uris:
+          - https://photos.{{ domain }}/auth/login
+          - https://photos.{{ domain }}/user-settings
+          - app.immich:///oauth-callback
+        consent_mode: implicit
