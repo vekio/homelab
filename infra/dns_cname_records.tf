@@ -47,3 +47,8 @@ resource "adguard_rewrite" "photos_record" {
   domain = "photos.${var.domain}"
   answer = "proxy.home.local"
 }
+
+resource "adguard_rewrite" "freqtrade_record" {
+  domain = "freqtrade.${var.domain}"
+  answer = "proxy.home.local"
+}

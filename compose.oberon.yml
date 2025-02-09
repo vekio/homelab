@@ -157,12 +157,36 @@ services:
       - traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080
     restart: unless-stopped
 
+  supertrend_ema:
+    image: freqtradeorg/freqtrade:stable
+    container_name: supertrend_ema
+    restart: unless-stopped
+    networks:
+      - proxy
+      - freqtrade
+    volumes:
+      - ${VOL_PATH}/freqtrade/supertrend_ema:/freqtrade/user_data:rw
+    command: >
+      trade
+      --logfile /freqtrade/user_data/logs/freqtrade.log
+      --db-url sqlite:////freqtrade/user_data/trades/tradesv3.sqlite
+      --config /freqtrade/user_data/config_supertrend_ema.json
+      --strategy SuperTrend_EMA
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.freqtrade-rtr.entrypoints=websecure
+      - traefik.http.routers.freqtrade-rtr.rule=Host(`freqtrade.${DOMAIN}`)
+      - traefik.http.routers.freqtrade-rtr.service=freqtrade-svc
+      - traefik.http.services.freqtrade-svc.loadbalancer.server.port=8080
+
 volumes:
   immich-cache:
 
 networks:
   immich:
     name: immich
+  freqtrade:
+    name: freqtrade
   proxy:
     name: proxy
     driver: bridge
