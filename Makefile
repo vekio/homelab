@@ -1,5 +1,9 @@
 TERRAFORM_DIR = infra
 
+sync:
+	@bash scripts/sync_compose.sh
+
+
 init:
 	@cd $(TERRAFORM_DIR) && terraform init
 
