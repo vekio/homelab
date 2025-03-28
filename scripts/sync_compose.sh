@@ -21,7 +21,7 @@ main() {
     # Run the Ansible playbook with the loaded environment
     log_info "Running Ansible playbook to sync compose.yml files..."
 
-    ansible-playbook ansible/playbooks/sync_all_compose_files.yml -i ansible/inventories/production.yml
+    ansible-playbook ansible/playbooks/sync_all_compose_files.yml
 
     log_success "Compose files successfully synchronized."
 }
