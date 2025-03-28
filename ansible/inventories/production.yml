@@ -1,0 +1,16 @@
+all:
+  hosts:
+    oberon:
+      ansible_connection: ssh
+      ansible_host: oberon
+    calisto:
+      ansible_connection: ssh
+      ansible_host: calisto
+    localhost:
+      ansible_connection: local
+
+  children:
+    homelab:
+      hosts:
+        oberon:
+        calisto:

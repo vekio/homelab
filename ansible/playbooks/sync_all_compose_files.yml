@@ -1,0 +1,45 @@
+---
+- name: Sincronizar todos los docker-compose.yml al servidor
+  hosts: oberon
+  become: true
+  vars:
+    homelab_share: "{{ lookup('env', 'HOMELAB_SHARE') }}"
+    services_dir: "{{ homelab_share }}/docker/services/"
+    compose_services:
+      # Add services
+      - qbittorrent
+
+  tasks:
+    - name: Crear carpeta destino por servicio si no existe
+      ansible.builtin.file:
+        path: "{{ services_dir }}{{ item }}"
+        state: directory
+        mode: '0755'
+        owner: homelab
+        group: users
+      loop: "{{ compose_services }}"
+
+    - name: Copiar compose.yml de cada servicio
+      ansible.builtin.copy:
+        src: "../../docker/services/{{ item }}/compose.yml"
+        dest: "{{ services_dir }}{{ item }}/compose.yml"
+        mode: '0644'
+        owner: homelab
+        group: users
+      loop: "{{ compose_services }}"
+
+    # - name: Copiar compose.yml principal
+    #   ansible.builtin.copy:
+    #     src: "docker/compose.yml"
+    #     dest: "{{ services_dir }}/compose.yml"
+    #     mode: '0644'
+    #     owner: homelab
+    #     group: users
+
+    # - name: Copiar archivo .env
+    #   ansible.builtin.copy:
+    #     src: "docker/.env"
+    #     dest: "{{ services_dir }}/.env"
+    #     mode: '0644'
+    #     owner: homelab
+    #     group: users
