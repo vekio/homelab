@@ -36,10 +36,10 @@
     #     owner: homelab
     #     group: users
 
-    # - name: Copiar archivo .env
-    #   ansible.builtin.copy:
-    #     src: "docker/.env"
-    #     dest: "{{ services_dir }}/.env"
-    #     mode: '0644'
-    #     owner: homelab
-    #     group: users
+    - name: Copiar archivo .env
+      ansible.builtin.copy:
+        src: "../../.env"
+        dest: "{{ services_dir }}/.env"
+        mode: '0644'
+        owner: homelab
+        group: users
