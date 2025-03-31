@@ -2,6 +2,8 @@ TERRAFORM_DIR = infra
 
 sync:
 	@bash scripts/sync_compose.sh
+setup:
+	@bash scripts/setup_interactive.sh
 
 
 init:
