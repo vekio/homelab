@@ -1,5 +1,5 @@
 ---
-- name: Crear carpeta de configuración de qBittorrent
+- name: Create qBittorrent config directory
   ansible.builtin.file:
     path: "{{ qbittorrent_path }}/config"
     state: directory
@@ -7,7 +7,7 @@
     owner: homelab
     group: users
 
-- name: Crear carpetas de descargas de qBittorrent
+- name: Create qBittorrent download subdirectories
   ansible.builtin.file:
     path: "{{ qbittorrent_download_path }}/{{ item }}"
     state: directory
