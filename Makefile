@@ -4,6 +4,8 @@ sync:
 	@bash scripts/sync_compose.sh
 setup:
 	@bash scripts/setup_interactive.sh
+stack:
+	@bash scripts/manage_stack.sh
 
 
 init:

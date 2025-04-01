@@ -1,0 +1,7 @@
+---
+- name: Config {{ compose_stack }}
+  ansible.builtin.command: >
+    docker compose -f compose.yml config
+  args:
+    chdir: "{{ compose_root }}"
+  changed_when: false

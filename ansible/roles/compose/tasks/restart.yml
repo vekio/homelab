@@ -1,0 +1,7 @@
+---
+- name: Restart {{ compose_stack }}
+  ansible.builtin.command: >
+    docker compose -f compose.yml restart
+  args:
+    chdir: "{{ compose_root }}"
+  changed_when: false

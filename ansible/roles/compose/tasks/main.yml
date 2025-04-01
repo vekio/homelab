@@ -1,0 +1,10 @@
+---
+- name: Debug compose variables
+  ansible.builtin.debug:
+    msg:
+      - "compose_action: {{ compose_action }}"
+      - "compose_root: {{ compose_root }}"
+      - "compose_stack: {{ compose_stack }}"
+
+- name: Include task file
+  ansible.builtin.include_tasks: "{{ compose_action }}.yml"
