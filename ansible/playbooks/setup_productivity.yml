@@ -1,0 +1,28 @@
+---
+- name: Configure productivity stack
+  hosts: oberon
+  become: true
+
+  vars:
+    productivity_path: "{{ lookup('env', 'VOLUMES_PATH') }}/productivity"
+
+  tasks:
+    - name: Create productivity directory
+      ansible.builtin.file:
+        path: "{{ productivity_path }}"
+        state: directory
+        mode: '0775'
+        owner: homelab
+        group: users
+
+    - name: Create stack directory
+      ansible.builtin.file:
+        path: "{{ productivity_path }}/{{ item }}"
+        state: directory
+        mode: '0775'
+        owner: homelab
+        group: users
+      loop:
+        - nocodb
+        - postgres
+        - n8n

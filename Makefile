@@ -6,6 +6,8 @@ setup:
 	@bash scripts/setup_interactive.sh
 stack:
 	@bash scripts/manage_stack.sh
+postgres:
+	@bash scripts/init_postgres.sh
 
 
 init:
