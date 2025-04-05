@@ -7,11 +7,19 @@
     owner: homelab
     group: users
 
+- name: Create qBittorrent download directory
+  ansible.builtin.file:
+    path: "{{ qbittorrent_download_path }}"
+    state: directory
+    mode: '0755'
+    owner: homelab
+    group: users
+
 - name: Create qBittorrent download subdirectories
   ansible.builtin.file:
     path: "{{ qbittorrent_download_path }}/{{ item }}"
     state: directory
-    mode: '0770'
+    mode: '0755'
     owner: homelab
     group: users
     recurse: true
