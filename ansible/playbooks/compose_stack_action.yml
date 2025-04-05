@@ -1,0 +1,6 @@
+---
+- name: Manage Docker Compose Service
+  hosts: localhost
+  # become: true
+  roles:
+    - role: compose

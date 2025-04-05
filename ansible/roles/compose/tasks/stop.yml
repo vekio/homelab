@@ -1,0 +1,7 @@
+---
+- name: Stop {{ compose_stack }}
+  ansible.builtin.command: >
+    docker compose -f compose.yml stop
+  args:
+    chdir: "{{ compose_root }}"
+  changed_when: false

@@ -1,0 +1,6 @@
+---
+- name: Configure qBittorrent directories
+  hosts: oberon
+  become: true
+  roles:
+    - qbittorrent

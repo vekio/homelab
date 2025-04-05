@@ -1,0 +1,19 @@
+---
+- name: Pull the latest image for {{ compose_stack }}
+  ansible.builtin.command: >
+    docker compose -f compose.yml pull
+  args:
+    chdir: "{{ compose_root }}"
+  register: pull_result
+  changed_when: "'Downloaded newer image' in pull_result.stdout"
+
+- name: Recreate container with the new image
+  ansible.builtin.command: >
+    docker compose -f compose.yml up -d
+  args:
+    chdir: "{{ compose_root }}"
+  changed_when: false
+
+- name: Remove unused Docker images
+  ansible.builtin.command: docker image prune -f
+  changed_when: false
