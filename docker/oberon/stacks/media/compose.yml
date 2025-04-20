@@ -1,0 +1,42 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:${JELLYFIN_VERSION:-latest}
+    container_name: jellyfin
+    restart: unless-stopped
+    user: ${HOMELABUID}:${USERSGID}
+    # user: 1003:100
+    networks:
+      - proxy
+    environment:
+      - JELLYFIN_PublishedServerUrl=https://media.${DOMAIN}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - TZ=${TZ}
+    volumes:
+      - ${MEDIA_PATH}/jellyfin/config:/config:rw
+      - ${MEDIA_PATH}/jellyfin/cache:/cache:rw
+      - ${MEDIA_SHARE}:/media:rw
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin-rtr.entrypoints=websecure
+      - traefik.http.routers.jellyfin-rtr.rule=Host(`media.${DOMAIN}`)
+      - traefik.http.routers.jellyfin-rtr.service=jellyfin-svc
+      - traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+networks:
+  proxy:
+    external: true

@@ -5,6 +5,7 @@
 
   vars:
     media_share: "{{ lookup('env', 'MEDIA_SHARE') }}"
+    media_path: "{{ lookup('env', 'VOLUMES_PATH') }}/media"
 
   tasks:
     - name: Define media directories
@@ -29,3 +30,14 @@
         group: users
         mode: '0775'
       loop: "{{ media_dirs }}"
+
+    - name: Create media volume directories
+      ansible.builtin.file:
+        path: "{{ media_path }}/jellyfin/{{ item }}"
+        state: directory
+        owner: homelab
+        group: users
+        mode: '0775'
+      loop:
+        - config
+        - cache
