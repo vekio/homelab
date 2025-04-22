@@ -1,5 +1,5 @@
 services:
-  qbittorrent:
+  minecraft:
     image: itzg/minecraft-server:${MINECRAFT_VERSION:-latest}
     container_name: minecraft
     ports:
