@@ -14,9 +14,9 @@ services:
       - WEBUI_PORT=8080
       - TORRENTING_PORT=6881
     volumes:
-      - ${VOLUMES_PATH}/qbittorrent/config:/config:rw
-      - ${DOWNLOAD_SHARE}/qbittorrent:/downloads:rw
-      - ${DOWNLOAD_SHARE}/qbittorrent/watch:/watch:rw
+      - ${DOWNLOADS_PATH}/qbittorrent/config:/config:rw
+      - ${DOWNLOADS_SHARE}/Torrents:/downloads:rw
+      - ${DOWNLOADS_SHARE}/Torrents/Watch:/watch:rw
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent-rtr.entrypoints=websecure

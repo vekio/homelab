@@ -1,3 +1,0 @@
----
-qbittorrent_path: "{{ lookup('env', 'VOLUMES_PATH') }}/qbittorrent"
-qbittorrent_download_path: "{{ lookup('env', 'DOWNLOAD_SHARE') }}/qbittorrent"
