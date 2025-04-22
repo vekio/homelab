@@ -11,6 +11,7 @@ services:
       - EULA=true
       - TYPE=VANILLA
       - SERVER_NAME=Mantita
+      - MOTD=§6Servidor Mantita §f| §a¡Bienvenidos!
       - VERSION=1.21.5
       - MEMORY=4G
       - ENABLE_RCON=true
