@@ -2,7 +2,6 @@ services:
   jellyfin:
     image: jellyfin/jellyfin:${JELLYFIN_VERSION:-latest}
     container_name: jellyfin
-    restart: unless-stopped
     user: ${HOMELABUID}:${USERSGID}
     # user: 1003:100
     networks:
@@ -28,6 +27,7 @@ services:
       - traefik.http.routers.jellyfin-rtr.rule=Host(`media.${DOMAIN}`)
       - traefik.http.routers.jellyfin-rtr.service=jellyfin-svc
       - traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096
+    restart: unless-stopped
     runtime: nvidia
     deploy:
       resources:
