@@ -1,0 +1,18 @@
+---
+- name: Create games directories in Unraid
+  hosts: oberon
+  become: true
+
+  vars:
+    games_path: "{{ lookup('env', 'GAMES_PATH') }}"
+
+  tasks:
+    - name: Create games volume directories
+      ansible.builtin.file:
+        path: "{{ games_path }}/minecraft/{{ item }}"
+        state: directory
+        owner: homelab
+        group: users
+        mode: '0775'
+      loop:
+        - mantita
