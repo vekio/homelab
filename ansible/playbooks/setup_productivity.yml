@@ -1,0 +1,35 @@
+---
+- name: Configure productivity stack
+  hosts: oberon
+  become: true
+
+  vars:
+    productivity_path: "{{ lookup('env', 'VOLUMES_PATH') }}/productivity"
+
+  tasks:
+    - name: Create productivity directory
+      ansible.builtin.file:
+        path: "{{ productivity_path }}"
+        state: directory
+        mode: '0775'
+        owner: homelab
+        group: users
+
+    - name: Create stack directory
+      ansible.builtin.file:
+        path: "{{ productivity_path }}/{{ item }}"
+        state: directory
+        mode: '0775'
+        owner: homelab
+        group: users
+      loop:
+        - nocodb
+        - postgres
+
+    - name: Create n8n directory. Requisito del contenedor de n8n usar 1000:1000
+      ansible.builtin.file:
+        path: "{{ productivity_path }}/n8n"
+        state: directory
+        mode: '0775'
+        owner: 1000
+        group: 1000

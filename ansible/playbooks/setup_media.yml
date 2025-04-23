@@ -1,0 +1,43 @@
+---
+- name: Create media directories in Unraid
+  hosts: oberon
+  become: true
+
+  vars:
+    media_share: "{{ lookup('env', 'MEDIA_SHARE') }}"
+    media_path: "{{ lookup('env', 'VOLUMES_PATH') }}/media"
+
+  tasks:
+    - name: Define media directories
+      ansible.builtin.set_fact:
+        media_dirs:
+          - "{{ media_share }}/Movies"
+          - "{{ media_share }}/TVShows"
+          - "{{ media_share }}/Documentaries"
+          - "{{ media_share }}/Music"
+          - "{{ media_share }}/Anime"
+          - "{{ media_share }}/Kids"
+          - "{{ media_share }}/Wallpapers"
+          - "{{ media_share }}/Books"
+          - "{{ media_share }}/Other"
+
+    - name: Create media directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        recurse: true
+        owner: homelab
+        group: users
+        mode: '0775'
+      loop: "{{ media_dirs }}"
+
+    - name: Create media volume directories
+      ansible.builtin.file:
+        path: "{{ media_path }}/jellyfin/{{ item }}"
+        state: directory
+        owner: homelab
+        group: users
+        mode: '0775'
+      loop:
+        - config
+        - cache

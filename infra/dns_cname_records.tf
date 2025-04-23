@@ -52,3 +52,13 @@ resource "adguard_rewrite" "freqtrade_record" {
   domain = "freqtrade.${var.domain}"
   answer = "proxy.home.local"
 }
+
+resource "adguard_rewrite" "nocodb_record" {
+  domain = "nocodb.${var.domain}"
+  answer = "proxy.home.local"
+}
+
+resource "adguard_rewrite" "flow_record" {
+  domain = "flow.${var.domain}"
+  answer = "proxy.home.local"
+}

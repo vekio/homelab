@@ -1,0 +1,44 @@
+---
+- name: Configure productivity stack
+  hosts: localhost
+
+  vars:
+    postgres_container_name: productivity-db
+    dbs_to_create:
+      - name: nocodb
+        user: nocodb
+        password: "{{ lookup('env', 'NC_DB_PASS') }}"
+        superuser: true
+      - name: n8n
+        user: n8n
+        password: "{{ lookup('env', 'N8N_DB_PASS') }}"
+        superuser: true
+
+  tasks:
+    - name: Crear usuarios y bases de datos dentro del contenedor PostgreSQL
+      ansible.builtin.command: >
+        docker exec {{ postgres_container_name }}
+        psql -U postgres -c
+        "CREATE USER {{ item.user }} {{ 'SUPERUSER' if item.superuser else '' }} PASSWORD '{{ item.password }}';"
+      register: create_user_result
+      changed_when: false
+      failed_when: "'already exists' not in create_user_result.stderr and create_user_result.rc != 0"
+      loop: "{{ dbs_to_create }}"
+
+    - name: Crear base de datos PostgreSQL
+      ansible.builtin.command: >
+        docker exec {{ postgres_container_name }}
+        psql -U postgres -c
+        "CREATE DATABASE {{ item.name }};"
+      register: create_db_result
+      changed_when: false
+      failed_when: "'already exists' not in create_db_result.stderr and create_db_result.rc != 0"
+      loop: "{{ dbs_to_create }}"
+
+    - name: Otorgar privilegios a usuarios
+      ansible.builtin.command: >
+        docker exec {{ postgres_container_name }}
+        psql -U postgres -c
+        "GRANT ALL PRIVILEGES ON DATABASE {{ item.name }} TO {{ item.user }};"
+      changed_when: false
+      loop: "{{ dbs_to_create }}"

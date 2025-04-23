@@ -1,0 +1,38 @@
+---
+- name: Create downloads directories in Unraid
+  hosts: oberon
+  become: true
+
+  vars:
+    download_share: "{{ lookup('env', 'DOWNLOADS_SHARE') }}"
+    download_path: "{{ lookup('env', 'DOWNLOADS_PATH') }}"
+
+  tasks:
+    - name: Define downloads directories
+      ansible.builtin.set_fact:
+        downloads_dirs:
+          - "{{ download_share }}/Torrents"
+          - "{{ download_share }}/Torrents/Complete"
+          - "{{ download_share }}/Torrents/Incomplete"
+          - "{{ download_share }}/Torrents/TorrentFiles"
+          - "{{ download_share }}/Torrents/Watch"
+
+    - name: Create downloads directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        recurse: true
+        owner: homelab
+        group: users
+        mode: '0775'
+      loop: "{{ downloads_dirs }}"
+
+    - name: Create downloads volume directories
+      ansible.builtin.file:
+        path: "{{ download_path }}/qbittorrent/{{ item }}"
+        state: directory
+        owner: homelab
+        group: users
+        mode: '0775'
+      loop:
+        - config

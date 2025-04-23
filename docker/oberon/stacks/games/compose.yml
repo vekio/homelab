@@ -1,0 +1,27 @@
+services:
+  minecraft:
+    image: itzg/minecraft-server:${MINECRAFT_VERSION:-latest}
+    container_name: minecraft
+    ports:
+      - 25565:25565
+      - 25575:25575
+    environment:
+      - UID=${HOMELABUID}
+      - GID=${USERSGID}
+      - EULA=true
+      - TYPE=VANILLA
+      - SERVER_NAME=Mantita
+      - MOTD=§6Servidor Mantita §f| §a¡Bienvenidos!
+      - VIEW_DISTANCE=20
+      - DIFFICULTY=hard
+      - VERSION=1.21.5
+      - MEMORY=4G
+      - ENABLE_RCON=true
+      - RCON_PASSWORD=${MINECRAFT_ADMIN_PASS}
+      - RCON_PORT=25575
+      - ENABLE_WHITELIST=true
+      - WHITELIST=${MINECRAFT_WHITELIST}
+      - TZ=${TZ}
+    volumes:
+      - ${GAMES_PATH}/minecraft/mantita:/data
+    restart: unless-stopped
