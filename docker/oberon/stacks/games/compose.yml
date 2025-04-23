@@ -12,6 +12,8 @@ services:
       - TYPE=VANILLA
       - SERVER_NAME=Mantita
       - MOTD=§6Servidor Mantita §f| §a¡Bienvenidos!
+      - VIEW_DISTANCE=20
+      - DIFFICULTY=hard
       - VERSION=1.21.5
       - MEMORY=4G
       - ENABLE_RCON=true
