@@ -25,4 +25,11 @@
       loop:
         - nocodb
         - postgres
-        - n8n
+
+    - name: Create n8n directory. Requisito del contenedor de n8n usar 1000:1000
+      ansible.builtin.file:
+        path: "{{ productivity_path }}/n8n"
+        state: directory
+        mode: '0775'
+        owner: 1000
+        group: 1000
