@@ -9,7 +9,7 @@ services:
       - UID=${HOMELABUID}
       - GID=${USERSGID}
       - EULA=true
-      - TYPE=VANILLA
+      - TYPE=FABRIC
       - SERVER_NAME=Mantita
       - MOTD=§6Servidor Mantita §f| §a¡Bienvenidos!
       - VIEW_DISTANCE=20
