@@ -15,7 +15,7 @@ services:
       - VIEW_DISTANCE=20
       - DIFFICULTY=hard
       - VERSION=1.21.5
-      - MEMORY=4G
+      - MEMORY=8G
       - ENABLE_RCON=true
       - RCON_PASSWORD=${MINECRAFT_ADMIN_PASS}
       - RCON_PORT=25575
